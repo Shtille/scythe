@@ -28,7 +28,7 @@ namespace scythe {
 	//! Colored rectangle class
 	class RectColored : public Rect, public Drawable {
 	public:
-		RectColored(sht::graphics::Renderer * renderer, sht::graphics::Shader * shader, const vec4& color,
+		RectColored(Renderer * renderer, Shader * shader, const vec4& color,
 			 F32 x, F32 y, F32 width, F32 height, U32 flags);
 		
 		virtual void Render() override;
@@ -45,8 +45,8 @@ namespace scythe {
 	//! Textured rectangle class
 	class RectTextured : public Rect, public Drawable {
 	public:
-		RectTextured(sht::graphics::Renderer * renderer, sht::graphics::Shader * shader,
-			sht::graphics::Texture * texture, F32 x, F32 y, F32 width, F32 height, U32 flags);
+		RectTextured(Renderer * renderer, Shader * shader,
+			Texture * texture, F32 x, F32 y, F32 width, F32 height, U32 flags);
 		
 		virtual void Render() override;
 		

@@ -2,8 +2,8 @@
 
 namespace scythe {
 
-	ProgressBar::ProgressBar(sht::graphics::Renderer * renderer, sht::graphics::Shader * shader,
-			sht::graphics::Texture * texture, F32 progress_max,
+	ProgressBar::ProgressBar(Renderer * renderer, Shader * shader,
+			Texture * texture, F32 progress_max,
 			F32 x, F32 y, F32 width, F32 height, U32 flags)
 	: RectTextured(renderer, shader, texture, x, y, width, height, flags)
 	, progress_(0.0f)

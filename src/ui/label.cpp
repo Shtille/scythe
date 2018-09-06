@@ -2,8 +2,8 @@
 
 namespace scythe {
 
-	Label::Label(sht::graphics::Renderer * renderer, sht::graphics::Shader * shader,
-				 sht::graphics::Font * font, const vec4& color, F32 text_height, U32 buffer_size,
+	Label::Label(Renderer * renderer, Shader * shader,
+				 Font * font, const vec4& color, F32 text_height, U32 buffer_size,
 				 F32 x, F32 y, U32 flags)
 	: Widget(x, y, flags)
 	, shader_(shader)
@@ -13,7 +13,7 @@ namespace scythe {
 	, constant_position_(false)
 	{
 		BindConstUniforms();
-		text_ = sht::graphics::DynamicText::Create(renderer, buffer_size);
+		text_ = DynamicText::Create(renderer, buffer_size);
 		assert(text_);
 		SetText(L""); // just to be able to render the text
 	}

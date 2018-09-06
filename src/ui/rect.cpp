@@ -36,7 +36,7 @@ namespace scythe {
 		return (position.x < x) && (position.y < y) &&
 			(x < position.x + width_) && (y < position.y + height_);
 	}
-	RectColored::RectColored(sht::graphics::Renderer * renderer, sht::graphics::Shader * shader,
+	RectColored::RectColored(Renderer * renderer, Shader * shader,
 							 const vec4& color, F32 x, F32 y, F32 width, F32 height, U32 flags)
 	: Rect(x, y, width, height, flags)
 	, Drawable(renderer, shader, nullptr)
@@ -65,13 +65,13 @@ namespace scythe {
 	}
 	void RectColored::FillVertexAttribs()
 	{
-		sht::graphics::VertexAttribute attrib(sht::graphics::VertexAttribute::kVertex, 2);
+		VertexAttribute attrib(VertexAttribute::kVertex, 2);
 		attribs_.push_back(attrib);
 	}
 	void RectColored::FillVertices()
 	{
 		num_vertices_ = 4;
-		vertices_array_ = new u8[num_vertices_ * sizeof(vec2)]; // 4 * 2 * s(float)
+		vertices_array_ = new U8[num_vertices_ * sizeof(vec2)]; // 4 * 2 * s(float)
 		vec2 * vertices = reinterpret_cast<vec2*>(vertices_array_);
 		
 		// Lower left
@@ -90,8 +90,8 @@ namespace scythe {
 		vertices[3].x = width_;
 		vertices[3].y = height_;
 	}
-	RectTextured::RectTextured(sht::graphics::Renderer * renderer, sht::graphics::Shader * shader,
-			sht::graphics::Texture * texture, F32 x, F32 y, F32 width, F32 height, U32 flags)
+	RectTextured::RectTextured(Renderer * renderer, Shader * shader,
+			Texture * texture, F32 x, F32 y, F32 width, F32 height, U32 flags)
 	: Rect(x, y, width, height, flags)
 	, Drawable(renderer, shader, texture)
 	{
@@ -118,13 +118,13 @@ namespace scythe {
 	}
 	void RectTextured::FillVertexAttribs()
 	{
-		sht::graphics::VertexAttribute attrib(sht::graphics::VertexAttribute::kVertex, 4);
+		VertexAttribute attrib(VertexAttribute::kVertex, 4);
 		attribs_.push_back(attrib);
 	}
 	void RectTextured::FillVertices()
 	{
 		num_vertices_ = 4;
-		vertices_array_ = new u8[num_vertices_ * sizeof(vec4)]; // x, y, tx, ty
+		vertices_array_ = new U8[num_vertices_ * sizeof(vec4)]; // x, y, tx, ty
 		vec4 * vertices = reinterpret_cast<vec4*>(vertices_array_);
 		
 		// Lower left

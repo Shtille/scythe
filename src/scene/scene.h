@@ -2,6 +2,7 @@
 #define __SCYTHE_SCENE_H__
 
 #include "resource.h"
+#include "string_id.h"
 #include "graphics/renderer.h"
 #include "input/keys.h"
 #include "input/mouse.h"

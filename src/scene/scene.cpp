@@ -1,5 +1,7 @@
 #include "scene.h"
 
+#include "resource_manager.h"
+
 namespace scythe {
 
 	Scene::Scene(Renderer * renderer)

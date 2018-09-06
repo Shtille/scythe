@@ -45,4 +45,4 @@ namespace scythe {
 		return impl_->GetTime();
 	}
 
-} // namespace sht
+} // namespace scythe

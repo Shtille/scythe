@@ -70,9 +70,9 @@ namespace scythe {
 
 	private:
 
-		static constexpr u32 kMaxArgs = 4;
+		static constexpr U32 kMaxArgs = 4;
 		StringID type_;
-		u32 num_args_;
+		U32 num_args_;
 		KeyValuePair args_[kMaxArgs];
 	};
 	

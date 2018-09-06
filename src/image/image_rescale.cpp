@@ -134,9 +134,9 @@ namespace {
 		reinterpret_cast<float*>(out)[2] = b;
 		reinterpret_cast<float*>(out)[3] = a;
 	}
-	void InterpolateSamples(const unsigned char* c1, const unsigned char* c2, float alpha, unsigned char* out, sht::graphics::Image::Format format)
+	void InterpolateSamples(const unsigned char* c1, const unsigned char* c2, float alpha, unsigned char* out, scythe::Image::Format format)
 	{
-		using namespace sht::graphics;
+		using namespace scythe;
 		switch (format)
 		{
 		case Image::Format::kI8:

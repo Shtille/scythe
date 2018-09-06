@@ -47,7 +47,7 @@ namespace scythe {
 			kQuad,
 			kCircle
 		};
-		SliderColored(sht::graphics::Renderer * renderer, sht::graphics::Shader * shader,
+		SliderColored(Renderer * renderer, Shader * shader,
 			const vec4& bar_color, const vec4& pin_color_normal, const vec4& pin_color_touch,
 			F32 x, F32 y, F32 width, F32 height, F32 bar_radius, U32 flags,
 			Form bar_form = kQuad, Form pin_form = kQuad);
@@ -77,17 +77,17 @@ namespace scythe {
 			kQuad,
 			kCircle
 		};
-		SliderTextured(sht::graphics::Renderer * renderer,
-			sht::graphics::Shader * color_shader, sht::graphics::Shader * texture_shader,
-			sht::graphics::Texture * texture_normal, sht::graphics::Texture * texture_touch,
+		SliderTextured(Renderer * renderer,
+			Shader * color_shader, Shader * texture_shader,
+			Texture * texture_normal, Texture * texture_touch,
 			const vec4& bar_color, F32 x, F32 y, F32 width, F32 height, F32 bar_radius, U32 flags,
 			Form bar_form = kQuad);
 
 		virtual void Render() override;
 
 	protected:
-		sht::graphics::Shader * texture_shader_;
-		sht::graphics::Texture * texture_touch_;
+		Shader * texture_shader_;
+		Texture * texture_touch_;
 		vec4 bar_color_;
 		U32 num_bar_vertices_;
 		U32 num_pin_vertices_;

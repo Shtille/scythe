@@ -3,7 +3,7 @@
 #include "stream/file_stream.h"
 #include "stream/log_stream.h"
 
-#include "thirdparty/libpng/include/png.h"
+#include "png.h"
 
 #include <cstring>
 
@@ -11,34 +11,31 @@ namespace scythe {
 
 	bool Image::SavePng(const char *filename)
 	{
-		// Get access to error log
-		system::ErrorLogStream * error_log = system::ErrorLogStream::GetInstance();
-
-		sht::system::FileStream stream;
-		if (!stream.Open(filename, sht::system::StreamAccess::kWriteBinary))
+		FileStream stream;
+		if (!stream.Open(filename, StreamAccess::kWriteBinary))
 		{
-			error_log->PrintString("failed to open file '%s' for saving\n", filename);
+			LOG_ERROR("failed to open file '%s' for saving", filename);
 			return false;
 		}
 
 		png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 		if (!png)
 		{
-			error_log->PrintString("png_create_write_struct failed during saving '%s'\n", filename);
+			LOG_ERROR("png_create_write_struct failed during saving '%s'", filename);
 			return false;
 		}
 
 		png_infop info = png_create_info_struct(png);
 		if (!info)
 		{
-			error_log->PrintString("png_create_info_struct failed during saving '%s'\n", filename);
+			LOG_ERROR("png_create_info_struct failed during saving '%s'", filename);
 			png_destroy_write_struct(&png, NULL);
 			return false;
 		}
 
 		if (setjmp(png_jmpbuf(png)))
 		{
-			error_log->PrintString("set_jmp failed during saving '%s'\n", filename);
+			LOG_ERROR("set_jmp failed during saving '%s'", filename);
 			png_destroy_write_struct(&png, NULL);
 			return false;
 		}
@@ -65,8 +62,8 @@ namespace scythe {
 		int row_stride = width_ * bpp_;
 		if (inverted_row_order_)
 		{
-			for(int y = height_-1; y >= 0; --y)
-				row_pointers[y] = (png_bytep)(pixels_ + y*row_stride);
+			for(int y = 0; y < height_; ++y)
+				row_pointers[y] = (png_bytep)(pixels_ + (height_-1-y)*row_stride);
 		}
 		else // normal row order
 		{
@@ -87,34 +84,31 @@ namespace scythe {
 	}
 	bool Image::LoadPng(const char *filename)
 	{
-		// Get access to error log
-		system::ErrorLogStream * error_log = system::ErrorLogStream::GetInstance();
-
-		sht::system::FileStream stream;
-		if (!stream.Open(filename, sht::system::StreamAccess::kReadBinary))
+		FileStream stream;
+		if (!stream.Open(filename, StreamAccess::kReadBinary))
 		{
-			error_log->PrintString("failed to open file '%s' for loading\n", filename);
+			LOG_ERROR("failed to open file '%s' for loading", filename);
 			return false;
 		}
 
 		png_structp png = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 		if (!png)
 		{
-			error_log->PrintString("png_create_read_struct failed during loading '%s'\n", filename);
+			LOG_ERROR("png_create_read_struct failed during loading '%s'", filename);
 			return false;
 		}
 
 		png_infop info = png_create_info_struct(png);
 		if (!info)
 		{
-			error_log->PrintString("png_create_info_struct failed during loading '%s'\n", filename);
+			LOG_ERROR("png_create_info_struct failed during loading '%s'", filename);
 			png_destroy_read_struct(&png, NULL, NULL);
 			return false;
 		}
 
 		if (setjmp(png_jmpbuf(png)))
 		{
-			error_log->PrintString("setjmp failed during loading '%s'\n", filename);
+			LOG_ERROR("setjmp failed during loading '%s'", filename);
 			png_destroy_read_struct(&png, NULL, NULL);
 			return false;
 		}
@@ -162,7 +156,7 @@ namespace scythe {
 		format_ 	= Format::kRGBA8;
 
 		size_t image_size = png_get_rowbytes(png, info) * height_;
-		pixels_ = new u8[image_size];
+		pixels_ = new U8[image_size];
 		
 		png_bytepp row_pointers = new png_bytep[height_];
 		int row_stride = width_ * bpp_;
@@ -190,7 +184,7 @@ namespace scythe {
 		return true;
 	}
 	struct PngReadState {
-		const u8 * buffer;
+		const U8 * buffer;
 		size_t offset; // that we've read
 		size_t size;
 	};
@@ -205,29 +199,26 @@ namespace scythe {
 		else
 			png_error(png_ptr, "read error (ReadDataFromBuffer)");
 	}
-	bool Image::LoadFromBufferPng(const u8* buffer, size_t length)
+	bool Image::LoadFromBufferPng(const U8* buffer, size_t length)
 	{
-		// Get access to error log
-		system::ErrorLogStream * error_log = system::ErrorLogStream::GetInstance();
-
 		png_structp png = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 		if (!png)
 		{
-			error_log->PrintString("png_create_read_struct failed\n");
+			LOG_ERROR("png_create_read_struct failed");
 			return false;
 		}
 
 		png_infop info = png_create_info_struct(png);
 		if (!info)
 		{
-			error_log->PrintString("png_create_info_struct failed\n");
+			LOG_ERROR("png_create_info_struct failed");
 			png_destroy_read_struct(&png, NULL, NULL);
 			return false;
 		}
 
 		if (setjmp(png_jmpbuf(png)))
 		{
-			error_log->PrintString("setjmp failed\n");
+			LOG_ERROR("setjmp failed");
 			png_destroy_read_struct(&png, NULL, NULL);
 			return false;
 		}
@@ -279,7 +270,7 @@ namespace scythe {
 		format_ = Format::kRGBA8;
 
 		size_t image_size = png_get_rowbytes(png, info) * height_;
-		pixels_ = new u8[image_size];
+		pixels_ = new U8[image_size];
 
 		png_bytepp row_pointers = new png_bytep[height_];
 		int row_stride = width_ * bpp_;

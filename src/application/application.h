@@ -3,6 +3,8 @@
 
 #include "common/types.h"
 
+#include <string>
+
 namespace scythe {
 
 	// Predeclarations

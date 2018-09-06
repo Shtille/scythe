@@ -1,62 +1,46 @@
 # Makefile for scythe
 
-# Platform-specific defines
-STATIC_LIB_EXT = .a
-AR = ar rcs
-ifeq ($(OS),Windows_NT)
-	#CCFLAGS += -D WIN32
-	MAKE := mingw32-make.exe
-	LDFLAGS = -s -shared
-	CC = gcc
-	CCP = g++
-	PLATFORM_SUFFIX = mingw32
-	SHARED_LIB_EXT = .so
+TARGET = scythe
+STATIC_LIB = lib$(TARGET)$(STATIC_LIB_EXT)
+SHARED_LIB = lib$(TARGET)$(SHARED_LIB_EXT)
+
+ifeq ($(IS_STATIC),NO)
+TARGET_TYPE = dynamic
+TARGET_FILE = $(SHARED_LIB)
 else
-	MAKE := make
-	LDFLAGS = -shared -fPIC
-	UNAME_S := $(shell uname -s)
-	ifeq ($(UNAME_S),Linux)
-		#CCFLAGS += -D LINUX
-		CC = gcc
-		CCP = g++
-		PLATFORM_SUFFIX = unix
-		SHARED_LIB_EXT = .so
-	endif
-	ifeq ($(UNAME_S),Darwin)
-		#CCFLAGS += -D OSX
-		CC = clang
-		CCP = clang++
-		PLATFORM_SUFFIX = macosx
-		SHARED_LIB_EXT = .dylib
-		# OSX has its own CURL with command line tools
-		CURL_LIB := curl
-	endif
+TARGET_TYPE = static
+TARGET_FILE = $(STATIC_LIB)
 endif
 
-# Exports
-export STATIC_LIB_EXT
-export SHARED_LIB_EXT
-export CC
-export CCP
-export AR
-export LDFLAGS
+include sources.mk
 
-INSTALL_PATH = lib
+CFLAGS = -g -Wall -O3 -std=c++11
+CFLAGS += $(INCLUDE)
+CFLAGS += $(DEFINES)
 
-# Main routine
-SUBDIRS = thirdparty src
+SRC_FILES = $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.cpp))
 
-all: $(SUBDIRS)
+OBJECTS = $(SRC_FILES:.cpp=.o)
 
-create_dir:
-	@test -d $(INSTALL_PATH) || mkdir $(INSTALL_PATH)
+LIBRARIES =
 
-install: create_dir
-	@find $(INSTALL_PATH) -name "*$(STATIC_LIB_EXT)" -type f -delete
-	@find thirdparty -name "*$(STATIC_LIB_EXT)" -type f -exec mv {} $(INSTALL_PATH) \;
+all: $(SRC_FILES) $(TARGET)
+	@echo $(TARGET_FILE) is done!
 
-$(SUBDIRS):
-	@echo Get down to $@
-	@$(MAKE) -C $@
+$(TARGET): clean $(TARGET_TYPE)
 
-.PHONY: $(SUBDIRS)
+# TODO: Make clean platform dependent
+clean:
+	@find src -name "*.o" -type f -delete
+
+static: $(OBJECTS)
+	@echo making static library
+	@$(AR) $(STATIC_LIB) $(OBJECTS)
+	
+dynamic: $(OBJECTS)
+	@echo making shared library
+	@$(CCP) $(LDFLAGS) -o $(SHARED_LIB) $^ $(LIBRARIES)
+
+%.o : %.cpp
+	@echo compiling file $<
+	@$(CCP) $(CFLAGS) -c $< -o $@

@@ -271,7 +271,7 @@ namespace scythe {
 
 		return mat;
 	}
-	Matrix4 Translate(float x, float y, float z)
+	Matrix4 TranslateMatrix(float x, float y, float z)
 	{
 		Matrix4 mat(
 			1.0f, 0.0f, 0.0f, 0.0f,
@@ -281,7 +281,7 @@ namespace scythe {
 
 		return mat;
 	}
-	Matrix4 Translate(const Vector3& v)
+	Matrix4 TranslateMatrix(const Vector3& v)
 	{
 		Matrix4 mat(
 			1.0f, 0.0f, 0.0f, 0.0f,

@@ -1,7 +1,7 @@
 #include "cubemap_face_filler.h"
 
 #include "image/image.h"
-#include "math/matrix.h"
+#include "math/common_math.h"
 
 #include <cstring>
 #include <cmath>
@@ -141,8 +141,8 @@ namespace scythe {
 				float x = (float)i / (float)(w-1);
 				vec3 face_point = face_matrix * vec3(2.0f * x - 1.0f, 2.0f * y - 1.0f, 1.0f);
 				face_point.Normalize();
-				float angle_x = (atan2(face_point.z, face_point.x) * 0.5f / math::kPi) + 0.5f; // [-Pi; Pi] -> [0; 1]
-				float angle_y = (asin(-face_point.y) / math::kPi) + 0.5f; // [-Pi/2; Pi/2] -> [0; 1]
+				float angle_x = (atan2(face_point.z, face_point.x) * 0.5f / kPi) + 0.5f; // [-Pi; Pi] -> [0; 1]
+				float angle_y = (asin(-face_point.y) / kPi) + 0.5f; // [-Pi/2; Pi/2] -> [0; 1]
 				int src_i = static_cast<int>(angle_x * (float)source_image_->width());
 				int src_j = static_cast<int>(angle_y * (float)source_image_->height());
 				src_i = Clamp(src_i, 0, source_image_->width() - 1);

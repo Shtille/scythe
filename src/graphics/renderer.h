@@ -73,8 +73,8 @@ namespace scythe {
 		virtual void AddRenderDepthStencil(Texture* &texture, int w, int h, U32 depthSize, U32 stencilSize) = 0;
 		virtual void DeleteTexture(Texture* texture) = 0;
 		virtual void ChangeTexture(Texture* texture, U32 layer = 0) = 0;
-		virtual void ChangeRenderTargets(u8 nTargets, Texture* *colorRTs, Texture* depthRT) = 0;
-		virtual void ChangeRenderTargetsToCube(u8 nTargets, Texture* *colorRTs, Texture* depthRT, int face, int level) = 0;
+		virtual void ChangeRenderTargets(U8 nTargets, Texture* *colorRTs, Texture* depthRT) = 0;
+		virtual void ChangeRenderTargetsToCube(U8 nTargets, Texture* *colorRTs, Texture* depthRT, int face, int level) = 0;
 		void ChangeRenderTarget(Texture* colorRT, Texture* depthRT);
 		virtual void GenerateMipmap(Texture* texture) = 0;
 		virtual void CopyToTexture(Texture* texture, U32 layer = 0) = 0;

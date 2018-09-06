@@ -3,7 +3,7 @@
 #include "stream/file_stream.h"
 #include "stream/log_stream.h"
 
-#include "thirdparty/libjpeg/include/jpeglib.h"
+#include "jpeglib.h"
 
 #include <csetjmp> // for error handling
 
@@ -12,9 +12,6 @@ namespace scythe {
 	bool Image::SaveJpeg(const char *filename, int quality)
 	{
 		assert(bpp_ == 3 && channels_ == 3);
-
-		// Get access to error log
-		system::ErrorLogStream * error_log = system::ErrorLogStream::GetInstance();
 
 		/* This struct contains the JPEG compression parameters and pointers to
 		* working space (which is allocated as needed by the JPEG library).
@@ -33,7 +30,7 @@ namespace scythe {
 		*/
 		struct jpeg_error_mgr jerr;
 		/* More stuff */
-		sht::system::FileStream stream;
+		FileStream stream;
 		JSAMPROW row_pointer[1];	/* pointer to JSAMPLE row[s] */
 		int row_stride;		/* physical row width in image buffer */
 
@@ -56,9 +53,9 @@ namespace scythe {
 		* VERY IMPORTANT: use "b" option to fopen() if you are on a machine that
 		* requires it in order to write binary files.
 		*/
-		if (!stream.Open(filename, sht::system::StreamAccess::kWriteBinary))
+		if (!stream.Open(filename, StreamAccess::kWriteBinary))
 		{
-			error_log->PrintString("can't open %s\n", filename);
+			LOG_ERROR("can't open %s", filename);
 			return false;
 		}
 		jpeg_stdio_dest(&cinfo, stream.GetFilePointer());
@@ -151,9 +148,6 @@ namespace scythe {
 	}
 	bool Image::LoadJpeg(const char *filename)
 	{
-		// Get access to error log
-		system::ErrorLogStream * error_log = system::ErrorLogStream::GetInstance();
-
 		/* This struct contains the JPEG decompression parameters and pointers to
 		* working space (which is allocated as needed by the JPEG library).
 		*/
@@ -164,7 +158,7 @@ namespace scythe {
 		*/
 		jpegErrorManager jerr;
 		/* More stuff */
-		sht::system::FileStream stream;
+		FileStream stream;
 		unsigned char * rowptr[1];
 		int row_stride;		/* physical row width in output buffer */
 
@@ -174,9 +168,9 @@ namespace scythe {
 		* requires it in order to read binary files.
 		*/
 
-		if (!stream.Open(filename, sht::system::StreamAccess::kReadBinary))
+		if (!stream.Open(filename, StreamAccess::kReadBinary))
 		{
-			error_log->PrintString("can't open %s\n", filename);
+			LOG_ERROR("can't open %s", filename);
 			return false;
 		}
 
@@ -250,7 +244,7 @@ namespace scythe {
 			break;
 		}
 
-		pixels_ = new u8[width_ * height_ * bpp_];
+		pixels_ = new U8[width_ * height_ * bpp_];
 
 		/* We may need to do some setup of our own at this point before reading
 		* the data.  After jpeg_start_decompress() we have the correct scaled
@@ -307,7 +301,7 @@ namespace scythe {
 
 		return true;
 	}
-	bool Image::LoadFromBufferJpeg(const u8* buffer, size_t length)
+	bool Image::LoadFromBufferJpeg(const U8* buffer, size_t length)
 	{
 		/* This struct contains the JPEG decompression parameters and pointers to
 		* working space (which is allocated as needed by the JPEG library).
@@ -400,7 +394,7 @@ namespace scythe {
 			break;
 		}
 
-		pixels_ = new u8[width_ * height_ * bpp_];
+		pixels_ = new U8[width_ * height_ * bpp_];
 
 		/* We may need to do some setup of our own at this point before reading
 		* the data.  After jpeg_start_decompress() we have the correct scaled

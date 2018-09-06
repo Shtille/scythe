@@ -4,8 +4,7 @@
 #include <stdlib.h>
 #include <cmath>
 
-namespace sht {
-namespace math {
+namespace scythe {
 namespace geometry {
 
 	// Precision (all values below this will be threated as zero)
@@ -102,5 +101,4 @@ namespace geometry {
 	}
 
 } // namespace geometry
-} // namespace math
-} // namespace sht
+} // namespace scythe

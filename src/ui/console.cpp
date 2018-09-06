@@ -2,8 +2,8 @@
 
 namespace scythe {
 
-	Console::Console(sht::graphics::Renderer * renderer, sht::graphics::Font * font,
-					 sht::graphics::Shader * gui_shader, sht::graphics::Shader * text_shader,
+	Console::Console(Renderer * renderer, Font * font,
+					 Shader * gui_shader, Shader * text_shader,
 					 F32 bottom, F32 text_height, F32 velocity, F32 aspect_ratio)
 	: vertical_board_(renderer, gui_shader, vec4(0.2f, 0.2f, 0.2f, 0.8f),
 		aspect_ratio, // width
@@ -14,14 +14,14 @@ namespace scythe {
 		velocity,
 		false, // is pos down
 		true, // is vertical
-		(U32)ui::Flags::kRenderAlways)
+		(U32)Flags::kRenderAlways)
 	, labels_(nullptr)
 	, need_to_update_input_(false)
 	, need_to_update_all_(false)
 	{
 		max_lines_ = static_cast<U32>(vertical_board_.height()/text_height + 0.5f);
 		assert(max_lines_ > 0);
-		labels_ = new ui::Label*[max_lines_];
+		labels_ = new Label*[max_lines_];
 		for (U32 i = 0; i < max_lines_; ++i)
 		{
 			lines_.push_back(L"");

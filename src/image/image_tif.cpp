@@ -14,7 +14,7 @@ namespace scythe {
 		assert(!"not implemented yet");
 		return true;
 	}
-	bool Image::LoadFromBufferTiff(const u8* buffer, size_t length)
+	bool Image::LoadFromBufferTiff(const U8* buffer, size_t length)
 	{
 		assert(!"not implemented yet");
 		return true;

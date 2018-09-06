@@ -11,4 +11,4 @@ namespace scythe {
 	{
 	}
 
-} // namespace sht
+} // namespace scythe

@@ -16,8 +16,8 @@ namespace scythe {
 	class Console {
 	public:
 		//! Requires gui colored shader to render
-		Console(sht::graphics::Renderer * renderer, sht::graphics::Font * font,
-				sht::graphics::Shader * gui_shader, sht::graphics::Shader * text_shader,
+		Console(Renderer * renderer, Font * font,
+				Shader * gui_shader, Shader * text_shader,
 				F32 bottom, F32 text_height, F32 velocity, F32 aspect_ratio);
 		virtual ~Console();
 
@@ -28,7 +28,7 @@ namespace scythe {
 		void Update(F32 sec);
 		void Render();
 		
-		void ProcessKeyInput(sht::PublicKey key, int mods);
+		void ProcessKeyInput(PublicKey key, int mods);
 		void ProcessCharInput(unsigned short code);
 
 	protected:
@@ -44,9 +44,9 @@ namespace scythe {
 		void PushString();
 		void InsertString();
 		
-		ui::ColoredBoard vertical_board_;
+		ColoredBoard vertical_board_;
 		U32 max_lines_; //!< maximum number of lines
-		ui::Label * * labels_; // pointers to labels
+		Label * * labels_; // pointers to labels
 		std::vector<std::wstring> lines_;
 		bool need_to_update_input_;
 		bool need_to_update_all_;

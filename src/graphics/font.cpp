@@ -4,7 +4,7 @@
 #include "image/image.h"
 #include "stream/log_stream.h"
 
-#include "thirdparty/freetype/include/ft2build.h"
+#include "ft2build.h"
 #include FT_FREETYPE_H
 
 #include <algorithm>

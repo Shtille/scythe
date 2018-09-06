@@ -1,6 +1,7 @@
 #include "camera.h"
 
 #include "common/sc_assert.h"
+#include "math/common_math.h"
 
 namespace scythe {
 	

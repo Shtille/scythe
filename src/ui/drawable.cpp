@@ -2,7 +2,7 @@
 
 namespace scythe {
 
-	Drawable::Drawable(sht::graphics::Renderer * renderer, sht::graphics::Shader * shader, sht::graphics::Texture * texture)
+	Drawable::Drawable(Renderer * renderer, Shader * shader, Texture * texture)
 	: renderer_(renderer)
 	, shader_(shader)
 	, texture_(texture)
@@ -43,7 +43,7 @@ namespace scythe {
 		renderer_->context()->BindVertexArrayObject(vertex_array_object_);
 		renderer_->context()->CheckForErrors();
 		
-		renderer_->AddVertexBuffer(vertex_buffer_, num_vertices_ * vertex_format_->vertex_size(), vertices_array_, sht::graphics::BufferUsage::kStaticDraw);
+		renderer_->AddVertexBuffer(vertex_buffer_, num_vertices_ * vertex_format_->vertex_size(), vertices_array_, BufferUsage::kStaticDraw);
 		renderer_->context()->CheckForErrors();
 		if (vertex_buffer_ == nullptr)
 		{
@@ -58,8 +58,8 @@ namespace scythe {
 		const char* base = (char*)0;
 		for (U32 i = 0; i < attribs_.size(); ++i)
 		{
-			const sht::graphics::VertexFormat::Attrib& vf_attrib = vertex_format_->generic(i);
-			renderer_->context()->VertexAttribPointer(i, vf_attrib.size, sht::graphics::DataType::kFloat, vertex_format_->vertex_size(), base + vf_attrib.offset);
+			const VertexFormat::Attrib& vf_attrib = vertex_format_->generic(i);
+			renderer_->context()->VertexAttribPointer(i, vf_attrib.size, DataType::kFloat, vertex_format_->vertex_size(), base + vf_attrib.offset);
 			renderer_->context()->CheckForErrors();
 			renderer_->context()->EnableVertexAttribArray(i);
 			renderer_->context()->CheckForErrors();
@@ -80,10 +80,10 @@ namespace scythe {
 		
 		renderer_->ChangeTexture(texture_);
 		renderer_->context()->BindVertexArrayObject(vertex_array_object_);
-		renderer_->context()->DrawArrays(sht::graphics::PrimitiveType::kTriangleStrip, 0, num_vertices_);
+		renderer_->context()->DrawArrays(PrimitiveType::kTriangleStrip, 0, num_vertices_);
 		renderer_->context()->BindVertexArrayObject(0);
 	}
-	sht::graphics::Renderer * Drawable::renderer()
+	Renderer * Drawable::renderer()
 	{
 		return renderer_;
 	}

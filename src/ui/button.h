@@ -23,7 +23,7 @@ namespace scythe {
 	//! Colored button class
 	class ButtonColored : public Button, public Drawable {
 	public:
-		ButtonColored(sht::graphics::Renderer * renderer, sht::graphics::Shader * shader,
+		ButtonColored(Renderer * renderer, Shader * shader,
 			const vec4& normal_color, const vec4& touch_color,
 			F32 x, F32 y, F32 width, F32 height, U32 flags);
 		
@@ -42,14 +42,14 @@ namespace scythe {
 	//! Colored button class
 	class ButtonTextured : public Button, public Drawable {
 	public:
-		ButtonTextured(sht::graphics::Renderer * renderer, sht::graphics::Shader * shader,
-			sht::graphics::Texture * normal_texture, sht::graphics::Texture * touch_texture,
+		ButtonTextured(Renderer * renderer, Shader * shader,
+			Texture * normal_texture, Texture * touch_texture,
 			F32 x, F32 y, F32 width, F32 height, U32 flags);
 		
 		virtual void Render() override;
 
 	protected:
-		sht::graphics::Texture * touch_texture_;
+		Texture * touch_texture_;
 
 	private:
 		virtual void BindConstUniforms() override;

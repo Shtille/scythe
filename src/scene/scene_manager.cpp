@@ -1,6 +1,7 @@
-#include "../../include/scene/scene_manager.h"
-#include "../../include/scene/scene.h"
-#include "../../include/resource_manager.h"
+#include "scene_manager.h"
+
+#include "scene.h"
+#include "resource_manager.h"
 
 namespace {
 	// Required render count to bypass loading time spikes

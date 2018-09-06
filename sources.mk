@@ -1,28 +1,29 @@
 # Source directories for scythe
 
 SRC_DIRS = \
-	. \
-	application \
-	common \
-	containers \
-	event \
-	filesystem \
-	graphics \
-	graphics/opengl \
-	image \
-	input \
-	math \
-	math/geometry \
-	scene \
-	stream \
-	tasks \
-	time \
-	ui
+	src \
+	src/application \
+	src/common \
+	src/containers \
+	src/event \
+	src/filesystem \
+	src/graphics \
+	src/graphics/opengl \
+	src/image \
+	src/input \
+	src/math \
+	src/math/geometry \
+	src/scene \
+	src/stream \
+	src/tasks \
+	src/time \
+	src/ui
 
 # Includes
 THIRDPARTY = ../thirdparty
 
 INCLUDE = \
+	-Isrc \
 	-I$(THIRDPARTY)/libjpeg/include \
 	-I$(THIRDPARTY)/libjpeg/src \
 	-I$(THIRDPARTY)/libpng/include \
@@ -31,10 +32,10 @@ INCLUDE = \
 
 # Platform specific
 
-SRC_DIRS += platform
+SRC_DIRS += src/platform
 ifeq ($(OS),Windows_NT)
 	# Windows
-	SRC_DIRS += platform/windows
+	SRC_DIRS += src/platform/windows
 	DEFINES += -DGLEW_STATIC
 else
 	# Posix based
@@ -44,6 +45,6 @@ else
 	endif
 	ifeq ($(UNAME_S),Darwin)
 		# Mac OS X
-		SRC_DIRS += platform/macosx
+		SRC_DIRS += src/platform/macosx
 	endif
 endif

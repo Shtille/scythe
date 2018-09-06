@@ -144,14 +144,14 @@ namespace scythe {
 		char filename[50];
 		time_t now = time(nullptr);
 		strftime(filename, _countof(filename), "SS.%Y.%m.%d.%H.%M.%S.jpg", localtime(&now));
-		char delimeter[2] = { system::GetPathDelimeter(), '\0' };
+		char delimeter[2] = { GetPathDelimeter(), '\0' };
 		size_t size = strlen(directory_name) + strlen(filename) + 2; // 1 is for delimeter, another 1 is for \0
 		char *full_filename = new char[size];
 		strcpy(full_filename, directory_name);
 		strcat(full_filename, delimeter);
 		strcat(full_filename, filename);
 
-		system::CreateDirectory(directory_name); // create directory if it doesn't exist
+		CreateDirectory(directory_name); // create directory if it doesn't exist
 
 		Image image;
 		// allocate memory and read pixels
@@ -307,11 +307,11 @@ namespace scythe {
 	}
 	void Renderer::Translate(float x, float y, float z)
 	{
-		model_matrix_ *= Translate(x, y, z);
+		model_matrix_ *= TranslateMatrix(x, y, z);
 	}
-	void Renderer::Translate(const sht::math::Vector3& v)
+	void Renderer::Translate(const Vector3& v)
 	{
-		model_matrix_ *= Translate(v);
+		model_matrix_ *= TranslateMatrix(v);
 	}
 	void Renderer::Scale(float x, float y, float z)
 	{

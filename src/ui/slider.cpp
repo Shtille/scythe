@@ -99,7 +99,7 @@ namespace scythe {
 			(global_position.y < pin_global_position.y + pin_radius_);
 	}
 
-	SliderColored::SliderColored(sht::graphics::Renderer * renderer, sht::graphics::Shader * shader,
+	SliderColored::SliderColored(Renderer * renderer, Shader * shader,
 		 const vec4& bar_color, const vec4& pin_color_normal, const vec4& pin_color_touch,
 		 F32 x, F32 y, F32 width, F32 height, F32 bar_radius, U32 flags,
 		 Form bar_form, Form pin_form)
@@ -142,11 +142,11 @@ namespace scythe {
 
 		shader_->Uniform2fv("u_position", position);
 		shader_->Uniform4fv("u_color", bar_color_);
-		renderer_->context()->DrawArrays(sht::graphics::PrimitiveType::kTriangles, 0, num_bar_vertices_);
+		renderer_->context()->DrawArrays(PrimitiveType::kTriangles, 0, num_bar_vertices_);
 
 		shader_->Uniform2fv("u_position", pin_global_position);
 		shader_->Uniform4fv("u_color", (is_touched_) ? pin_color_touch_ : pin_color_normal_);
-		renderer_->context()->DrawArrays(sht::graphics::PrimitiveType::kTriangles, num_bar_vertices_, num_pin_vertices_);
+		renderer_->context()->DrawArrays(PrimitiveType::kTriangles, num_bar_vertices_, num_pin_vertices_);
 
 		renderer_->context()->BindVertexArrayObject(0);
 
@@ -160,7 +160,7 @@ namespace scythe {
 	}
 	void SliderColored::FillVertexAttribs()
 	{
-		sht::graphics::VertexAttribute attrib(sht::graphics::VertexAttribute::kVertex, 2);
+		VertexAttribute attrib(VertexAttribute::kVertex, 2);
 		attribs_.push_back(attrib);
 	}
 	void SliderColored::FillVertices()
@@ -177,7 +177,7 @@ namespace scythe {
 		else if (pin_form_ == kCircle)
 			num_pin_vertices_ = kNumPinVertices * 3;
 		num_vertices_ = num_bar_vertices_ + num_pin_vertices_;
-		vertices_array_ = new u8[num_vertices_ * sizeof(vec2)]; // 4 * 2 * s(float)
+		vertices_array_ = new U8[num_vertices_ * sizeof(vec2)]; // 4 * 2 * s(float)
 		vec2 * vertices = reinterpret_cast<vec2*>(vertices_array_);
 
 		// ----- Bar -----
@@ -217,7 +217,7 @@ namespace scythe {
 		}
 		else if (bar_form_ == kCircle)
 		{
-			const float kAngle = sht::math::kPi / (float)kNumVerticesPerSemicircle;
+			const float kAngle = kPi / (float)kNumVerticesPerSemicircle;
 			if (is_vertical())
 			{
 				// Lower left
@@ -379,7 +379,7 @@ namespace scythe {
 		}
 		else if (pin_form_ == kCircle)
 		{
-			const float kAngle = sht::math::kTwoPi / (float)kNumPinVertices;
+			const float kAngle = kTwoPi / (float)kNumPinVertices;
 			for (unsigned int i = 0; i < kNumPinVertices; ++i)
 			{
 				float current_angle = (float)i * kAngle;
@@ -396,9 +396,9 @@ namespace scythe {
 		}
 	}
 
-	SliderTextured::SliderTextured(sht::graphics::Renderer * renderer,
-		sht::graphics::Shader * color_shader, sht::graphics::Shader * texture_shader,
-		sht::graphics::Texture * texture_normal, sht::graphics::Texture * texture_touch,
+	SliderTextured::SliderTextured(Renderer * renderer,
+		Shader * color_shader, Shader * texture_shader,
+		Texture * texture_normal, Texture * texture_touch,
 		const vec4& bar_color, F32 x, F32 y, F32 width, F32 height, F32 bar_radius, U32 flags,
 		Form bar_form)
 	: Slider(x, y, width, height, bar_radius, flags)
@@ -438,13 +438,13 @@ namespace scythe {
 		shader_->Bind();
 		shader_->Uniform2fv("u_position", position);
 		shader_->Uniform4fv("u_color", bar_color_);
-		renderer_->context()->DrawArrays(sht::graphics::PrimitiveType::kTriangles, 0, num_bar_vertices_);
+		renderer_->context()->DrawArrays(PrimitiveType::kTriangles, 0, num_bar_vertices_);
 
 		renderer_->ChangeTexture((is_touched_) ? texture_touch_ : texture_);
 
 		texture_shader_->Bind();
 		texture_shader_->Uniform2fv("u_position", pin_global_position);
-		renderer_->context()->DrawArrays(sht::graphics::PrimitiveType::kTriangles, num_bar_vertices_, num_pin_vertices_);
+		renderer_->context()->DrawArrays(PrimitiveType::kTriangles, num_bar_vertices_, num_pin_vertices_);
 
 		renderer_->context()->BindVertexArrayObject(0);
 
@@ -464,7 +464,7 @@ namespace scythe {
 	}
 	void SliderTextured::FillVertexAttribs()
 	{
-		sht::graphics::VertexAttribute attrib(sht::graphics::VertexAttribute::kVertex, 2);
+		VertexAttribute attrib(VertexAttribute::kVertex, 2);
 		attribs_.push_back(attrib);
 	}
 	void SliderTextured::FillVertices()
@@ -477,7 +477,7 @@ namespace scythe {
 			num_bar_vertices_ = 6 + kNumVerticesPerSemicircle * 6;
 		num_pin_vertices_ = 6;
 		num_vertices_ = num_bar_vertices_ + num_pin_vertices_ * 2; // because pin uses vec4 instead of vec2
-		vertices_array_ = new u8[num_vertices_ * sizeof(vec2)]; // 4 * 2 * s(float)
+		vertices_array_ = new U8[num_vertices_ * sizeof(vec2)]; // 4 * 2 * s(float)
 		vec2 * vertices = reinterpret_cast<vec2*>(vertices_array_);
 
 		// ----- Bar -----
@@ -517,7 +517,7 @@ namespace scythe {
 		}
 		else if (bar_form_ == kCircle)
 		{
-			const float kAngle = sht::math::kPi / (float)kNumVerticesPerSemicircle;
+			const float kAngle = kPi / (float)kNumVerticesPerSemicircle;
 			if (is_vertical())
 			{
 				// Lower left

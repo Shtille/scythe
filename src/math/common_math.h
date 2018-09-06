@@ -46,8 +46,8 @@ namespace scythe {
 	// Other matrix generation functions
 	Matrix3 Identity3(void);
 	Matrix4 Identity4(void);
-	Matrix4 Translate(float x, float y, float z);
-	Matrix4 Translate(const Vector3& v);
+	Matrix4 TranslateMatrix(float x, float y, float z);
+	Matrix4 TranslateMatrix(const Vector3& v);
 	Matrix3 Scale3(float x);
 	Matrix3 Scale3(float x, float y, float z);
 	Matrix4 Scale4(float x);

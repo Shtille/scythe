@@ -24,7 +24,7 @@ namespace scythe {
 	}
 	const int Event::GetValueInteger(StringID key) const
 	{
-		for (u32 i = 0; i < num_args_; ++i)
+		for (U32 i = 0; i < num_args_; ++i)
 		{
 			const KeyValuePair & pair = args_[i];
 			if (pair.key == key)
@@ -38,7 +38,7 @@ namespace scythe {
 	}
 	const float Event::GetValueFloat(StringID key) const
 	{
-		for (u32 i = 0; i < num_args_; ++i)
+		for (U32 i = 0; i < num_args_; ++i)
 		{
 			const KeyValuePair & pair = args_[i];
 			if (pair.key == key)
@@ -52,7 +52,7 @@ namespace scythe {
 	}
 	const bool Event::GetValueBool(StringID key) const
 	{
-		for (u32 i = 0; i < num_args_; ++i)
+		for (U32 i = 0; i < num_args_; ++i)
 		{
 			const KeyValuePair & pair = args_[i];
 			if (pair.key == key)
@@ -66,7 +66,7 @@ namespace scythe {
 	}
 	const StringID Event::GetValueStringId(StringID key) const
 	{
-		for (u32 i = 0; i < num_args_; ++i)
+		for (U32 i = 0; i < num_args_; ++i)
 		{
 			const KeyValuePair & pair = args_[i];
 			if (pair.key == key)

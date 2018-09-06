@@ -1,9 +1,11 @@
-#include "../include/main_wrapper.h"
-#include "platform_inner.h"
-#include "../../application/application.h"
-#include "../../system/include/time/clock.h"
+#include "desktop_main_wrapper.h"
 
-int MainWrapper(int, const char**)
+#include "platform_inner.h"
+
+#include "application/desktop_application.h"
+#include "time/clock.h"
+
+int DesktopMainWrapper(int, const char**)
 {
 	if (!PlatformInit())
 		return 1;
@@ -14,7 +16,7 @@ int MainWrapper(int, const char**)
 		return 2;
 	}
 
-	sht::Application * app = sht::Application::GetInstance();
+	scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<scythe::DesktopApplication>();
 	app->Center();
 
 	if (app->InitApi())
@@ -25,7 +27,7 @@ int MainWrapper(int, const char**)
 			app->Show();
 			app->set_visible(true);
 
-			sht::system::Clock clock;
+			scythe::Clock clock;
 			float time_gameclock = clock.GetTime();
 			float time_physics_prev, time_physics_curr;
 			time_physics_prev = time_physics_curr = time_gameclock;

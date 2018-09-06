@@ -8,8 +8,8 @@ namespace scythe {
 	//! Standart horizontal progress bar class
 	class ProgressBar : public RectTextured {
 	public:
-		explicit ProgressBar(sht::graphics::Renderer * renderer, sht::graphics::Shader * shader,
-			sht::graphics::Texture * texture, F32 progress_max,
+		explicit ProgressBar(Renderer * renderer, Shader * shader,
+			Texture * texture, F32 progress_max,
 			F32 x, F32 y, F32 width, F32 height, U32 flags);
 
 		void PositionIncrease(F32 value);

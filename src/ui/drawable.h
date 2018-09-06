@@ -3,7 +3,7 @@
 
 #include "renderable.h"
 
-#include "renderer/renderer.h"
+#include "graphics/renderer.h"
 
 #include <vector>
 
@@ -15,12 +15,12 @@ namespace scythe {
 	//! Drawable class
 	class Drawable : public virtual IRenderable {
 	public:
-		sht::graphics::Renderer * renderer();
+		Renderer * renderer();
 		
 		virtual void Render() override;
 
 	protected:
-		Drawable(sht::graphics::Renderer * renderer, sht::graphics::Shader * shader, sht::graphics::Texture * texture);
+		Drawable(Renderer * renderer, Shader * shader, Texture * texture);
 		virtual ~Drawable();
 		
 		void MakeRenderable();
@@ -29,17 +29,17 @@ namespace scythe {
 		virtual void FillVertexAttribs() = 0;
 		virtual void FillVertices() = 0;
 		
-		sht::graphics::Renderer * renderer_;
-		sht::graphics::Shader * shader_;
-		sht::graphics::Texture * texture_;
-		sht::graphics::VertexFormat * vertex_format_;
-		sht::graphics::VertexBuffer * vertex_buffer_;
+		Renderer * renderer_;
+		Shader * shader_;
+		Texture * texture_;
+		VertexFormat * vertex_format_;
+		VertexBuffer * vertex_buffer_;
 		U32 vertex_array_object_;
 		
 		U32 num_vertices_;
 		U8 * vertices_array_;
 		
-		std::vector<sht::graphics::VertexAttribute> attribs_;
+		std::vector<VertexAttribute> attribs_;
 
 	private:
 		void FreeArrays();

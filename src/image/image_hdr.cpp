@@ -181,7 +181,7 @@ namespace scythe {
 		format_ = Format::kRGB32;
 
 		float *cols = new float[width_ * height_ * bpp_];
-		pixels_ = reinterpret_cast<u8*>(cols);
+		pixels_ = reinterpret_cast<U8*>(cols);
 
 		RGBE *scanline = new RGBE[w];
 		if (!scanline)
@@ -203,7 +203,7 @@ namespace scythe {
 
 		return true;
 	}
-	bool Image::LoadFromBufferHdr(const u8* buffer, size_t length)
+	bool Image::LoadFromBufferHdr(const U8* buffer, size_t length)
 	{
 		assert(!"haven't been implemented yet");
 		return true;

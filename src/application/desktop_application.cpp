@@ -1,6 +1,6 @@
 #include "desktop_application.h"
 
-#include "platform/main_wrapper.h"
+#include "platform/desktop_main_wrapper.h"
 #include "platform/window_controller.h"
 #include "graphics/renderer.h"
 #include "stream/file_stream.h"
@@ -58,7 +58,7 @@ namespace scythe {
 		PlatformChangeDirectoryToResources();
 
 		// Wrapper for the Mac OS X and iOS main function
-		return MainWrapper(argc, argv);
+		return DesktopMainWrapper(argc, argv);
 	}
 	void DesktopApplication::Terminate()
 	{

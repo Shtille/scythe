@@ -89,7 +89,7 @@ namespace scythe {
 		Shader * shader = new Shader(context);
 		
 		GLint success;
-		system::FileStream stream;
+		FileStream stream;
 		std::string shader_source;
 		std::string shader_filename;
 		
@@ -98,7 +98,7 @@ namespace scythe {
 		// Vertex program
 		shader_filename = filename;
 		shader_filename += ".vs";
-		if (stream.Open(shader_filename.c_str(), system::StreamAccess::kReadBinary))
+		if (stream.Open(shader_filename.c_str(), StreamAccess::kReadBinary))
 		{
 			shader_source.resize(stream.Length());
 			if (!stream.Read(&shader_source[0], shader_source.size()))
@@ -138,7 +138,7 @@ namespace scythe {
 		// Fragment program
 		shader_filename = filename;
 		shader_filename += ".fs";
-		if (stream.Open(shader_filename.c_str(), system::StreamAccess::kReadBinary))
+		if (stream.Open(shader_filename.c_str(), StreamAccess::kReadBinary))
 		{
 			shader_source.resize(stream.Length());
 			if (!stream.Read(&shader_source[0], shader_source.size()))

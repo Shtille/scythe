@@ -36,7 +36,7 @@ namespace scythe {
 		is_touched_ = false;
 	}
 
-	ButtonColored::ButtonColored(sht::graphics::Renderer * renderer, sht::graphics::Shader * shader,
+	ButtonColored::ButtonColored(Renderer * renderer, Shader * shader,
 		const vec4& normal_color, const vec4& touch_color,
 		F32 x, F32 y, F32 width, F32 height, U32 flags)
 	: Button(x, y, width, height, flags)
@@ -67,7 +67,7 @@ namespace scythe {
 	}
 	void ButtonColored::FillVertexAttribs()
 	{
-		sht::graphics::VertexAttribute attrib(sht::graphics::VertexAttribute::kVertex, 2);
+		VertexAttribute attrib(VertexAttribute::kVertex, 2);
 		attribs_.push_back(attrib);
 	}
 	void ButtonColored::FillVertices()
@@ -92,8 +92,8 @@ namespace scythe {
 		vertices[3].x = width_;
 		vertices[3].y = height_;
 	}
-	ButtonTextured::ButtonTextured(sht::graphics::Renderer * renderer, sht::graphics::Shader * shader,
-			sht::graphics::Texture * normal_texture, sht::graphics::Texture * touch_texture,
+	ButtonTextured::ButtonTextured(Renderer * renderer, Shader * shader,
+			Texture * normal_texture, Texture * touch_texture,
 			F32 x, F32 y, F32 width, F32 height, U32 flags)
 	: Button(x, y, width, height, flags)
 	, Drawable(renderer, shader, normal_texture)
@@ -112,7 +112,7 @@ namespace scythe {
 		shader_->Uniform2fv("u_position", position);
 		renderer_->ChangeTexture((is_touched_) ? touch_texture_ : texture_);
 		renderer_->context()->BindVertexArrayObject(vertex_array_object_);
-		renderer_->context()->DrawArrays(sht::graphics::PrimitiveType::kTriangleStrip, 0, num_vertices_);
+		renderer_->context()->DrawArrays(PrimitiveType::kTriangleStrip, 0, num_vertices_);
 		renderer_->context()->BindVertexArrayObject(0);
 		shader_->Unbind();
 	}
@@ -125,7 +125,7 @@ namespace scythe {
 	}
 	void ButtonTextured::FillVertexAttribs()
 	{
-		sht::graphics::VertexAttribute attrib(sht::graphics::VertexAttribute::kVertex, 4);
+		VertexAttribute attrib(VertexAttribute::kVertex, 4);
 		attribs_.push_back(attrib);
 	}
 	void ButtonTextured::FillVertices()
