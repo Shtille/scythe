@@ -153,30 +153,23 @@ namespace scythe {
 	{
 		VertexAttribute attribs[] = { {VertexAttribute::kVertex, 4} };
 		renderer_->AddVertexFormat(vertex_format_, &attribs[0], _countof(attribs));
-		renderer_->context()->CheckForErrors();
 		
 		renderer_->context()->GenVertexArrayObject(vertex_array_object_);
 		renderer_->context()->BindVertexArrayObject(vertex_array_object_);
-		renderer_->context()->CheckForErrors();
 		
 		AllocateVertexBuffer();
-		renderer_->context()->CheckForErrors();
 		if (vertex_buffer_ == nullptr) return false;
 		
 		// Free all data in memory
 		FreeArrays();
 		
 		// There is only one attribute
-		const char* base = (char*)0;
-		{
-		renderer_->context()->VertexAttribPointer(0, vertex_format_->generic_[0].size, DataType::kFloat, vertex_format_->vertex_size(), base + vertex_format_->generic_[0].offset);
-			renderer_->context()->CheckForErrors();
+		const char* base = nullptr;
+		const VertexFormat::Attrib& generic = vertex_format_->generic(0);
+		renderer_->context()->VertexAttribPointer(0, generic.size, DataType::kFloat, vertex_format_->vertex_size(), base + generic.offset);
 		renderer_->context()->EnableVertexAttribArray(0);
-			renderer_->context()->CheckForErrors();
-		}
 		
 		renderer_->context()->BindVertexArrayObject(0);
-		renderer_->context()->CheckForErrors();
 		
 		return true;
 	}

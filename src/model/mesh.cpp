@@ -46,7 +46,7 @@ namespace scythe {
 	{
 		num_vertices_ = (U32)vertices_.size();
 		vertices_array_ = new U8[num_vertices_ * vertex_format->vertex_size()];
-		u8 *ptr = vertices_array_;
+		U8 *ptr = vertices_array_;
 		for (auto &v : vertices_)
 		{
 			for (auto &a : attribs)
@@ -85,7 +85,7 @@ namespace scythe {
 				index_size_ = sizeof(U32);
 				index_data_type_ = DataType::kUnsignedInt;
 				indices_array_ = new U8[num_indices_ * index_size_];
-				u32 *indices = reinterpret_cast<U32*>(indices_array_);
+				U32 *indices = reinterpret_cast<U32*>(indices_array_);
 				for (size_t i = 0; i < indices_.size(); ++i)
 				{
 					indices[i] = static_cast<U32>(indices_[i]);
@@ -96,7 +96,7 @@ namespace scythe {
 				index_size_ = sizeof(U16);
 				index_data_type_ = DataType::kUnsignedShort;
 				indices_array_ = new U8[num_indices_ * index_size_];
-				u16 *indices = reinterpret_cast<U16*>(indices_array_);
+				U16 *indices = reinterpret_cast<U16*>(indices_array_);
 				for (size_t i = 0; i < indices_.size(); ++i)
 				{
 					indices[i] = static_cast<U16>(indices_[i]);
@@ -125,7 +125,7 @@ namespace scythe {
 		}
 		
 		const char* base = (char*)0;
-		for (u32 i = 0; i < attribs.size(); ++i)
+		for (U32 i = 0; i < attribs.size(); ++i)
 		{
 			const VertexFormat::Attrib& generic = vertex_format->generic(i);
 			renderer_->context()->VertexAttribPointer(i, generic.size, DataType::kFloat, vertex_format->vertex_size(), base + generic.offset);

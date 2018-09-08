@@ -9,6 +9,7 @@ SRC_DIRS = \
 	src/filesystem \
 	src/graphics \
 	src/graphics/opengl \
+	src/model \
 	src/image \
 	src/input \
 	src/math \

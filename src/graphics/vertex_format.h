@@ -36,9 +36,6 @@ namespace scythe {
 	class VertexFormat {
 		friend class Renderer;
 		friend class OpenGlRenderer;
-		
-		friend class Model;
-		friend class Text;
 
 	public:
 		struct Attrib {

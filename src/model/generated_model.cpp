@@ -29,11 +29,11 @@ namespace scythe {
 			renderer_->context()->DeleteVertexArrayObject(vertex_array_object_);
 		FreeArrays();
 	}
-	void Model::AddFormat(const VertexAttribute& attrib)
+	void GeneratedModel::AddFormat(const VertexAttribute& attrib)
 	{
 		attribs_.push_back(attrib);
 	}
-	void Model::FreeArrays()
+	void GeneratedModel::FreeArrays()
 	{
 		if (vertices_array_)
 		{
@@ -46,7 +46,7 @@ namespace scythe {
 			indices_array_ = nullptr;
 		}
 	}
-	void Model::TransformVertices()
+	void GeneratedModel::TransformVertices()
 	{
 		num_vertices_ = (U32)vertices_.size();
 		vertices_array_ = new U8[num_vertices_ * vertex_format_->vertex_size()];
@@ -96,7 +96,7 @@ namespace scythe {
 			index_size_ = sizeof(U16);
 			index_data_type_ = DataType::kUnsignedShort;
 			indices_array_ = new U8[num_indices_ * index_size_];
-			u16 *indices = reinterpret_cast<U16*>(indices_array_);
+			U16 *indices = reinterpret_cast<U16*>(indices_array_);
 			for (size_t i = 0; i < indices_.size(); ++i)
 			{
 				indices[i] = static_cast<U16>(indices_[i]);
@@ -105,7 +105,7 @@ namespace scythe {
 		indices_.clear();
 		indices_.shrink_to_fit();
 	}
-	bool Model::MakeRenderable()
+	bool GeneratedModel::MakeRenderable()
 	{
 		if (attribs_.empty())
 		{
@@ -128,7 +128,7 @@ namespace scythe {
 		const char* base = (char*)0;
 		for (U32 i = 0; i < attribs_.size(); ++i)
 		{
-			renderer_->context()->VertexAttribPointer(i, vertex_format_->generic_[i].size, DataType::kFloat, vertex_format_->vertex_size(), base + vertex_format_->generic_[i].offset);
+			renderer_->context()->VertexAttribPointer(i, vertex_format_->generic(i).size, DataType::kFloat, vertex_format_->vertex_size(), base + vertex_format_->generic(i).offset);
 			renderer_->context()->EnableVertexAttribArray(i);
 		}
 		
@@ -138,29 +138,29 @@ namespace scythe {
 		
 		return true;
 	}
-	bool Model::HasTexture() const
+	bool GeneratedModel::HasTexture() const
 	{
 		for (const auto &a : attribs_)
 			if (a.type == VertexAttribute::kTexcoord)
 				return true;
 		return false;
 	}
-	void Model::Render()
+	void GeneratedModel::Render()
 	{
 		renderer_->context()->BindVertexArrayObject(vertex_array_object_);
 		renderer_->context()->DrawElements(primitive_mode_, num_indices_, index_data_type_);
 	}
-	void Model::ScaleVertices(const Vector3& scale)
+	void GeneratedModel::ScaleVertices(const Vector3& scale)
 	{
 		for (auto& v : vertices_)
 			v.position *= scale;
 	}
-	void Model::ScaleTexcoord(const Vector2& scale)
+	void GeneratedModel::ScaleTexcoord(const Vector2& scale)
 	{
 		for (auto& v : vertices_)
 			v.texcoord *= scale;
 	}
-	void Model::ComputeTangentBasis()
+	void GeneratedModel::ComputeTangentBasis()
 	{
 		// TODO
 	}
