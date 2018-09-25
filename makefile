@@ -14,13 +14,20 @@ endif
 
 include sources.mk
 
-CFLAGS = -g -Wall -O3 -std=c++11
+CFLAGS = -g -Wall -O3
 CFLAGS += $(INCLUDE)
 CFLAGS += $(DEFINES)
+CFLAGS_CPP = $(CFLAGS) -std=c++11
 
-SRC_FILES = $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.cpp))
+SRC_FILES_M = $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.m))
+SRC_FILES_MM = $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.mm))
+SRC_FILES_CPP = $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.cpp))
+SRC_FILES = $(SRC_FILES_M) $(SRC_FILES_MM) $(SRC_FILES_CPP)
 
-OBJECTS = $(SRC_FILES:.cpp=.o)
+OBJECTS_M = $(SRC_FILES_M:.m=.o)
+OBJECTS_MM = $(SRC_FILES_MM:.mm=.o)
+OBJECTS_CPP = $(SRC_FILES_CPP:.cpp=.o)
+OBJECTS = $(OBJECTS_M) $(OBJECTS_MM) $(OBJECTS_CPP)
 
 LIBRARIES =
 
@@ -41,6 +48,14 @@ dynamic: $(OBJECTS)
 	@echo making shared library
 	@$(CCP) $(LDFLAGS) -o $(SHARED_LIB) $^ $(LIBRARIES)
 
-%.o : %.cpp
+%.o : %.m
 	@echo compiling file $<
 	@$(CCP) $(CFLAGS) -c $< -o $@
+
+%.o : %.mm
+	@echo compiling file $<
+	@$(CCP) $(CFLAGS_CPP) -c $< -o $@
+
+%.o : %.cpp
+	@echo compiling file $<
+	@$(CCP) $(CFLAGS_CPP) -c $< -o $@

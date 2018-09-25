@@ -39,7 +39,7 @@ static void LogError(const char* message)
     const NSRect viewRectPoints = [g_window.view frame];
     const NSRect viewRectPixels = [g_window.view convertRectToBacking:viewRectPoints];
 
-    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<DesktopApplication>();
+    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<scythe::DesktopApplication>();
     app->OnSize(viewRectPixels.size.width, viewRectPixels.size.height);
 }
 
@@ -49,13 +49,13 @@ static void LogError(const char* message)
 
 - (void)windowDidMiniaturize:(NSNotification *)notification
 {
-    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<DesktopApplication>();
+    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<scythe::DesktopApplication>();
     app->set_visible(false);
 }
 
 - (void)windowDidDeminiaturize:(NSNotification *)notification
 {
-    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<DesktopApplication>();
+    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<scythe::DesktopApplication>();
     app->set_visible(true);
 }
 
@@ -221,7 +221,7 @@ static scythe::MouseButton TranslateMouseButton(int button)
     const NSRect viewRectPoints = [g_window.view frame];
     const NSRect viewRectPixels = [g_window.view convertRectToBacking:viewRectPoints];
 
-    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<DesktopApplication>();
+    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<scythe::DesktopApplication>();
     app->OnSize(viewRectPixels.size.width, viewRectPixels.size.height);
 }
 
@@ -232,7 +232,7 @@ static scythe::MouseButton TranslateMouseButton(int button)
     const unsigned short key_code = [theEvent keyCode];
     const int modifiers = TranslateModifiers([theEvent modifierFlags]);
     
-    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<DesktopApplication>();
+    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<scythe::DesktopApplication>();
     scythe::PublicKey translated_key = app->keys().table(key_code);
     app->keys().key_down(translated_key) = true;
     app->keys().modifiers() = modifiers;
@@ -258,7 +258,7 @@ static scythe::MouseButton TranslateMouseButton(int button)
     const unsigned short key_code = [theEvent keyCode];
     const int modifiers = TranslateModifiers([theEvent modifierFlags]);
     
-    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<DesktopApplication>();
+    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<scythe::DesktopApplication>();
     scythe::PublicKey translated_key = app->keys().table(key_code);
     app->keys().key_down(translated_key) = false;
     app->keys().modifiers() = 0;
@@ -276,7 +276,7 @@ static scythe::MouseButton TranslateMouseButton(int button)
 #endif
     const int modifiers = TranslateModifiers([theEvent modifierFlags] & kFlagsMask);
     
-    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<DesktopApplication>();
+    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<scythe::DesktopApplication>();
     scythe::PublicKey translated_key = app->keys().table(key_code);
     
     bool press;
@@ -300,21 +300,21 @@ static scythe::MouseButton TranslateMouseButton(int button)
 
 - (void) mouseDown:(NSEvent *)theEvent
 {
-    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<DesktopApplication>();
+    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<scythe::DesktopApplication>();
     app->mouse().button_down(scythe::MouseButton::kLeft) = true;
     app->OnMouseDown(scythe::MouseButton::kLeft, TranslateModifiers([theEvent modifierFlags]));
 }
 
 - (void) mouseUp:(NSEvent *)theEvent
 {
-    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<DesktopApplication>();
+    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<scythe::DesktopApplication>();
     app->mouse().button_down(scythe::MouseButton::kLeft) = false;
     app->OnMouseUp(scythe::MouseButton::kLeft, TranslateModifiers([theEvent modifierFlags]));
 }
 
 - (void) mouseMoved:(NSEvent *)theEvent
 {
-    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<DesktopApplication>();
+    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<scythe::DesktopApplication>();
     app->mouse().delta_x() = [theEvent deltaX];
     app->mouse().delta_y() = [theEvent deltaY];
     NSPoint pos = [theEvent locationInWindow];
@@ -332,14 +332,14 @@ static scythe::MouseButton TranslateMouseButton(int button)
 
 - (void) rightMouseDown:(NSEvent *)theEvent
 {
-    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<DesktopApplication>();
+    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<scythe::DesktopApplication>();
     app->mouse().button_down(scythe::MouseButton::kRight) = true;
     app->OnMouseDown(scythe::MouseButton::kRight, TranslateModifiers([theEvent modifierFlags]));
 }
 
 - (void) rightMouseUp:(NSEvent *)theEvent
 {
-    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<DesktopApplication>();
+    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<scythe::DesktopApplication>();
     app->mouse().button_down(scythe::MouseButton::kRight) = false;
     app->OnMouseUp(scythe::MouseButton::kRight, TranslateModifiers([theEvent modifierFlags]));
 }
@@ -351,7 +351,7 @@ static scythe::MouseButton TranslateMouseButton(int button)
 
 - (void) otherMouseDown:(NSEvent *)theEvent
 {
-    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<DesktopApplication>();
+    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<scythe::DesktopApplication>();
     scythe::MouseButton button = TranslateMouseButton((int)[theEvent buttonNumber]);
     app->mouse().button_down(button) = true;
     app->OnMouseDown(button, TranslateModifiers([theEvent modifierFlags]));
@@ -359,7 +359,7 @@ static scythe::MouseButton TranslateMouseButton(int button)
 
 - (void) otherMouseUp:(NSEvent *)theEvent
 {
-    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<DesktopApplication>();
+    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<scythe::DesktopApplication>();
     scythe::MouseButton button = TranslateMouseButton((int)[theEvent buttonNumber]);
     app->mouse().button_down(button) = false;
     app->OnMouseUp(button, TranslateModifiers([theEvent modifierFlags]));
@@ -379,7 +379,7 @@ static scythe::MouseButton TranslateMouseButton(int button)
         delta_x *= 0.1f;
         delta_y *= 0.1f;
     }
-    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<DesktopApplication>();
+    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<scythe::DesktopApplication>();
     app->OnScroll(delta_x, delta_y);
 }
 
@@ -425,7 +425,7 @@ static scythe::MouseButton TranslateMouseButton(int button)
 
 - (void)toggleFullScreen:(id)sender
 {
-    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<DesktopApplication>();
+    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<scythe::DesktopApplication>();
     app->ToggleFullscreen();
 }
 
@@ -668,7 +668,7 @@ static bool InitializeAppKit()
 
 static bool CreateWindow()
 {
-    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<DesktopApplication>();
+    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<scythe::DesktopApplication>();
 
 	g_window.delegate = [[ScytheWindowDelegate alloc] init];
     if (g_window.delegate == nil)
@@ -783,7 +783,7 @@ bool PlatformWindowCreate()
     [g_window.object setContentView:g_window.view];
 
     // Create a fullscreen window initially
-    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<DesktopApplication>();
+    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<scythe::DesktopApplication>();
     if (app->fullscreen())
         [g_window.object goFullscreen];
 
@@ -878,7 +878,7 @@ void PlatformWindowTerminate()
 }
 bool PlatformInitOpenGLContext(int color_bits, int depth_bits, int stencil_bits)
 {
-    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<DesktopApplication>();
+    scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<scythe::DesktopApplication>();
 
     std::vector<NSOpenGLPixelFormatAttribute> attributes;
     attributes.reserve(20);
