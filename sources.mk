@@ -18,7 +18,8 @@ SRC_DIRS = \
 	src/stream \
 	src/tasks \
 	src/time \
-	src/ui
+	src/ui \
+	src/planet
 
 # Includes
 THIRDPARTY = ../thirdparty
