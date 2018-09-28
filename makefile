@@ -50,7 +50,7 @@ dynamic: $(OBJECTS)
 
 %.o : %.m
 	@echo compiling file $<
-	@$(CCP) $(CFLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 %.o : %.mm
 	@echo compiling file $<
