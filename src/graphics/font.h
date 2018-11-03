@@ -7,9 +7,10 @@
 #include <unordered_map>
 
 namespace scythe {
-		
+
 	class Image;
 	class Texture;
+	class RgbColor;
 	
 	//! Struct containing all offsets data
 	struct FontCharInfo {
@@ -42,7 +43,11 @@ namespace scythe {
 		Texture * texture() const;
 		const float font_height() const;
 		
+		//! Creates standard monochrome atlas (R8 format)
 		bool MakeAtlas(const char* filename, int font_height, Image * image);
+		//! Creates colored atlas (RGBA8 format)
+		bool MakeAtlasWithBorder(const char* filename, int font_height, int border,
+			const RgbColor& base_color, const RgbColor& border_color, Image * image);
 		
 	protected:
 		Font();

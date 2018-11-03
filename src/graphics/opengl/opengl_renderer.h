@@ -38,6 +38,8 @@ namespace scythe {
 		void DeleteShader(Shader* shader);
 
 		void AddFont(Font* &font, const char* fontname);
+		void AddOutlinedFont(Font* &font, const char* fontname, float border_size,
+			const RgbColor& base_color, const RgbColor& border_color);
 		void DeleteFont(Font* font);
 
 		void ReadPixels(int w, int h, U8 *data);

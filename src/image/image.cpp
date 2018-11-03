@@ -228,6 +228,72 @@ namespace scythe {
 			memcpy(dst, src, w * bpp_);
 		}
 	}
+	void Image::SubDataColored(int offset_x, int offset_y, int w, int h, const U8* data,
+		const RgbColor& color)
+	{
+		int max_x = offset_x + w;
+		int max_y = offset_y + h;
+		assert(max_x <= width_);
+		assert(max_y <= height_);
+		assert(bpp_ == 4);
+
+		U8 r = static_cast<U8>(color.red()   * 255.0f);
+		U8 g = static_cast<U8>(color.green() * 255.0f);
+		U8 b = static_cast<U8>(color.blue()  * 255.0f);
+
+		const U8* src = data;
+
+		// Destination should have 4 bytes per pixel while source - only 1
+		for (int y = offset_y; y < max_y; ++y)
+		{
+			for (int x = offset_x; x < max_x; ++x)
+			{
+				U8* dst = &pixels_[(y*width_ + x)*bpp_];
+				*dst++ = r;
+				*dst++ = g;
+				*dst++ = b;
+				*dst = *src++;
+			}
+		}
+	}
+	void Image::SubDataAlphaBlend(int offset_x, int offset_y, int w, int h, const U8* data,
+		const RgbColor& color)
+	{
+		int max_x = offset_x + w;
+		int max_y = offset_y + h;
+		assert(max_x <= width_);
+		assert(max_y <= height_);
+		assert(bpp_ == 4);
+
+		const U8* src = data;
+
+		// Destination should have 4 bytes per pixel while source - only 1
+		for (int y = offset_y; y < max_y; ++y)
+		{
+			for (int x = offset_x; x < max_x; ++x)
+			{
+				U8* dst = &pixels_[(y*width_ + x)*bpp_];
+
+				float base_r = (float)(*(dst  ))/255.0f;
+				float base_g = (float)(*(dst+1))/255.0f;
+				float base_b = (float)(*(dst+2))/255.0f;
+				float base_a = (float)(*(dst+3))/255.0f;
+				float blend_r = color.red();
+				float blend_g = color.green();
+				float blend_b = color.blue();
+				float blend_a = (float)(*src)/255.0f;
+				float out_r = (1.0f - blend_a) * base_r + blend_a * blend_r;
+				float out_g = (1.0f - blend_a) * base_g + blend_a * blend_g;
+				float out_b = (1.0f - blend_a) * base_b + blend_a * blend_b;
+				float out_a = (1.0f - blend_a) * base_a + blend_a * blend_a;
+				*dst++ = (U8)(out_r * 255.0f);
+				*dst++ = (U8)(out_g * 255.0f);
+				*dst++ = (U8)(out_b * 255.0f);
+				*dst   = (U8)(out_a * 255.0f);
+				++src;
+			}
+		}
+	}
 	bool Image::Save(const char* filename)
 	{
 		FileFormat fmt = ExtractFileFormat(filename);

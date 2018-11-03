@@ -98,6 +98,8 @@ namespace scythe {
 
 		// Font functions
 		virtual void AddFont(Font* &font, const char* fontname) = 0;
+		virtual void AddOutlinedFont(Font* &font, const char* fontname, float border_size,
+			const RgbColor& base_color, const RgbColor& border_color) = 0; //!< requires another shader
 		virtual void DeleteFont(Font* font) = 0;
 
 		virtual void ReadPixels(int w, int h, U8 *data) = 0; //!< reads pixels in R8G8B8 format

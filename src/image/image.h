@@ -3,6 +3,7 @@
 
 #include "common/types.h"
 #include "common/platform.h"
+#include "color.h"
 
 namespace scythe {
 
@@ -50,6 +51,10 @@ namespace scythe {
 		void Copy(const Image& other);
 		void CopyData(int offset_x, int offset_y, int source_width, const U8* data); //!< copies data from part of other image
 		void SubData(int offset_x, int offset_y, int w, int h, const U8* data);
+		void SubDataColored(int offset_x, int offset_y, int w, int h, const U8* data,
+			const RgbColor& color);
+		void SubDataAlphaBlend(int offset_x, int offset_y, int w, int h, const U8* data,
+			const RgbColor& color);
 		bool Save(const char* filename);							//!< saves image to file with specified format
 
 		bool LoadFromFile(const char* filename);					//!< loads image from file

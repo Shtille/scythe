@@ -6,6 +6,7 @@
 
 #include "ft2build.h"
 #include FT_FREETYPE_H
+#include "freetype/ftbitmap.h" // for embolden operations
 
 #include <algorithm>
 
@@ -169,6 +170,168 @@ namespace scythe {
 			// Goto next charcode
 			charcode = FT_Get_Next_Char(face, charcode, &gindex);
 		}
+		
+		FT_Done_Face(face);
+		
+		FT_Done_FreeType(ft);
+		
+		return true;
+	}
+	bool Font::MakeAtlasWithBorder(const char* filename, int font_height, int border,
+		const RgbColor& base_color, const RgbColor& border_color, Image * image)
+	{
+		font_height_ = static_cast<float>(font_height);
+		
+		FT_Library ft;
+		FT_Face face;
+		
+		// Initialize library
+		if (FT_Init_FreeType(&ft))
+		{
+			fprintf(stderr, "FreeType library initialization failed");
+			return false;
+		}
+		
+		// Load a font
+		if (FT_New_Face(ft, filename, 0, &face))
+		{
+			fprintf(stderr, "Failed to load a font %s!\n", filename);
+			FT_Done_FreeType(ft);
+			return false;
+		}
+		
+		// Set encoding
+		if (FT_Select_Charmap(face, FT_ENCODING_UNICODE))
+		{
+			fprintf(stderr, "Failed to set encoding\n");
+			FT_Done_FreeType(ft);
+			return false;
+		}
+		
+		// Set font height in pixels
+		FT_Set_Pixel_Sizes(face, 0, font_height);
+		
+		FT_GlyphSlot g = face->glyph;
+		
+		const unsigned int kMaxTextureWidth = 1024U;
+		
+		unsigned int w,h;
+		unsigned int roww = 0;
+		unsigned int rowh = 0;
+		w = 0;
+		h = 0;
+
+		FT_Bitmap border_bitmap;
+		FT_Bitmap_New(&border_bitmap);
+
+		FT_ULong charcode;
+		FT_UInt gindex;
+		
+		// Find minimum size for a texture holding all visible ASCII characters
+		charcode = FT_Get_First_Char(face, &gindex);
+		while (gindex != 0)
+		{
+			// Load glyph
+			if (FT_Load_Char(face, charcode, FT_LOAD_RENDER)) {
+				fprintf(stderr, "Loading character %lu failed!\n", charcode);
+				continue;
+			}
+			// Copy glyph bitmap to our border bitmap and embolden it
+			FT_Bitmap_Copy(ft, &g->bitmap, &border_bitmap);
+			FT_Bitmap_Embolden(
+				ft,
+				&border_bitmap,
+				FT_Pos(border * 32) * 2, //multiply by 32 because FreeType expects 26.6 values;
+				FT_Pos(border * 32) * 2);
+			if (roww + border_bitmap.width + 1 >= kMaxTextureWidth) {
+				w = std::max(w, roww);
+				h += rowh;
+				roww = 0;
+				rowh = 0;
+			}
+			roww += border_bitmap.width + 1;
+			rowh = std::max(rowh, border_bitmap.rows);
+			// Goto next charcode
+			charcode = FT_Get_Next_Char(face, charcode, &gindex);
+		}
+		
+		w = std::max(w, roww);
+		h += rowh;
+		
+		if (w == 0 || h == 0)
+		{
+			FT_Done_FreeType(ft);
+			return false;
+		}
+		
+		// Create an image that will be used to hold all ASCII glyphs
+		image->Allocate(w, h, Image::Format::kRGBA8);
+		image->FillWithZeroes();
+		
+		// Paste all glyph bitmaps into the image, remembering the offset
+		int ox = 0;
+		int oy = 0;
+		
+		rowh = 0;
+		
+		charcode = FT_Get_First_Char(face, &gindex);
+		while (gindex != 0)
+		{
+			if (FT_Load_Char(face, charcode, FT_LOAD_RENDER))
+			{
+				fprintf(stderr, "Loading character %lu failed!\n", charcode);
+				continue;
+			}
+
+			// Copy glyph bitmap to our border bitmap and embolden it
+			FT_Bitmap_Copy(ft, &g->bitmap, &border_bitmap);
+			FT_Bitmap_Embolden(
+				ft,
+				&border_bitmap,
+				FT_Pos(border * 32) * 2, //multiply by 32 because FreeType expects 26.6 values;
+				FT_Pos(border * 32) * 2);//multiply by 32 because we want it bigger on both sides, not just one
+			
+			if (ox + border_bitmap.width + 1 >= kMaxTextureWidth)
+			{
+				oy += rowh;
+				rowh = 0;
+				ox = 0;
+			}
+
+			int offset_x = (border_bitmap.width - g->bitmap.width) >> 1;
+			int offset_y = (border_bitmap.rows - g->bitmap.rows) >> 1;
+
+			image->SubDataColored(ox, oy, 
+				border_bitmap.width, border_bitmap.rows, border_bitmap.buffer,
+				border_color);
+			image->SubDataAlphaBlend(ox + offset_x, oy + offset_y,
+				g->bitmap.width, g->bitmap.rows, g->bitmap.buffer,
+				base_color);
+			
+			U32 i = static_cast<U32>(charcode);
+			
+			FontCharInfo & info = info_map_[i];
+
+			info.advance_x = static_cast<float>(g->advance.x >> 6);
+			info.advance_y = static_cast<float>(g->advance.y >> 6);
+			
+			info.bitmap_width = static_cast<float>(border_bitmap.width);
+			info.bitmap_height = static_cast<float>(border_bitmap.rows);
+			
+			info.bitmap_left = static_cast<float>(g->bitmap_left);
+			info.bitmap_top = static_cast<float>(g->bitmap_top);
+			
+			info.texcoord_x = ox / (float)w;
+			info.texcoord_y = oy / (float)h;
+			
+			rowh = std::max(rowh, border_bitmap.rows);
+			ox += border_bitmap.width + 1;
+			
+			// Goto next charcode
+			charcode = FT_Get_Next_Char(face, charcode, &gindex);
+		}
+
+		FT_Bitmap_Done(ft, &border_bitmap);
 		
 		FT_Done_Face(face);
 		

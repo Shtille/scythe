@@ -837,6 +837,27 @@ namespace scythe {
 			font = nullptr;
 		}
 	}
+	void OpenGlRenderer::AddOutlinedFont(Font* &font, const char* fontname, float border_size,
+		const RgbColor& base_color, const RgbColor& border_color)
+	{
+		font = new Font();
+		
+		const int kFontHeight = 64;
+		int border = static_cast<int>((float)kFontHeight * border_size);
+
+		Image image;
+		if (font->MakeAtlasWithBorder(fontname, kFontHeight, border, base_color, border_color, &image))
+		{
+			CreateTextureFromData(font->texture_, image.width(), image.height(), image.format(), image.pixels());
+			
+			fonts_.push_back(font);
+		}
+		else
+		{
+			delete font;
+			font = nullptr;
+		}
+	}
 	void OpenGlRenderer::DeleteFont(Font* font)
 	{
 		assert(font);
