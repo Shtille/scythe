@@ -8,8 +8,8 @@
 #include <stdio.h>	// for error logging
 
 // OpenGL specific
-#include "thirdparty/glew/include/GL/glew.h"
-#include "thirdparty/glew/include/GL/wglew.h" // Windows only
+#include "GL/glew.h"
+#include "GL/wglew.h" // Windows only
 #include <Windowsx.h> // for GET_X_LPARAM
 
 #ifndef WM_MOUSEHWHEEL // It isn't defined on MinGW platform
@@ -77,7 +77,7 @@ static scythe::PublicKey TranslateKey(WPARAM wParam, LPARAM lParam)
 		return scythe::PublicKey::kLeftControl;
 	}
 
-	scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<DesktopApplication>();
+	scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<scythe::DesktopApplication>();
 	return app->keys().table(HIWORD(lParam) & 0x1FF);
 }
 
@@ -86,7 +86,7 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	static POINT old_mouse_position = { 0 };
 	static POINT mouse_position;
 
-	scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<DesktopApplication>();
+	scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<scythe::DesktopApplication>();
 	switch (uMsg)
 	{
 	case WM_SYSCOMMAND:
@@ -253,7 +253,7 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 static void AdjustVideoSettings()
 {
-	scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<DesktopApplication>();
+	scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<scythe::DesktopApplication>();
 
 	g_window.current_state.style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
 	g_window.current_state.ex_style = WS_EX_APPWINDOW;
@@ -300,7 +300,7 @@ static void AdjustVideoSettings()
 }
 static void RestoreVideoSettings()
 {
-	scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<DesktopApplication>();
+	scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<scythe::DesktopApplication>();
 	if (app->fullscreen())
 	{
 		ChangeDisplaySettingsA(NULL, 0);
@@ -495,7 +495,7 @@ void PlatformWindowTerminate()
 }
 bool PlatformInitOpenGLContext(int color_bits, int depth_bits, int stencil_bits)
 {
-	scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<DesktopApplication>();
+	scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<scythe::DesktopApplication>();
 
 	const int kContextMajorVersion = 3;
 	const int kContextMinorVersion = 3;

@@ -4,7 +4,7 @@
 #include "common/platform.h"
 
 #ifdef SCYTHE_TARGET_WINDOWS
- #include "thirdparty/glew/include/GL/glew.h"
+ #include "GL/glew.h"
 #elif defined(SCYTHE_TARGET_MAC)
  #include <OpenGL/gl3.h>
  #include <OpenGL/glext.h>
