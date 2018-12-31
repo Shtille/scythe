@@ -1,5 +1,7 @@
 #include "ref.h"
 
+#include "sc_assert.h"
+
 #ifdef SC_USE_MEM_LEAK_DETECTION
 #include <cstdlib>
 #include <typeinfo>
