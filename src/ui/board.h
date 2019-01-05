@@ -9,7 +9,7 @@ namespace scythe {
 	class ColoredBoard : public RectColored {
 	public:
 		explicit ColoredBoard(Renderer * renderer, Shader * shader,
-			const vec4& color, F32 width, F32 height, F32 other_coord, F32 value_min, F32 value_max,
+			const Vector4& color, F32 width, F32 height, F32 other_coord, F32 value_min, F32 value_max,
 			F32 velocity, bool min_position, bool is_vertical, U32 flags);
 
 		bool IsMoving() const;

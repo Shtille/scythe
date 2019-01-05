@@ -4,7 +4,7 @@
 #include "common/types.h"
 #include "common/platform.h"
 #include "common/counting_pointer.h"
-#include "math/common_math.h"
+#include "math/matrix4.h"
 
 #include "vertex_format.h"
 #include "vertex_buffer.h"
@@ -47,7 +47,6 @@ namespace scythe {
 		U32 GetUsedIndexBuffersSize();
 
 		bool TakeScreenshot(const char* directory_name);
-		void Setup2DMatrix();
 
 		// Texture functions
 		bool AddTexture(Texture* &texture, const char* filename,
@@ -161,7 +160,6 @@ namespace scythe {
 		int width_;								//!< owner app's window width
 		int height_;							//!< owner app's window height
 		float aspect_ratio_;					//!< w/h
-		Matrix4 standart_2d_matrix_;			//!< matrix for 2d projection
 		
 		Vector4 viewport_;						//!< viewport
 		Matrix4 projection_matrix_;				//!< projection matrix

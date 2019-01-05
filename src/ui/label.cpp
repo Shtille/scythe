@@ -3,7 +3,7 @@
 namespace scythe {
 
 	Label::Label(Renderer * renderer, Shader * shader,
-				 Font * font, const vec4& color, F32 text_height, U32 buffer_size,
+				 Font * font, const Vector4& color, F32 text_height, U32 buffer_size,
 				 F32 x, F32 y, U32 flags)
 	: Widget(x, y, flags)
 	, shader_(shader)
@@ -30,7 +30,7 @@ namespace scythe {
 		if (!constant_position_)
 		{
 			// Doing this at Render() because we sometimes omit rendering labels
-			vec2 position;
+			Vector2 position;
 			ObtainGlobalPosition(&position);
 			text_->SetPosition(position);
 		}
@@ -46,7 +46,7 @@ namespace scythe {
 	}
 	void Label::SetText(const wchar_t* text)
 	{
-		vec2 position;
+		Vector2 position;
 		ObtainGlobalPosition(&position);
 		text_->SetTextSimple(font_, position.x, position.y, text_height_, text);
 	}
@@ -54,7 +54,7 @@ namespace scythe {
 	{
 		if (parent_ == nullptr) return;
 
-		vec2 parent_position;
+		Vector2 parent_position;
 		parent_->ObtainGlobalPosition(&parent_position);
 
 		// We also have to modify local position
@@ -63,7 +63,7 @@ namespace scythe {
 		position_.x = 0.5f * rect_width - 0.5f * (max_x - min_x);
 		position_.y = 0.5f * rect_height - 0.5f * (max_y - min_y);
 
-		vec2 position;
+		Vector2 position;
 		position.x = parent_position.x + position_.x;
 		position.y = parent_position.y + position_.y;
 		text_->SetPosition(position);

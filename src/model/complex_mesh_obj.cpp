@@ -129,8 +129,7 @@ namespace scythe {
 			}
 		}
 
-		bounding_box_.center = 0.5f * (max + min);
-		bounding_box_.extent = 0.5f * (max - min);
+		bounding_box_.Set(min, max);
 
 		// Finally fill the meshes
 		for (auto& map : shape_meshes)

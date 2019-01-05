@@ -1,30 +1,32 @@
 #include "vertical_profile.h"
 #include "segment.h"
+#include "vector2.h"
 
 namespace scythe {
 
-	VerticalProfile::VerticalProfile(const vec3& a, const vec3& b, float hmin, float hmax)
+	VerticalProfile::VerticalProfile(const Vector3& a, const Vector3& b, float hmin, float hmax)
 	: hmin(hmin)
 	, hmax(hmax)
 	{
-		vec2 ba(b.x - a.x, b.z - a.z);
+		Vector2 ba(b.x - a.x, b.z - a.z);
 		ba.Normalize();
-		plane.normal = vec3(-ba.y, 0.0f, ba.x);
-		plane.offset = -(plane.normal & a);
+		Vector3 normal(-ba.y, 0.0f, ba.x);
+		float distance = -(normal & a);
+		plane.Set(normal, distance);
 	}
-	vec3 VerticalProfile::GetAnyPoint()
+	Vector3 VerticalProfile::GetAnyPoint()
 	{
-		vec3 p;
+		Vector3 p;
 		p.y = hmin;
-		if (plane.normal.x != 0.0f) // use x
+		if (plane.GetNormal().x != 0.0f) // use x
 		{
 			p.x = 0.0f;
-			p.z = -plane.offset/plane.normal.z;
+			p.z = -plane.GetDistance() / plane.GetNormal().z;
 		}
 		else // use z
 		{
 			p.z = 0.0f;
-			p.x = -plane.offset/plane.normal.x;
+			p.x = -plane.GetDistance() / plane.GetNormal().x;
 		}
 		return p;
 	}

@@ -31,13 +31,13 @@ namespace scythe {
 	}
 	bool Rect::IsInsideGlobal(F32 x, F32 y)
 	{
-		vec2 position;
+		Vector2 position;
 		ObtainGlobalPosition(&position);
 		return (position.x < x) && (position.y < y) &&
 			(x < position.x + width_) && (y < position.y + height_);
 	}
 	RectColored::RectColored(Renderer * renderer, Shader * shader,
-							 const vec4& color, F32 x, F32 y, F32 width, F32 height, U32 flags)
+							 const Vector4& color, F32 x, F32 y, F32 width, F32 height, U32 flags)
 	: Rect(x, y, width, height, flags)
 	, Drawable(renderer, shader, nullptr)
 	, color_(color)
@@ -49,7 +49,7 @@ namespace scythe {
 	}
 	void RectColored::Render()
 	{
-		vec2 position;
+		Vector2 position;
 		ObtainGlobalPosition(&position);
 		shader_->Bind();
 		shader_->Uniform2fv("u_position", position);
@@ -71,8 +71,8 @@ namespace scythe {
 	void RectColored::FillVertices()
 	{
 		num_vertices_ = 4;
-		vertices_array_ = new U8[num_vertices_ * sizeof(vec2)]; // 4 * 2 * s(float)
-		vec2 * vertices = reinterpret_cast<vec2*>(vertices_array_);
+		vertices_array_ = new U8[num_vertices_ * sizeof(Vector2)]; // 4 * 2 * s(float)
+		Vector2 * vertices = reinterpret_cast<Vector2*>(vertices_array_);
 		
 		// Lower left
 		vertices[0].x = 0.0f;
@@ -102,7 +102,7 @@ namespace scythe {
 	}
 	void RectTextured::Render()
 	{
-		vec2 position;
+		Vector2 position;
 		ObtainGlobalPosition(&position);
 		shader_->Bind();
 		shader_->Uniform2fv("u_position", position);
@@ -124,8 +124,8 @@ namespace scythe {
 	void RectTextured::FillVertices()
 	{
 		num_vertices_ = 4;
-		vertices_array_ = new U8[num_vertices_ * sizeof(vec4)]; // x, y, tx, ty
-		vec4 * vertices = reinterpret_cast<vec4*>(vertices_array_);
+		vertices_array_ = new U8[num_vertices_ * sizeof(Vector4)]; // x, y, tx, ty
+		Vector4 * vertices = reinterpret_cast<Vector4*>(vertices_array_);
 		
 		// Lower left
 		vertices[0].x = 0.0f;

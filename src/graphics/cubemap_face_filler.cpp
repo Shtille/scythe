@@ -2,6 +2,7 @@
 
 #include "image/image.h"
 #include "math/common_math.h"
+#include "math/matrix3.h"
 
 #include <cstring>
 #include <cmath>
@@ -139,7 +140,7 @@ namespace scythe {
 			for (int i = 0; i < w; ++i)
 			{
 				float x = (float)i / (float)(w-1);
-				vec3 face_point = face_matrix * vec3(2.0f * x - 1.0f, 2.0f * y - 1.0f, 1.0f);
+				Vector3 face_point = face_matrix * Vector3(2.0f * x - 1.0f, 2.0f * y - 1.0f, 1.0f);
 				face_point.Normalize();
 				float angle_x = (atan2(face_point.z, face_point.x) * 0.5f / kPi) + 0.5f; // [-Pi; Pi] -> [0; 1]
 				float angle_y = (asin(-face_point.y) / kPi) + 0.5f; // [-Pi/2; Pi/2] -> [0; 1]

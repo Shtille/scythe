@@ -5,43 +5,43 @@
 
 namespace scythe {
 	
-	Camera::Camera(const vec3& pos, const vec3& target_pos)
+	Camera::Camera(const Vector3& pos, const Vector3& target_pos)
 	{
 		Set(pos, target_pos);
 	}
-	Camera::Camera(const vec3 * pos, const vec3& target_pos)
+	Camera::Camera(const Vector3 * pos, const Vector3& target_pos)
 	{
 		Set(pos, target_pos);
 	}
-	Camera::Camera(const vec3& pos, const vec3 * target_pos)
+	Camera::Camera(const Vector3& pos, const Vector3 * target_pos)
 	{
 		Set(pos, target_pos);
 	}
-	Camera::Camera(const vec3 * pos, const vec3 * target_pos)
+	Camera::Camera(const Vector3 * pos, const Vector3 * target_pos)
 	{
 		Set(pos, target_pos);
 	}
-	Camera::Camera(const vec3& pos, const quat& orient)
+	Camera::Camera(const Vector3& pos, const Quaternion& orient)
 	{
 		Set(pos, orient);
 	}
-	Camera::Camera(const vec3& pos, const quat& orient, const vec3& target_pos)
+	Camera::Camera(const Vector3& pos, const Quaternion& orient, const Vector3& target_pos)
 	{
 		Set(pos, orient, target_pos);
 	}
-	Camera::Camera(const vec3 * pos, const quat& orient)
+	Camera::Camera(const Vector3 * pos, const Quaternion& orient)
 	{
 		Set(pos, orient);
 	}
-	Camera::Camera(const vec3& pos, const quat * orient)
+	Camera::Camera(const Vector3& pos, const Quaternion * orient)
 	{
 		Set(pos, orient);
 	}
-	Camera::Camera(const vec3 * pos, const quat * orient)
+	Camera::Camera(const Vector3 * pos, const Quaternion * orient)
 	{
 		Set(pos, orient);
 	}
-	Camera::Camera(const quat& orient, const vec3 * target_pos, float distance)
+	Camera::Camera(const Quaternion& orient, const Vector3 * target_pos, float distance)
 	{
 		Set(orient, target_pos, distance);
 	}
@@ -87,7 +87,7 @@ namespace scythe {
 			orientation_ptr_ = camera.orientation_ptr_;
 		return *this;
 	}
-	void Camera::Set(const vec3& pos, const vec3& target_pos)
+	void Camera::Set(const Vector3& pos, const Vector3& target_pos)
 	{
 		is_position_ = true;
 		position_ = pos;
@@ -101,7 +101,7 @@ namespace scythe {
 		need_update_orientation_ = false;
 		need_update_position_ = false;
 	}
-	void Camera::Set(const vec3 * pos, const vec3& target_pos)
+	void Camera::Set(const Vector3 * pos, const Vector3& target_pos)
 	{
 		is_position_ = false;
 		position_ptr_ = pos;
@@ -114,7 +114,7 @@ namespace scythe {
 		need_update_orientation_ = true;
 		need_update_position_ = false;
 	}
-	void Camera::Set(const vec3& pos, const vec3 * target_pos)
+	void Camera::Set(const Vector3& pos, const Vector3 * target_pos)
 	{
 		is_position_ = true;
 		position_ = pos;
@@ -127,7 +127,7 @@ namespace scythe {
 		need_update_orientation_ = true;
 		need_update_position_ = false;
 	}
-	void Camera::Set(const vec3 * pos, const vec3 * target_pos)
+	void Camera::Set(const Vector3 * pos, const Vector3 * target_pos)
 	{
 		is_position_ = false;
 		position_ptr_ = pos;
@@ -139,7 +139,7 @@ namespace scythe {
 		need_update_orientation_ = true;
 		need_update_position_ = false;
 	}
-	void Camera::Set(const vec3& pos, const quat& orient)
+	void Camera::Set(const Vector3& pos, const Quaternion& orient)
 	{
 		is_position_ = true;
 		position_ = pos;
@@ -152,7 +152,7 @@ namespace scythe {
 		need_update_orientation_ = false;
 		need_update_position_ = false;
 	}
-	void Camera::Set(const vec3& pos, const quat& orient, const vec3& target_pos)
+	void Camera::Set(const Vector3& pos, const Quaternion& orient, const Vector3& target_pos)
 	{
 		is_position_ = true;
 		position_ = pos;
@@ -166,7 +166,7 @@ namespace scythe {
 		need_update_orientation_ = false;
 		need_update_position_ = false;
 	}
-	void Camera::Set(const vec3 * pos, const quat& orient)
+	void Camera::Set(const Vector3 * pos, const Quaternion& orient)
 	{
 		is_position_ = false;
 		position_ptr_ = pos;
@@ -178,7 +178,7 @@ namespace scythe {
 		need_update_orientation_ = false;
 		need_update_position_ = false;
 	}
-	void Camera::Set(const vec3& pos, const quat * orient)
+	void Camera::Set(const Vector3& pos, const Quaternion * orient)
 	{
 		is_position_ = true;
 		position_ = pos;
@@ -190,7 +190,7 @@ namespace scythe {
 		need_update_orientation_ = false;
 		need_update_position_ = false;
 	}
-	void Camera::Set(const vec3 * pos, const quat * orient)
+	void Camera::Set(const Vector3 * pos, const Quaternion * orient)
 	{
 		is_position_ = false;
 		position_ptr_ = pos;
@@ -201,10 +201,12 @@ namespace scythe {
 		need_update_orientation_ = false;
 		need_update_position_ = false;
 	}
-	void Camera::Set(const quat& orient, const vec3 * target_pos, float distance)
+	void Camera::Set(const Quaternion& orient, const Vector3 * target_pos, float distance)
 	{
+		Vector3 orient_dir;
+		orient.GetDirection(&orient_dir);
 		is_position_ = true;
-		position_ = *target_pos - orient.Direction() * distance;
+		position_ = *target_pos - orient_dir * distance;
 		position_ptr_ = &position_;
 		is_target_position_ = false;
 		target_position_ptr_ = target_pos;
@@ -215,7 +217,7 @@ namespace scythe {
 		need_update_orientation_ = false;
 		need_update_position_ = true;
 	}
-	void Camera::Move(const vec3& translation)
+	void Camera::Move(const Vector3& translation)
 	{
 		if (is_position_)
 		{
@@ -229,7 +231,11 @@ namespace scythe {
 			orientation_.Set(*position_ptr_, *target_position_ptr_);
 
 		if (need_update_position_ && target_position_ptr_)
-			position_ = *target_position_ptr_ - orientation_ptr_->Direction() * distance_;
+		{
+			Vector3 orient_dir;
+			orientation_ptr_->GetDirection(&orient_dir);
+			position_ = *target_position_ptr_ - orient_dir * distance_;
+		}
 	}
 	CameraManager::CameraManager()
 	: animation_time_(0.0f)
@@ -265,20 +271,32 @@ namespace scythe {
 	}
 	Vector3 CameraManager::GetForward() const
 	{
-		return Vector3(-view_matrix_.e13, -view_matrix_.e23, -view_matrix_.e33);
+		Vector3 result;
+		view_matrix_.GetForwardVector(&result);
+		return result;
+		//return Vector3(-view_matrix_.e13, -view_matrix_.e23, -view_matrix_.e33);
 	}
 	Vector3 CameraManager::GetUp() const
 	{
-		return Vector3(view_matrix_.e12, view_matrix_.e22, view_matrix_.e32);
+		Vector3 result;
+		view_matrix_.GetUpVector(&result);
+		return result;
+		//return Vector3(view_matrix_.e12, view_matrix_.e22, view_matrix_.e32);
 	}
 	Vector3 CameraManager::GetSide() const
 	{
-		return Vector3(view_matrix_.e11, view_matrix_.e21, view_matrix_.e31);
+		Vector3 result;
+		view_matrix_.GetRightVector(&result);
+		return result;
+		//return Vector3(view_matrix_.e11, view_matrix_.e21, view_matrix_.e31);
 	}
 	Vector3 CameraManager::GetDirection() const
 	{
 		SC_ASSERT(current_camera_ptr_);
-		return current_camera_ptr_->orientation_ptr_->Direction();
+
+		Vector3 orient_dir;
+		current_camera_ptr_->orientation_ptr_->GetDirection(&orient_dir);
+		return orient_dir;
 	}
 	bool CameraManager::animated() const
 	{
@@ -290,24 +308,27 @@ namespace scythe {
 	}
 	void CameraManager::RotateAroundX(float angle)
 	{
-		quat orient(UNIT_X, angle);
 		SC_ASSERT(current_camera_ptr_->is_orientation_);
+
+		Quaternion orient(Vector3::UnitX(), angle);
 		current_camera_ptr_->orientation_ = *current_camera_ptr_->orientation_ptr_ * orient;
 		current_camera_ptr_->orientation_.Normalize();
 		manual_rotation_ = true;
 	}
 	void CameraManager::RotateAroundY(float angle)
 	{
-		quat orient(UNIT_Y, angle);
 		SC_ASSERT(current_camera_ptr_->is_orientation_);
+
+		Quaternion orient(Vector3::UnitY(), angle);
 		current_camera_ptr_->orientation_ = *current_camera_ptr_->orientation_ptr_ * orient;
 		current_camera_ptr_->orientation_.Normalize();
 		manual_rotation_ = true;
 	}
 	void CameraManager::RotateAroundZ(float angle)
 	{
-		quat orient(UNIT_Z, angle);
 		SC_ASSERT(current_camera_ptr_->is_orientation_);
+
+		Quaternion orient(Vector3::UnitZ(), angle);
 		current_camera_ptr_->orientation_ = *current_camera_ptr_->orientation_ptr_ * orient;
 		current_camera_ptr_->orientation_.Normalize();
 		manual_rotation_ = true;
@@ -320,8 +341,10 @@ namespace scythe {
 		
 		RotateAroundX(-angle);
 		float distance = (*current_camera_ptr_->target_position_ptr_ - *current_camera_ptr_->position_ptr_).Length();
+		Vector3 camera_direction;
+		current_camera_ptr_->orientation_ptr_->GetDirection(&camera_direction);
 		current_camera_ptr_->position_ = *current_camera_ptr_->target_position_ptr_
-			- distance * current_camera_ptr_->orientation_ptr_->Direction();
+			- distance * camera_direction;
 	}
 	void CameraManager::RotateAroundTargetInY(float angle)
 	{
@@ -331,8 +354,10 @@ namespace scythe {
 		
 		RotateAroundY(-angle);
 		float distance = (*current_camera_ptr_->target_position_ptr_ - *current_camera_ptr_->position_ptr_).Length();
+		Vector3 camera_direction;
+		current_camera_ptr_->orientation_ptr_->GetDirection(&camera_direction);
 		current_camera_ptr_->position_ = *current_camera_ptr_->target_position_ptr_
-			- distance * current_camera_ptr_->orientation_ptr_->Direction();
+			- distance * camera_direction;
 	}
 	void CameraManager::RotateAroundTargetInZ(float angle)
 	{
@@ -342,23 +367,25 @@ namespace scythe {
 		
 		RotateAroundZ(-angle);
 		float distance = (*current_camera_ptr_->target_position_ptr_ - *current_camera_ptr_->position_ptr_).Length();
+		Vector3 camera_direction;
+		current_camera_ptr_->orientation_ptr_->GetDirection(&camera_direction);
 		current_camera_ptr_->position_ = *current_camera_ptr_->target_position_ptr_
-			- distance * current_camera_ptr_->orientation_ptr_->Direction();
+			- distance * camera_direction;
 	}
-	void CameraManager::Move(const vec3& translation)
+	void CameraManager::Move(const Vector3& translation)
 	{
 		if (is_current_)
 			current_camera_ptr_->Move(translation);
 		manual_rotation_ = true; // need to update matrix anyway
 	}
-	void CameraManager::MakeFree(const vec3& pos, const vec3& target_pos)
+	void CameraManager::MakeFree(const Vector3& pos, const Vector3& target_pos)
 	{
 		is_current_ = true;
 		current_camera_.Set(pos, target_pos);
 		current_camera_ptr_ = &current_camera_;
 		manual_rotation_ = true;
 	}
-	void CameraManager::MakeFree(const vec3& pos, const quat& orient)
+	void CameraManager::MakeFree(const Vector3& pos, const Quaternion& orient)
 	{
 		is_current_ = true;
 		current_camera_.Set(pos, orient);
@@ -374,21 +401,21 @@ namespace scythe {
 		current_camera_ptr_ = &current_camera_;
 		manual_rotation_ = true;
 	}
-	void CameraManager::MakeFreeTargeted(const vec3& pos, const quat& orient, const vec3& target_pos)
+	void CameraManager::MakeFreeTargeted(const Vector3& pos, const Quaternion& orient, const Vector3& target_pos)
 	{
 		is_current_ = true;
 		current_camera_.Set(pos, orient, target_pos);
 		current_camera_ptr_ = &current_camera_;
 		manual_rotation_ = true;
 	}
-	void CameraManager::MakeAttached(const vec3 * pos, const quat * orient)
+	void CameraManager::MakeAttached(const Vector3 * pos, const Quaternion * orient)
 	{
 		is_current_ = true;
 		current_camera_.Set(pos, orient);
 		current_camera_ptr_ = &current_camera_;
 		manual_rotation_ = true;
 	}
-	void CameraManager::MakeAttached(const quat& orient, const vec3 * target_pos, float distance)
+	void CameraManager::MakeAttached(const Quaternion& orient, const Vector3 * target_pos, float distance)
 	{
 		is_current_ = true;
 		current_camera_.Set(orient, target_pos, distance);
@@ -401,70 +428,70 @@ namespace scythe {
 		if (!is_current_)
 			current_camera_ptr_ = nullptr;
 	}
-	CameraID CameraManager::Add(const vec3& pos, const vec3& target_pos)
+	CameraID CameraManager::Add(const Vector3& pos, const Vector3& target_pos)
 	{
 		CameraID cam_id = static_cast<CameraID>(cameras_.size());
 		Camera camera(pos, target_pos);
 		cameras_.push_back(camera);
 		return cam_id;
 	}
-	CameraID CameraManager::Add(const vec3 * pos, const vec3& target_pos)
+	CameraID CameraManager::Add(const Vector3 * pos, const Vector3& target_pos)
 	{
 		CameraID cam_id = static_cast<CameraID>(cameras_.size());
 		Camera camera(pos, target_pos);
 		cameras_.push_back(camera);
 		return cam_id;
 	}
-	CameraID CameraManager::Add(const vec3& pos, const vec3 * target_pos)
+	CameraID CameraManager::Add(const Vector3& pos, const Vector3 * target_pos)
 	{
 		CameraID cam_id = static_cast<CameraID>(cameras_.size());
 		Camera camera(pos, target_pos);
 		cameras_.push_back(camera);
 		return cam_id;
 	}
-	CameraID CameraManager::Add(const vec3 * pos, const vec3 * target_pos)
+	CameraID CameraManager::Add(const Vector3 * pos, const Vector3 * target_pos)
 	{
 		CameraID cam_id = static_cast<CameraID>(cameras_.size());
 		Camera camera(pos, target_pos);
 		cameras_.push_back(camera);
 		return cam_id;
 	}
-	CameraID CameraManager::Add(const vec3& pos, const quat& orient)
+	CameraID CameraManager::Add(const Vector3& pos, const Quaternion& orient)
 	{
 		CameraID cam_id = static_cast<CameraID>(cameras_.size());
 		Camera camera(pos, orient);
 		cameras_.push_back(camera);
 		return cam_id;
 	}
-	CameraID CameraManager::Add(const vec3& pos, const quat& orient, const vec3& target_pos)
+	CameraID CameraManager::Add(const Vector3& pos, const Quaternion& orient, const Vector3& target_pos)
 	{
 		CameraID cam_id = static_cast<CameraID>(cameras_.size());
 		Camera camera(pos, orient, target_pos);
 		cameras_.push_back(camera);
 		return cam_id;
 	}
-	CameraID CameraManager::Add(const vec3 * pos, const quat& orient)
+	CameraID CameraManager::Add(const Vector3 * pos, const Quaternion& orient)
 	{
 		CameraID cam_id = static_cast<CameraID>(cameras_.size());
 		Camera camera(pos, orient);
 		cameras_.push_back(camera);
 		return cam_id;
 	}
-	CameraID CameraManager::Add(const vec3& pos, const quat * orient)
+	CameraID CameraManager::Add(const Vector3& pos, const Quaternion * orient)
 	{
 		CameraID cam_id = static_cast<CameraID>(cameras_.size());
 		Camera camera(pos, orient);
 		cameras_.push_back(camera);
 		return cam_id;
 	}
-	CameraID CameraManager::Add(const vec3 * pos, const quat * orient)
+	CameraID CameraManager::Add(const Vector3 * pos, const Quaternion * orient)
 	{
 		CameraID cam_id = static_cast<CameraID>(cameras_.size());
 		Camera camera(pos, orient);
 		cameras_.push_back(camera);
 		return cam_id;
 	}
-	CameraID CameraManager::Add(const quat& orient, const vec3 * target_pos, float distance)
+	CameraID CameraManager::Add(const Quaternion& orient, const Vector3 * target_pos, float distance)
 	{
 		CameraID cam_id = static_cast<CameraID>(cameras_.size());
 		Camera camera(orient, target_pos, distance);
@@ -561,9 +588,9 @@ namespace scythe {
 				next_camera->Update();
 
 				float t = animation_time_ / paths_[next_index].interval;
-				quat orient;
-				quat::Slerp(*curr_camera->orientation_ptr_, *next_camera->orientation_ptr_, t, &orient);
-				vec3 pos;
+				Quaternion orient;
+				Quaternion::Slerp(*curr_camera->orientation_ptr_, *next_camera->orientation_ptr_, t, &orient);
+				Vector3 pos;
 				if (paths_[next_index].is_target_oriented)
 				{
 					// Rotation around target position
@@ -571,11 +598,12 @@ namespace scythe {
 					SC_ASSERT(curr_camera->target_position_ptr_);
 					SC_ASSERT(next_camera->target_position_ptr_);
 
-					vec3 direction = orient.Direction();
-					vec3 target_pos = *curr_camera->target_position_ptr_ +
+					Vector3 camera_direction;
+					current_camera_ptr_->orientation_ptr_->GetDirection(&camera_direction);
+					Vector3 target_pos = *curr_camera->target_position_ptr_ +
 						(*next_camera->target_position_ptr_ - *curr_camera->target_position_ptr_) * t;
 					float distance = (*curr_camera->target_position_ptr_ - *curr_camera->position_ptr_).Length();
-					pos = target_pos - (direction * distance);
+					pos = target_pos - (camera_direction * distance);
 				}
 				else
 				{
@@ -595,9 +623,8 @@ namespace scythe {
 		if (need_view_matrix_update_ || manual_rotation_)
 		{
 			manual_rotation_ = false;
-			Matrix3 rotation;
-			current_camera_ptr_->orientation_ptr_->ToMatrix(&rotation);
-			view_matrix_ = ViewMatrix(rotation, *current_camera_ptr_->position_ptr_);
+			Matrix4::CreateView(*current_camera_ptr_->orientation_ptr_,
+				*current_camera_ptr_->position_ptr_, &view_matrix_);
 		}
 	}
 

@@ -105,7 +105,7 @@ namespace scythe {
 		{
 			mesh->ScaleVertices(scale);
 		}
-		bounding_box_.extent *= scale;
+		bounding_box_.Scale(scale);
 	}
 	void ComplexMesh::SetMaterialBinder(MaterialBinderInterface * material_binder)
 	{

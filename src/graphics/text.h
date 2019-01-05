@@ -3,6 +3,7 @@
 
 #include "renderer.h"
 #include "font.h"
+#include "math/vector2.h"
 
 namespace scythe {
 
@@ -17,7 +18,7 @@ namespace scythe {
 		//! Returns text bounding box in screen coordinates ([0..a, 0..1])
 		void GetTextBoundingBox(float* min_x, float* min_y, float* max_x, float* max_y);
 
-		void SetPosition(const vec2& position);
+		void SetPosition(const Vector2& position);
 		
 	protected:
 		bool SetTextInternal(Font * font, float x, float y, float scale);

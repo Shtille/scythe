@@ -12,9 +12,9 @@ namespace scythe {
 
 		bool is_touched() const;
 
-		void OnTouchDown(const vec2& position); //!< position is in global coordinate system
-		void OnTouchMove(const vec2& position);
-		void OnTouchUp(const vec2& position);
+		void OnTouchDown(const Vector2& position); //!< position is in global coordinate system
+		void OnTouchMove(const Vector2& position);
+		void OnTouchUp(const Vector2& position);
 		
 	protected:
 		bool is_touched_;
@@ -24,14 +24,14 @@ namespace scythe {
 	class ButtonColored : public Button, public Drawable {
 	public:
 		ButtonColored(Renderer * renderer, Shader * shader,
-			const vec4& normal_color, const vec4& touch_color,
+			const Vector4& normal_color, const Vector4& touch_color,
 			F32 x, F32 y, F32 width, F32 height, U32 flags);
 		
 		virtual void Render() override;
 		
 	protected:
-		vec4 normal_color_;
-		vec4 touch_color_;
+		Vector4 normal_color_;
+		Vector4 touch_color_;
 
 	private:
 		virtual void BindConstUniforms() override;

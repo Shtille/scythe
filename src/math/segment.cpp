@@ -5,7 +5,7 @@ namespace scythe {
 	Segment::Segment()
 	{
 	}
-	Segment::Segment(const vec3& begin, const vec3& end)
+	Segment::Segment(const Vector3& begin, const Vector3& end)
 	: begin(begin)
 	, end(end)
 	{

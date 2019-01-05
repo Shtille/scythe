@@ -1,16 +1,17 @@
 #ifndef __SCYTHE_VERTEX_H__
 #define __SCYTHE_VERTEX_H__
 
-#include "math/vector.h"
+#include "math/vector2.h"
+#include "math/vector3.h"
 
 namespace scythe {
 
 	struct Vertex {
-		vec3 position;
-		vec3 normal;
-		vec2 texcoord;
-		vec3 tangent;
-		vec3 binormal;
+		Vector3 position;
+		Vector3 normal;
+		Vector2 texcoord;
+		Vector3 tangent;
+		Vector3 binormal;
 	};
 
 } // namespace scythe

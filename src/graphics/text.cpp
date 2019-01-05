@@ -236,7 +236,7 @@ namespace scythe {
 				*max_y = glyph_y + glyph_size_y;
 		}
 	}
-	void Text::SetPosition(const vec2& position)
+	void Text::SetPosition(const Vector2& position)
 	{
 		SetTextInternal(font_, position.x, position.y, scale_);
 	}

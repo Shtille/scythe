@@ -1,7 +1,7 @@
 #ifndef __SCYTHE_GEOMETRY_POINT_H__
 #define __SCYTHE_GEOMETRY_POINT_H__
 
-#include "../vector.h"
+#include "../vector2.h"
 
 namespace scythe {
 namespace geometry {

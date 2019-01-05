@@ -1,6 +1,7 @@
 #include "planet_navigation.h"
 
 #include "camera.h"
+#include "math/vector2.h"
 #include "math/common_math.h"
 
 #include <cmath>
@@ -74,7 +75,7 @@ namespace scythe {
 	{
 		const Vector3& pos = *camera_manager_->position();
 		const Quaternion& orient = *camera_manager_->orientation();
-		Quaternion new_orient = orient * Quaternion(UNIT_X, angle_x);
+		Quaternion new_orient = orient * Quaternion(Vector3::UnitX(), angle_x);
 		new_orient.Normalize();
 		camera_manager_->Clear();
 		auto first_camera = camera_manager_->AddAsCurrent();
@@ -141,16 +142,18 @@ namespace scythe {
 			if (((projected_point - new_point) & normal1) < 0.0f)
 				angle2 = -angle2;
 
-			Quaternion transform1(UNIT_Y, angle1);
-			Quaternion transform2(UNIT_Z, angle2);
-			Quaternion total_transform = transform1 * transform2;
-			Quaternion inverse_transform = total_transform.GetInverse();
+			Quaternion transform1(Vector3::UnitY(), angle1);
+			Quaternion transform2(Vector3::UnitZ(), angle2);
+			Quaternion inverse_transform = transform1 * transform2;
+			inverse_transform.Inverse();
 
 			Quaternion new_orient = *camera_manager_->orientation() * inverse_transform;
 			new_orient.Normalize();
 			const Vector3& cam_pos = *camera_manager_->position();
 			float distance = cam_pos.Distance(planet_position_);
-			Vector3 new_pos = planet_position_ - distance * new_orient.Direction();
+			Vector3 direction;
+			new_orient.GetDirection(&direction); // ?????
+			Vector3 new_pos = planet_position_ - distance * direction;
 			camera_manager_->MakeFreeTargeted(new_pos, new_orient, planet_position_);
 		}
 	}

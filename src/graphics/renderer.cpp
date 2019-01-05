@@ -4,18 +4,16 @@
 #include "filesystem/directory.h"
 
 #include <ctime>
-#include <algorithm>
 
 namespace scythe {
 
 	Renderer::Renderer(int w, int h)
 	{
 		UpdateSizes(w, h);
-		Setup2DMatrix();
 		
-		projection_matrix_.MakeIdentity();
-		view_matrix_.MakeIdentity();
-		model_matrix_.MakeIdentity();
+		projection_matrix_.SetIdentity();
+		view_matrix_.SetIdentity();
+		model_matrix_.SetIdentity();
 		
 		Defaults();
 	}
@@ -166,10 +164,6 @@ namespace scythe {
 		delete[] full_filename;
 		return true;
 	}
-	void Renderer::Setup2DMatrix()
-	{
-		standart_2d_matrix_ = OrthoMatrix(0.0f, aspect_ratio_, 0.0f, 1.0f, -1.0f, 1.0f);
-	}
 	bool Renderer::AddTexture(Texture* &texture, const char* filename, Texture::Wrap wrap, Texture::Filter filt)
 	{
 		Image image;
@@ -307,19 +301,27 @@ namespace scythe {
 	}
 	void Renderer::Translate(float x, float y, float z)
 	{
-		model_matrix_ *= TranslateMatrix(x, y, z);
+		Matrix4 translation;
+		Matrix4::CreateTranslation(x, y, z, &translation);
+		model_matrix_ *= translation;
 	}
 	void Renderer::Translate(const Vector3& v)
 	{
-		model_matrix_ *= TranslateMatrix(v);
+		Matrix4 translation;
+		Matrix4::CreateTranslation(v, &translation);
+		model_matrix_ *= translation;
 	}
 	void Renderer::Scale(float x, float y, float z)
 	{
-		model_matrix_ *= Scale4(x, y, z);
+		Matrix4 scale;
+		Matrix4::CreateScale(x, y, z, &scale);
+		model_matrix_ *= scale;
 	}
 	void Renderer::Scale(float s)
 	{
-		model_matrix_ *= Scale4(s);
+		Matrix4 scale;
+		Matrix4::CreateScale(s, s, s, &scale);
+		model_matrix_ *= scale;
 	}
 
 } // namespace scythe

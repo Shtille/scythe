@@ -15,7 +15,7 @@ namespace scythe {
 		const Vector3& sizes() const;
 		
 	protected:
-		vec3 sizes_;
+		Vector3 sizes_;
 	};
 
 } // namespace scythe

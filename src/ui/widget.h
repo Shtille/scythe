@@ -4,7 +4,7 @@
 #include "renderable.h"
 
 #include "common/types.h"
-#include "math/vector.h"
+#include "math/vector2.h"
 
 #include <list>
 
@@ -30,7 +30,7 @@ namespace scythe {
 		Widget(float x, float y, unsigned int flags);
 		virtual ~Widget();
 
-		void set_position(const vec2& position);
+		void set_position(const Vector2& position);
 		void set_active(bool active);
 		void set_enabled(bool enabled);
 
@@ -57,14 +57,14 @@ namespace scythe {
 		void EndChildSearch();
 		bool GetNextChild(Widget *& child);
 		
-		void ObtainGlobalPosition(vec2 * position);
+		void ObtainGlobalPosition(Vector2 * position);
 
 	protected:
 
 		Widget * parent_;
 		std::list<Widget*> nodes_; //!< child nodes
 		typename std::list<Widget*>::iterator child_iterator_; //!< for node enumeration
-		vec2 position_;
+		Vector2 position_;
 		unsigned int flags_;
 		bool active_;
 		bool enabled_;

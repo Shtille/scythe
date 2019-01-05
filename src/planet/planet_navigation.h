@@ -1,8 +1,7 @@
 #ifndef __SCYTHE_PLANET_NAVIGATION_H__
 #define __SCYTHE_PLANET_NAVIGATION_H__
 
-#include "math/vector.h"
-#include "math/matrix.h"
+#include "math/matrix4.h"
 
 namespace scythe {
 

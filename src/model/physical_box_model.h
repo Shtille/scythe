@@ -16,8 +16,8 @@ namespace scythe {
 		const Vector2& texture_sizes() const;
 		
 	protected:
-		vec3 sizes_;
-		vec2 texture_sizes_;
+		Vector3 sizes_;
+		Vector2 texture_sizes_;
 	};
 
 } // namespace scythe

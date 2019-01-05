@@ -15,9 +15,9 @@ namespace scythe {
 
 		void SetPinPosition(F32 pos);
 
-		void OnTouchDown(const vec2& position); //!< position is in global coordinate system
-		void OnTouchMove(const vec2& position);
-		void OnTouchUp(const vec2& position);
+		void OnTouchDown(const Vector2& position); //!< position is in global coordinate system
+		void OnTouchMove(const Vector2& position);
+		void OnTouchUp(const Vector2& position);
 
 		F32 width() const;
 		F32 height() const;
@@ -27,11 +27,11 @@ namespace scythe {
 		bool is_touched() const;
 
 	protected:
-		bool IsInsidePin(const vec2& global_position);
+		bool IsInsidePin(const Vector2& global_position);
 
 		F32 width_;
 		F32 height_;
-		vec2 old_position_;
+		Vector2 old_position_;
 		float radius_;
 		float bar_radius_;
 		float pin_position_;
@@ -48,16 +48,16 @@ namespace scythe {
 			kCircle
 		};
 		SliderColored(Renderer * renderer, Shader * shader,
-			const vec4& bar_color, const vec4& pin_color_normal, const vec4& pin_color_touch,
+			const Vector4& bar_color, const Vector4& pin_color_normal, const Vector4& pin_color_touch,
 			F32 x, F32 y, F32 width, F32 height, F32 bar_radius, U32 flags,
 			Form bar_form = kQuad, Form pin_form = kQuad);
 
 		virtual void Render() override;
 
 	protected:
-		vec4 bar_color_;
-		vec4 pin_color_normal_;
-		vec4 pin_color_touch_;
+		Vector4 bar_color_;
+		Vector4 pin_color_normal_;
+		Vector4 pin_color_touch_;
 		U32 num_bar_vertices_;
 		U32 num_pin_vertices_;
 		Form bar_form_;
@@ -80,7 +80,7 @@ namespace scythe {
 		SliderTextured(Renderer * renderer,
 			Shader * color_shader, Shader * texture_shader,
 			Texture * texture_normal, Texture * texture_touch,
-			const vec4& bar_color, F32 x, F32 y, F32 width, F32 height, F32 bar_radius, U32 flags,
+			const Vector4& bar_color, F32 x, F32 y, F32 width, F32 height, F32 bar_radius, U32 flags,
 			Form bar_form = kQuad);
 
 		virtual void Render() override;
@@ -88,7 +88,7 @@ namespace scythe {
 	protected:
 		Shader * texture_shader_;
 		Texture * texture_touch_;
-		vec4 bar_color_;
+		Vector4 bar_color_;
 		U32 num_bar_vertices_;
 		U32 num_pin_vertices_;
 		Form bar_form_;

@@ -1,18 +1,18 @@
 #ifndef __SCYTHE_MATERIAL_H__
 #define __SCYTHE_MATERIAL_H__
 
-#include "math/vector.h"
+#include "math/vector3.h"
 
 namespace scythe {
 
 	//! Base material class
 	struct Material
 	{
-		vec3 ambient;
-		vec3 diffuse;
-		vec3 specular;
-		vec3 transmittance;
-		vec3 emission;
+		Vector3 ambient;
+		Vector3 diffuse;
+		Vector3 specular;
+		Vector3 transmittance;
+		Vector3 emission;
 		float shininess;
 		float dissolve;  // 1 == opaque; 0 == fully transparent
 	};

@@ -28,13 +28,13 @@ namespace scythe {
 	//! Colored rectangle class
 	class RectColored : public Rect, public Drawable {
 	public:
-		RectColored(Renderer * renderer, Shader * shader, const vec4& color,
+		RectColored(Renderer * renderer, Shader * shader, const Vector4& color,
 			 F32 x, F32 y, F32 width, F32 height, U32 flags);
 		
 		virtual void Render() override;
 		
 	protected:
-		vec4 color_;
+		Vector4 color_;
 		
 	private:
 		virtual void BindConstUniforms() override;

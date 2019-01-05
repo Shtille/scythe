@@ -1,4 +1,5 @@
 #include "slider.h"
+#include "math/constants.h"
 
 namespace scythe {
 
@@ -22,7 +23,7 @@ namespace scythe {
 		if (pin_position_ > 1.0f)
 			pin_position_ = 1.0f;
 	}
-	void Slider::OnTouchDown(const vec2& position)
+	void Slider::OnTouchDown(const Vector2& position)
 	{
 		if (IsInsidePin(position))
 		{
@@ -30,7 +31,7 @@ namespace scythe {
 			old_position_ = position;
 		}
 	}
-	void Slider::OnTouchMove(const vec2& position)
+	void Slider::OnTouchMove(const Vector2& position)
 	{
 		if (is_touched_)
 		{
@@ -50,7 +51,7 @@ namespace scythe {
 			old_position_ = position;
 		}
 	}
-	void Slider::OnTouchUp(const vec2& position)
+	void Slider::OnTouchUp(const Vector2& position)
 	{
 		is_touched_ = false;
 	}
@@ -78,9 +79,9 @@ namespace scythe {
 	{
 		return is_touched_;
 	}
-	bool Slider::IsInsidePin(const vec2& global_position)
+	bool Slider::IsInsidePin(const Vector2& global_position)
 	{
-		vec2 position, pin_global_position;
+		Vector2 position, pin_global_position;
 		ObtainGlobalPosition(&position);
 		if (is_vertical())
 		{
@@ -100,7 +101,7 @@ namespace scythe {
 	}
 
 	SliderColored::SliderColored(Renderer * renderer, Shader * shader,
-		 const vec4& bar_color, const vec4& pin_color_normal, const vec4& pin_color_touch,
+		 const Vector4& bar_color, const Vector4& pin_color_normal, const Vector4& pin_color_touch,
 		 F32 x, F32 y, F32 width, F32 height, F32 bar_radius, U32 flags,
 		 Form bar_form, Form pin_form)
 	: Slider(x, y, width, height, bar_radius, flags)
@@ -120,7 +121,7 @@ namespace scythe {
 	}
 	void SliderColored::Render()
 	{
-		vec2 position, pin_global_position;
+		Vector2 position, pin_global_position;
 
 		ObtainGlobalPosition(&position);
 		if (is_vertical())
@@ -177,8 +178,8 @@ namespace scythe {
 		else if (pin_form_ == kCircle)
 			num_pin_vertices_ = kNumPinVertices * 3;
 		num_vertices_ = num_bar_vertices_ + num_pin_vertices_;
-		vertices_array_ = new U8[num_vertices_ * sizeof(vec2)]; // 4 * 2 * s(float)
-		vec2 * vertices = reinterpret_cast<vec2*>(vertices_array_);
+		vertices_array_ = new U8[num_vertices_ * sizeof(Vector2)]; // 4 * 2 * s(float)
+		Vector2 * vertices = reinterpret_cast<Vector2*>(vertices_array_);
 
 		// ----- Bar -----
 		unsigned int index = 0;
@@ -399,7 +400,7 @@ namespace scythe {
 	SliderTextured::SliderTextured(Renderer * renderer,
 		Shader * color_shader, Shader * texture_shader,
 		Texture * texture_normal, Texture * texture_touch,
-		const vec4& bar_color, F32 x, F32 y, F32 width, F32 height, F32 bar_radius, U32 flags,
+		const Vector4& bar_color, F32 x, F32 y, F32 width, F32 height, F32 bar_radius, U32 flags,
 		Form bar_form)
 	: Slider(x, y, width, height, bar_radius, flags)
 	, Drawable(renderer, color_shader, texture_normal)
@@ -417,7 +418,7 @@ namespace scythe {
 	}
 	void SliderTextured::Render()
 	{
-		vec2 position, pin_global_position;
+		Vector2 position, pin_global_position;
 
 		ObtainGlobalPosition(&position);
 		if (is_vertical())
@@ -477,8 +478,8 @@ namespace scythe {
 			num_bar_vertices_ = 6 + kNumVerticesPerSemicircle * 6;
 		num_pin_vertices_ = 6;
 		num_vertices_ = num_bar_vertices_ + num_pin_vertices_ * 2; // because pin uses vec4 instead of vec2
-		vertices_array_ = new U8[num_vertices_ * sizeof(vec2)]; // 4 * 2 * s(float)
-		vec2 * vertices = reinterpret_cast<vec2*>(vertices_array_);
+		vertices_array_ = new U8[num_vertices_ * sizeof(Vector2)]; // 4 * 2 * s(float)
+		Vector2 * vertices = reinterpret_cast<Vector2*>(vertices_array_);
 
 		// ----- Bar -----
 		unsigned int index = 0;

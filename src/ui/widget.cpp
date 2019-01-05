@@ -29,7 +29,7 @@ namespace scythe {
 			delete w;
 		}
 	}
-	void Widget::set_position(const vec2& position)
+	void Widget::set_position(const Vector2& position)
 	{
 		position_ = position;
 	}
@@ -155,7 +155,7 @@ namespace scythe {
 			return false;
 		}
 	}
-	void Widget::ObtainGlobalPosition(vec2 * position)
+	void Widget::ObtainGlobalPosition(Vector2 * position)
 	{
 		position->x = 0.0f;
 		position->y = 0.0f;

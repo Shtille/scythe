@@ -5,7 +5,7 @@ namespace scythe {
 	Console::Console(Renderer * renderer, Font * font,
 					 Shader * gui_shader, Shader * text_shader,
 					 F32 bottom, F32 text_height, F32 velocity, F32 aspect_ratio)
-	: vertical_board_(renderer, gui_shader, vec4(0.2f, 0.2f, 0.2f, 0.8f),
+	: vertical_board_(renderer, gui_shader, Vector4(0.2f, 0.2f, 0.2f, 0.8f),
 		aspect_ratio, // width
 		1.0f-bottom, // height
 		0.0f, // left
@@ -25,7 +25,7 @@ namespace scythe {
 		for (U32 i = 0; i < max_lines_; ++i)
 		{
 			lines_.push_back(L"");
-			labels_[i] = new Label(renderer, text_shader, font, vec4(1.0f), text_height, 256,
+			labels_[i] = new Label(renderer, text_shader, font, Vector4(1.0f), text_height, 256,
 											   0.0f, text_height*i, (U32)Flags::kRenderAlways);
 			// Attach all labels to board widget
 			vertical_board_.AttachWidget(labels_[i]);

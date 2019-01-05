@@ -2,8 +2,7 @@
 #define __SCYTHE_CAMERA_H__
 
 #include "common/types.h"
-#include "math/vector.h"
-#include "math/matrix.h"
+#include "math/matrix4.h"
 #include "math/quaternion.h"
 
 #include <vector>
@@ -14,16 +13,16 @@ namespace scythe {
 	class Camera {
 		friend class CameraManager;
 	public:
-		explicit Camera(const vec3& pos, const vec3& target_pos);
-		explicit Camera(const vec3 * pos, const vec3& target_pos);
-		explicit Camera(const vec3& pos, const vec3 * target_pos);
-		explicit Camera(const vec3 * pos, const vec3 * target_pos);
-		explicit Camera(const vec3& pos, const quat& orient);
-		explicit Camera(const vec3& pos, const quat& orient, const vec3& target_pos);
-		explicit Camera(const vec3 * pos, const quat& orient);
-		explicit Camera(const vec3& pos, const quat * orient);
-		explicit Camera(const vec3 * pos, const quat * orient);
-		explicit Camera(const quat& orient, const vec3 * target_pos, float distance);
+		explicit Camera(const Vector3& pos, const Vector3& target_pos);
+		explicit Camera(const Vector3 * pos, const Vector3& target_pos);
+		explicit Camera(const Vector3& pos, const Vector3 * target_pos);
+		explicit Camera(const Vector3 * pos, const Vector3 * target_pos);
+		explicit Camera(const Vector3& pos, const Quaternion& orient);
+		explicit Camera(const Vector3& pos, const Quaternion& orient, const Vector3& target_pos);
+		explicit Camera(const Vector3 * pos, const Quaternion& orient);
+		explicit Camera(const Vector3& pos, const Quaternion * orient);
+		explicit Camera(const Vector3 * pos, const Quaternion * orient);
+		explicit Camera(const Quaternion& orient, const Vector3 * target_pos, float distance);
 		Camera(const Camera& camera);
 		Camera();
 		~Camera();
@@ -32,28 +31,28 @@ namespace scythe {
 		
 	protected:
 		
-		void Set(const vec3& pos, const vec3& target_pos);
-		void Set(const vec3 * pos, const vec3& target_pos);
-		void Set(const vec3& pos, const vec3 * target_pos);
-		void Set(const vec3 * pos, const vec3 * target_pos);
-		void Set(const vec3& pos, const quat& orient);
-		void Set(const vec3& pos, const quat& orient, const vec3& target_pos);
-		void Set(const vec3 * pos, const quat& orient);
-		void Set(const vec3& pos, const quat * orient);
-		void Set(const vec3 * pos, const quat * orient);
-		void Set(const quat& orient, const vec3 * target_pos, float distance);
+		void Set(const Vector3& pos, const Vector3& target_pos);
+		void Set(const Vector3 * pos, const Vector3& target_pos);
+		void Set(const Vector3& pos, const Vector3 * target_pos);
+		void Set(const Vector3 * pos, const Vector3 * target_pos);
+		void Set(const Vector3& pos, const Quaternion& orient);
+		void Set(const Vector3& pos, const Quaternion& orient, const Vector3& target_pos);
+		void Set(const Vector3 * pos, const Quaternion& orient);
+		void Set(const Vector3& pos, const Quaternion * orient);
+		void Set(const Vector3 * pos, const Quaternion * orient);
+		void Set(const Quaternion& orient, const Vector3 * target_pos, float distance);
 
-		void Move(const vec3& translation);
+		void Move(const Vector3& translation);
 
 		void Update(); //!< update orientation
 
 	private:
-		const vec3 * position_ptr_;
-		const vec3 * target_position_ptr_;
-		const quat * orientation_ptr_;
-		vec3 position_;
-		vec3 target_position_;
-		quat orientation_;
+		const Vector3 * position_ptr_;
+		const Vector3 * target_position_ptr_;
+		const Quaternion * orientation_ptr_;
+		Vector3 position_;
+		Vector3 target_position_;
+		Quaternion orientation_;
 		float distance_;
 		bool is_position_; //!< owns position or refers to external pointer
 		bool is_target_position_; //!< owns target position or refers to external pointer
@@ -92,26 +91,26 @@ namespace scythe {
 		void RotateAroundTargetInX(float angle);
 		void RotateAroundTargetInY(float angle);
 		void RotateAroundTargetInZ(float angle);
-		void Move(const vec3& translation);
+		void Move(const Vector3& translation);
 
-		void MakeFree(const vec3& pos, const vec3& target_pos);
-		void MakeFree(const vec3& pos, const quat& orient);
+		void MakeFree(const Vector3& pos, const Vector3& target_pos);
+		void MakeFree(const Vector3& pos, const Quaternion& orient);
 		void MakeFree(CameraID camera_id);
-		void MakeFreeTargeted(const vec3& pos, const quat& orient, const vec3& target_pos);
-		void MakeAttached(const vec3 * pos, const quat * orient);
-		void MakeAttached(const quat& orient, const vec3 * target_pos, float distance);
+		void MakeFreeTargeted(const Vector3& pos, const Quaternion& orient, const Vector3& target_pos);
+		void MakeAttached(const Vector3 * pos, const Quaternion * orient);
+		void MakeAttached(const Quaternion& orient, const Vector3 * target_pos, float distance);
 
 		void Clear();
-		CameraID Add(const vec3& pos, const vec3& target_pos);
-		CameraID Add(const vec3* pos, const vec3& target_pos);
-		CameraID Add(const vec3& pos, const vec3* target_pos);
-		CameraID Add(const vec3* pos, const vec3* target_pos);
-		CameraID Add(const vec3& pos, const quat& orient);
-		CameraID Add(const vec3& pos, const quat& orient, const vec3& target_pos);
-		CameraID Add(const vec3* pos, const quat& orient);
-		CameraID Add(const vec3& pos, const quat* orient);
-		CameraID Add(const vec3* pos, const quat* orient);
-		CameraID Add(const quat& orient, const vec3* target_pos, float distance);
+		CameraID Add(const Vector3& pos, const Vector3& target_pos);
+		CameraID Add(const Vector3* pos, const Vector3& target_pos);
+		CameraID Add(const Vector3& pos, const Vector3* target_pos);
+		CameraID Add(const Vector3* pos, const Vector3* target_pos);
+		CameraID Add(const Vector3& pos, const Quaternion& orient);
+		CameraID Add(const Vector3& pos, const Quaternion& orient, const Vector3& target_pos);
+		CameraID Add(const Vector3* pos, const Quaternion& orient);
+		CameraID Add(const Vector3& pos, const Quaternion* orient);
+		CameraID Add(const Vector3* pos, const Quaternion* orient);
+		CameraID Add(const Quaternion& orient, const Vector3* target_pos, float distance);
 		CameraID AddAsCurrent();
 		void SetCurrent(CameraID cam_id);
 

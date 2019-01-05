@@ -1,17 +1,17 @@
 #ifndef __SCYTHE_SEGMENT_H__
 #define __SCYTHE_SEGMENT_H__
 
-#include "vector.h"
+#include "vector3.h"
 
 namespace scythe {
 
 	/** Standard mathematical segment definition */
     struct Segment {
         Segment();
-        Segment(const vec3& begin, const vec3& end);
+        Segment(const Vector3& begin, const Vector3& end);
 
-        vec3 begin;
-        vec3 end;
+		Vector3 begin;
+		Vector3 end;
     };
 
 } // namespace scythe
