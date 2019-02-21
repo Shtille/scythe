@@ -48,5 +48,6 @@ else
 	ifeq ($(UNAME_S),Darwin)
 		# Mac OS X
 		SRC_DIRS += src/platform/macosx
+		DEFINES += -DGL_SILENCE_DEPRECATION
 	endif
 endif

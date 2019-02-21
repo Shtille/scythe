@@ -955,7 +955,12 @@ void PlatformMakeContextCurrent()
 void PlatformSwapInterval(int interval)
 {
     GLint swapInt = (GLint)interval;
-    [g_window.context setValues:&swapInt forParameter:NSOpenGLCPSwapInterval];
+#if __MAC_OS_X_VERSION_MIN_REQUIRED < 101400
+    const NSOpenGLContextParameter kSwapInterval = NSOpenGLCPSwapInterval;
+#else
+    const NSOpenGLContextParameter kSwapInterval = NSOpenGLContextParameterSwapInterval;
+#endif
+    [g_window.context setValues:&swapInt forParameter:kSwapInterval];
 }
 void PlatformSetCursorPos(float x, float y)
 {
@@ -989,24 +994,36 @@ void PlatformHideCursor()
 }
 void PlatformSetClipboardText(const char *text)
 {
-    NSArray* types = [NSArray arrayWithObjects:NSStringPboardType, nil];
+    const NSPasteboardType kPasteboardType = 
+#if __MAC_OS_X_VERSION_MIN_REQUIRED < 101400
+        NSStringPboardType;
+#else
+        NSPasteboardTypeString;
+#endif
+    NSArray* types = [NSArray arrayWithObjects:kPasteboardType, nil];
     
     NSPasteboard* pasteboard = [NSPasteboard generalPasteboard];
     [pasteboard declareTypes:types owner:nil];
     [pasteboard setString:[NSString stringWithUTF8String:text]
-                  forType:NSStringPboardType];
+                  forType:kPasteboardType];
 }
 std::string PlatformGetClipboardText()
 {
+    const NSPasteboardType kPasteboardType = 
+#if __MAC_OS_X_VERSION_MIN_REQUIRED < 101400
+        NSStringPboardType;
+#else
+        NSPasteboardTypeString;
+#endif
     NSPasteboard* pasteboard = [NSPasteboard generalPasteboard];
     
-    if (![[pasteboard types] containsObject:NSStringPboardType])
+    if (![[pasteboard types] containsObject:kPasteboardType])
     {
         NSLog(@"Cocoa: Failed to retrieve string from pasteboard");
         return NULL;
     }
     
-    NSString* object = [pasteboard stringForType:NSStringPboardType];
+    NSString* object = [pasteboard stringForType:kPasteboardType];
     if (!object)
     {
         NSLog(@"Cocoa: Failed to retrieve object from pasteboard");
