@@ -87,6 +87,7 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	static POINT mouse_position;
 
 	scythe::DesktopApplication * app = scythe::Application::GetInstance()->Upcast<scythe::DesktopApplication>();
+	scythe::DesktopInputListener * input_listener = app->GetInputListener()->Upcast<scythe::DesktopInputListener>();
 	switch (uMsg)
 	{
 	case WM_SYSCOMMAND:
@@ -143,8 +144,8 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_CHAR:
 	{
 		unsigned short code = static_cast<unsigned short>(wParam);
-		if (scythe::Keys::IsGoodChar(code))
-			app->OnChar(code);
+		if (input_listener && scythe::Keys::IsGoodChar(code))
+			input_listener->OnChar(code);
 		return 0;
 	}
 
@@ -159,7 +160,8 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		app->keys().key_down(translated_key) = true;
 		app->keys().modifiers() = modifiers;
 
-		app->OnKeyDown(translated_key, modifiers);
+		if (input_listener)
+			input_listener->OnKeyDown(translated_key, modifiers);
 		break;
 	}
 
@@ -179,46 +181,61 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			// Release both Shift keys on Shift up event, as only one event
 			// is sent even if both keys are released
-			app->OnKeyUp(scythe::PublicKey::kLeftShift, modifiers);
-			app->OnKeyUp(scythe::PublicKey::kRightShift, modifiers);
+			if (input_listener)
+			{
+				input_listener->OnKeyUp(scythe::PublicKey::kLeftShift, modifiers);
+				input_listener->OnKeyUp(scythe::PublicKey::kRightShift, modifiers);
+			}
 		}
 		else if (wParam == VK_SNAPSHOT)
 		{
 			// Key down is not reported for the print screen key
-			app->OnKeyDown(scythe::PublicKey::kPrintScreen, modifiers);
-			app->OnKeyUp(scythe::PublicKey::kPrintScreen, modifiers);
+			if (input_listener)
+			{
+				input_listener->OnKeyDown(scythe::PublicKey::kPrintScreen, modifiers);
+				input_listener->OnKeyUp(scythe::PublicKey::kPrintScreen, modifiers);
+			}
 		}
 		else
-			app->OnKeyUp(translated_key, modifiers);
+		{
+			if (input_listener)
+				input_listener->OnKeyUp(translated_key, modifiers);
+		}
 
 		break;
 	}
 
 	case WM_LBUTTONDOWN:
 		app->mouse().button_down(scythe::MouseButton::kLeft) = true;
-		app->OnMouseDown(scythe::MouseButton::kLeft, TranslateModifiers());
+		if (input_listener)
+			input_listener->OnMouseDown(scythe::MouseButton::kLeft, TranslateModifiers());
 		return 0;
 	case WM_LBUTTONUP:
 		app->mouse().button_down(scythe::MouseButton::kLeft) = false;
-		app->OnMouseUp(scythe::MouseButton::kLeft, TranslateModifiers());
+		if (input_listener)
+			input_listener->OnMouseUp(scythe::MouseButton::kLeft, TranslateModifiers());
 		return 0;
 
 	case WM_MBUTTONDOWN:
 		app->mouse().button_down(scythe::MouseButton::kMiddle) = true;
-		app->OnMouseDown(scythe::MouseButton::kMiddle, TranslateModifiers());
+		if (input_listener)
+			input_listener->OnMouseDown(scythe::MouseButton::kMiddle, TranslateModifiers());
 		return 0;
 	case WM_MBUTTONUP:
 		app->mouse().button_down(scythe::MouseButton::kMiddle) = false;
-		app->OnMouseUp(scythe::MouseButton::kMiddle, TranslateModifiers());
+		if (input_listener)
+			input_listener->OnMouseUp(scythe::MouseButton::kMiddle, TranslateModifiers());
 		return 0;
 
 	case WM_RBUTTONDOWN:
 		app->mouse().button_down(scythe::MouseButton::kRight) = true;
-		app->OnMouseDown(scythe::MouseButton::kRight, TranslateModifiers());
+		if (input_listener)
+			input_listener->OnMouseDown(scythe::MouseButton::kRight, TranslateModifiers());
 		return 0;
 	case WM_RBUTTONUP:
 		app->mouse().button_down(scythe::MouseButton::kRight) = false;
-		app->OnMouseUp(scythe::MouseButton::kRight, TranslateModifiers());
+		if (input_listener)
+			input_listener->OnMouseUp(scythe::MouseButton::kRight, TranslateModifiers());
 		return 0;
 
 	case WM_MOUSEMOVE:
@@ -234,16 +251,19 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			::GetClientRect(hWnd, &client_rect);
 			app->mouse().x() = static_cast<float>(mouse_position.x);
 			app->mouse().y() = static_cast<float>(client_rect.bottom - mouse_position.y - 1);
-			app->OnMouseMove();
+			if (input_listener)
+				input_listener->OnMouseMove();
 			old_mouse_position = mouse_position;
 		}
 		return 0;
 
 	case WM_MOUSEWHEEL:
-		app->OnScroll(0.0f, (float)HIWORD(wParam) / (float)WHEEL_DELTA);
+		if (input_listener)
+			input_listener->OnScroll(0.0f, (float)HIWORD(wParam) / (float)WHEEL_DELTA);
 		return 0;
 	case WM_MOUSEHWHEEL:
-		app->OnScroll(-((float)HIWORD(wParam) / (float)WHEEL_DELTA), 0.0f);
+		if (input_listener)
+			input_listener->OnScroll(-((float)HIWORD(wParam) / (float)WHEEL_DELTA), 0.0f);
 		return 0;
 	}
 

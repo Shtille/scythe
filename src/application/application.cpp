@@ -13,7 +13,8 @@ namespace scythe {
 	Application * Application::app_ = nullptr;
 
 	Application::Application()
-	: renderer_(nullptr)
+	: input_listener_(nullptr)
+	, renderer_(nullptr)
 	, width_(800)
 	, height_(600)
 	, aspect_ratio_(1.0f)
@@ -33,6 +34,14 @@ namespace scythe {
 	Application* Application::GetInstance()
 	{
 		return app_;
+	}
+	InputListener * Application::GetInputListener()
+	{
+		return input_listener_;
+	}
+	void Application::SetInputListener(InputListener * listener)
+	{
+		input_listener_ = listener;
 	}
 	void Application::SetClipboardText(const char *text)
 	{

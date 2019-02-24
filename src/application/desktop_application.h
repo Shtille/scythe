@@ -5,6 +5,7 @@
 
 #include "input/keys.h"
 #include "input/mouse.h"
+#include "input/desktop_input_listener.h"
 
 namespace scythe {
 
@@ -53,13 +54,6 @@ namespace scythe {
 		virtual const bool IsDecorated(); //!< window style is decorated
 
 		// --- Messages ---
-		virtual void OnChar(unsigned short code);
-		virtual void OnKeyDown(PublicKey key, int modifiers);
-		virtual void OnKeyUp(PublicKey key, int modifiers);
-		virtual void OnMouseDown(MouseButton button, int modifiers);
-		virtual void OnMouseUp(MouseButton button, int modifiers);
-		virtual void OnMouseMove();
-		virtual void OnScroll(float delta_x, float delta_y);
 		virtual void OnSize(int w, int h);
 
 	protected:

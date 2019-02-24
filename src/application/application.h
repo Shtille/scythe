@@ -2,6 +2,7 @@
 #define __SCYTHE_APPLICATION_H__
 
 #include "common/types.h"
+#include "input/input_listener.h"
 
 #include <string>
 
@@ -23,6 +24,9 @@ namespace scythe {
 		{
 			return dynamic_cast<T*>(this);
 		}
+
+		InputListener * GetInputListener();
+		void SetInputListener(InputListener * listener);
 		
 		// Clipboard operations
 		void SetClipboardText(const char *text);
@@ -66,6 +70,7 @@ namespace scythe {
 
 		void ComputeFramebufferSize();
 
+		InputListener * input_listener_;//!< input listener
 		Renderer *renderer_;			//!< our renderer object
 		int width_;						//!< width of the window
 		int height_;					//!< height of the window

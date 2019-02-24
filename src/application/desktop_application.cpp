@@ -167,27 +167,6 @@ namespace scythe {
 	{
 		return true;
 	}
-	void DesktopApplication::OnChar(unsigned short code)
-	{
-	}
-	void DesktopApplication::OnKeyDown(PublicKey key, int modifiers)
-	{
-	}
-	void DesktopApplication::OnKeyUp(PublicKey key, int modifiers)
-	{
-	}
-	void DesktopApplication::OnMouseDown(MouseButton button, int modifiers)
-	{
-	}
-	void DesktopApplication::OnMouseUp(MouseButton button, int modifiers)
-	{
-	}
-	void DesktopApplication::OnMouseMove()
-	{
-	}
-	void DesktopApplication::OnScroll(float delta_x, float delta_y)
-	{
-	}
 	void DesktopApplication::OnSize(int w, int h)
 	{
 		width_ = w;
