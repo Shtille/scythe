@@ -325,7 +325,7 @@ public:
 	/**
 	 * Obtains the direction and stores result in dst.
 	 *
-	 * @param e The vector which stores the direction.
+	 * @param dst The vector which stores the direction.
 	 */
 	void GetDirection(Vector3 * dst) const;
 
