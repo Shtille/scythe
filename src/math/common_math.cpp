@@ -93,11 +93,15 @@ namespace scythe {
 		float D = b * b - c;
 		if (D < 0.0f) // ray cannot intersect sphere
 			return false;
-		// Ray can intersect the sphere, solve closer hitpoint
-		float t = -b - sqrtf(D);
+		float t;
+		if (c > 0.0f) // origin is outside of sphere, choose closer hitpoint
+			t = -b - sqrtf(D);
+		else // origin is inside the sphere, choose forward hitpoint
+			t = -b + sqrtf(D);
 		if (t > 0.0f)
 		{
-			*intersection = origin + t * direction;
+			if (intersection)
+				*intersection = origin + t * direction;
 			return true;
 		}
 		else
@@ -109,9 +113,12 @@ namespace scythe {
 		float denom = direction.x * plane.x + direction.y * plane.y + direction.z * plane.z;
 		if (denom > 0.001f || denom < -0.001f)
 		{
-			float t = -(origin.x * plane.x + origin.y * plane.y + origin.z * plane.z + plane.w)
-				 / denom;
-			*intersection = origin + t * direction;
+			if (intersection)
+			{
+				float t = -(origin.x * plane.x + origin.y * plane.y + origin.z * plane.z + plane.w)
+					 / denom;
+				*intersection = origin + t * direction;
+			}
 			return true;
 		}
 		else
