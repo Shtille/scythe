@@ -1,9 +1,12 @@
 # Makefile for scythe
+ifeq ($(LIBRARY_PATH),)
+	$(warning LIBRARY_PATH should be set by parent makefile with absolute path)
+endif
 
 TARGET = scythe
-STATIC_LIB = lib$(TARGET)$(STATIC_LIB_EXT)
-SHARED_LIB = lib$(TARGET)$(SHARED_LIB_EXT)
-LIBRARY_PATH = ../lib
+LIBRARY_PATH := ../lib
+STATIC_LIB = $(LIBRARY_PATH)/lib$(TARGET)$(STATIC_LIB_EXT)
+SHARED_LIB = $(LIBRARY_PATH)/lib$(TARGET)$(SHARED_LIB_EXT)
 
 ifeq ($(IS_STATIC),NO)
 TARGET_TYPE = dynamic
