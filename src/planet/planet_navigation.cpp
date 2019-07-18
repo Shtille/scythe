@@ -88,10 +88,8 @@ namespace scythe {
 							  const Vector4& viewport, const Matrix4& proj, const Matrix4& view)
 	{
 		Vector2 screen_point(screen_x, screen_y);
-		Vector3 ray;
-		ScreenToRay(screen_point, viewport, proj, view, &ray);
-		const Vector3& origin = *camera_manager_->position();
-		is_pan_mode_ = RaySphereIntersection(origin, ray, planet_position_, planet_radius_, &pan_point_);
+		old_screen_point_ = screen_point;
+		is_pan_mode_ = true;
 		// Clear all animations
 		camera_manager_->PathClear();
 		camera_manager_->Clear();
@@ -101,61 +99,48 @@ namespace scythe {
 	{
 		if (!is_pan_mode_)
 			return;
+
+		/*
+		Algorithm description.
+		Works only with perspective projection.
+		We did approximate approach like old screen position was at screen center
+		and camera always looks down.
+
+		angle = atan(l / R)
+		l / d = tan(view_angle)
+		x / h = tan(view_angle)
+		h = x_max / tan(fovx/2)
+
+		In clip space x_max = 1, so
+		angle = atan((d * x / factor_x) / R)
+		*/
+		const Vector3& camera_position = *camera_manager_->position();
+		float distance = camera_position.Distance(planet_position_);
 		
 		Vector2 screen_point(screen_x, screen_y);
-		Vector3 ray;
-		ScreenToRay(screen_point, viewport, proj, view, &ray);
-		const Vector3& origin = *camera_manager_->position();
-		Vector3 new_point;
-		if (RaySphereIntersection(origin, ray, planet_position_, planet_radius_, &new_point))
-		{
-			Vector3 first_vector, second_vector;
-			float dot_product;
-			// Forward should vector should point down, up and side will be tangent to sphere
-			// We will rotate in two planes
-			Vector3 normal1 = camera_manager_->GetUp();
-			Vector3 normal2 = camera_manager_->GetSide();
-			Vector3 distance1 = (new_point - pan_point_) & normal1;
-			Vector3 projected_point = new_point - distance1 * normal1;
-			
-			Vector3 plane_point1 = (pan_point_ & normal1) * normal1 + planet_position_;
-			first_vector = pan_point_ - plane_point1;
-			first_vector.Normalize();
-			second_vector = projected_point - plane_point1;
-			second_vector.Normalize();
-			dot_product = first_vector & second_vector;
-			if (dot_product > 1.0f)
-				dot_product = 1.0f;
-			float angle1 = acosf(dot_product);
-			if (((projected_point - pan_point_) & normal2) < 0.0f)
-				angle1 = -angle1;
-			
-			Vector3 plane_point2 = (new_point & normal2) * normal2 + planet_position_;
-			first_vector = projected_point - plane_point2;
-			first_vector.Normalize();
-			second_vector = new_point - plane_point2;
-			second_vector.Normalize();
-			dot_product = first_vector & second_vector;
-			if (dot_product > 1.0f)
-				dot_product = 1.0f;
-			float angle2 = acosf(dot_product);
-			if (((projected_point - new_point) & normal1) < 0.0f)
-				angle2 = -angle2;
+		Vector2 screen_delta = screen_point - old_screen_point_;
+		old_screen_point_ = screen_point;
 
-			Quaternion transform1(Vector3::UnitY(), angle1);
-			Quaternion transform2(Vector3::UnitZ(), angle2);
-			Quaternion inverse_transform = transform1 * transform2;
-			inverse_transform.Inverse();
+		Vector2 screen_ndc;
+		screen_ndc.x = screen_delta.x / viewport.z;
+		screen_ndc.y = screen_delta.y / viewport.w;
 
-			Quaternion new_orient = *camera_manager_->orientation() * inverse_transform;
-			new_orient.Normalize();
-			const Vector3& cam_pos = *camera_manager_->position();
-			float distance = cam_pos.Distance(planet_position_);
-			Vector3 direction;
-			new_orient.GetDirection(&direction); // ?????
-			Vector3 new_pos = planet_position_ - distance * direction;
-			camera_manager_->MakeFreeTargeted(new_pos, new_orient, planet_position_);
-		}
+		float factor_x = proj.m[0]; // 1/tan(fovx/2)
+		float factor_y = proj.m[5]; // 1/tan(fovy/2)
+
+		float angle_x = atan((distance * (screen_ndc.x / factor_x)) / planet_radius_);
+		float angle_y = atan((distance * (screen_ndc.y / factor_y)) / planet_radius_);
+
+		Quaternion transform1(Vector3::UnitY(), -angle_x);
+		Quaternion transform2(Vector3::UnitZ(), angle_y);
+		Quaternion transform = transform1 * transform2;
+
+		Quaternion new_orient = *camera_manager_->orientation() * transform;
+		new_orient.Normalize();
+		Vector3 direction;
+		new_orient.GetDirection(&direction);
+		Vector3 new_pos = planet_position_ - distance * direction;
+		camera_manager_->MakeFreeTargeted(new_pos, new_orient, planet_position_);
 	}
 	void PlanetNavigation::PanEnd()
 	{

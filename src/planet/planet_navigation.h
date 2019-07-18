@@ -2,6 +2,7 @@
 #define __SCYTHE_PLANET_NAVIGATION_H__
 
 #include "math/matrix4.h"
+#include "math/vector2.h"
 
 namespace scythe {
 
@@ -44,7 +45,7 @@ namespace scythe {
 		int num_scales_;					//!< number of scales
 		int current_scale_index_;			//!< current scale index
 		float * distances_;					//!< array of distances
-		Vector3 pan_point_;					//!< point that stays always under mouse during paning
+		Vector2 old_screen_point_;			//!< old screen position of mouse
 		bool is_pan_mode_;					//!< is pan mode enabled
 	};
 
