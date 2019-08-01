@@ -34,8 +34,13 @@ OBJECTS := $(patsubst %,$(OBJDIR)/%.o,$(basename $(SRC_FILES)))
 DEPS := $(patsubst %,$(DEPDIR)/%.d,$(basename $(SRC_FILES)))
 
 # compilers (at least gcc and clang) don't create the subdirectories automatically
+ifeq ($(OS),Windows_NT)
+$(foreach dir,$(subst /,$(SL),$(dir $(OBJECTS))),$(shell if not exist $(dir) mkdir $(dir)))
+$(foreach dir,$(subst /,$(SL),$(dir $(DEPS))),$(shell if not exist $(dir) mkdir $(dir)))
+else
 $(shell mkdir -p $(dir $(OBJECTS)) >/dev/null)
 $(shell mkdir -p $(dir $(DEPS)) >/dev/null)
+endif
 
 # C flags
 CFLAGS := -std=c11
@@ -77,7 +82,7 @@ endif
 PRECOMPILE =
 # postcompile step
 ifeq ($(OS),Windows_NT)
-	POSTCOMPILE = MOVE /Y $(DEPDIR)\$*.Td $(DEPDIR)\$*.d
+	POSTCOMPILE = MOVE /Y $(DEPDIR)$(SL)$(subst /,$(SL),$*.Td) $(DEPDIR)$(SL)$(subst /,$(SL),$*.d)
 else
 	POSTCOMPILE = mv -f $(DEPDIR)/$*.Td $(DEPDIR)/$*.d
 endif
