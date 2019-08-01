@@ -1,10 +1,10 @@
 # Makefile for scythe
+
 ifeq ($(LIBRARY_PATH),)
-	$(warning LIBRARY_PATH should be set by parent makefile with absolute path)
+	$(error LIBRARY_PATH should be set by parent makefile with absolute path)
 endif
 
 TARGET = scythe
-LIBRARY_PATH := ../lib
 STATIC_LIB = $(LIBRARY_PATH)/lib$(TARGET)$(STATIC_LIB_EXT)
 SHARED_LIB = $(LIBRARY_PATH)/lib$(TARGET)$(SHARED_LIB_EXT)
 
