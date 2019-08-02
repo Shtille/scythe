@@ -4,9 +4,8 @@
 
 namespace scythe {
 
-	Scene::Scene(Renderer * renderer)
-	: renderer_(renderer)
-	, next_(nullptr)
+	Scene::Scene()
+	: attached_scene_(nullptr)
 	{
 
 	}
@@ -14,13 +13,17 @@ namespace scythe {
 	{
 
 	}
-	void Scene::SetNextScene(Scene * scene)
+	void Scene::Attach(Scene * scene)
 	{
-		next_ = scene;
+		attached_scene_ = scene;
 	}
-	Scene * Scene::next()
+	void Scene::Detach()
 	{
-		return next_;
+		attached_scene_ = nullptr;
+	}
+	Scene * Scene::attached_scene()
+	{
+		return attached_scene_;
 	}
 	void Scene::UpdatePhysics(float sec)
 	{
@@ -52,26 +55,6 @@ namespace scythe {
 		ResourceID id = resource_manager->GetResourceIdByName(string_id);
 		resources_.push_back(id);
 		return id;
-	}
-	void Scene::OnChar(unsigned short code)
-	{
-
-	}
-	void Scene::OnKeyDown(PublicKey key, int mods)
-	{
-
-	}
-	void Scene::OnMouseDown(MouseButton button, int modifiers, float x, float y)
-	{
-
-	}
-	void Scene::OnMouseUp(MouseButton button, int modifiers, float x, float y)
-	{
-
-	}
-	void Scene::OnMouseMove(float x, float y)
-	{
-		
 	}
 
 } // namespace scythe

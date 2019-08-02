@@ -3,12 +3,27 @@
 
 namespace scythe {
 
-	class SceneTransitionListenerInterface {
+	/**
+	 * Defines scene transition listener interface
+	 */
+	class SceneTransitionListener {
 	public:
-		virtual ~SceneTransitionListenerInterface() = default;
+		virtual ~SceneTransitionListener() = default;
 
+		/**
+		 * Notification of how many steps are expected
+		 * @param count Number of steps.
+		 */
 		virtual void OnObtainCount(int count) = 0;
+
+		/**
+		 * Notification of one step completion
+		 */
 		virtual void OnStep() = 0;
+
+		/**
+		 * Notification of transition finish
+		 */
 		virtual void OnFinish() = 0;
 	};
 

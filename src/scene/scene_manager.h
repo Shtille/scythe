@@ -1,23 +1,27 @@
-#ifndef __SCYTHE_SCENE_MANAGER_H__
-#define __SCYTHE_SCENE_MANAGER_H__
+#ifndef __SCYTHE_SCENE_TRANSITION_MANAGER_H__
+#define __SCYTHE_SCENE_TRANSITION_MANAGER_H__
 
 #include "scene_transition_listener.h"
-#include "event/event_listener.h"
-#include "input/keys.h"
-#include "input/mouse.h"
 
 namespace scythe {
 
+	// Forward declarations
 	class Scene;
 
-	enum class Transition {
+	/**
+	 * Defines scene transition type
+	 */
+	enum class SceneTransition {
 		kNone,
 		kImmediate,
 		kDeferred,
 		kAsyncronous
 	};
 
-	class SceneManager : public EventListenerInterface {
+	/**
+	 * Defines scene manager
+	 */
+	class SceneManager {
 	public:
 		SceneManager();
 		virtual ~SceneManager();
@@ -26,16 +30,8 @@ namespace scythe {
 		void UpdatePhysics(float sec);
 		void Render();
 
-		// Desktop-based user input message processing
-		void OnChar(unsigned short code);
-		void OnKeyDown(PublicKey key, int mods);
-		void OnMouseDown(MouseButton button, int modifiers, float x, float y);
-		void OnMouseUp(MouseButton button, int modifiers, float x, float y);
-		void OnMouseMove(float x, float y);
-
-	protected:
 		void RequestImmediateTransition(Scene * scene);
-		void RequestDeferredTransition(Scene * scene, Scene * loading_scene, SceneTransitionListenerInterface * listener);
+		void RequestDeferredTransition(Scene * scene, Scene * loading_scene, SceneTransitionListener * listener);
 
 	private:
 		void UpdateTransition();
@@ -45,11 +41,11 @@ namespace scythe {
 		Scene * current_scene_;
 		Scene * next_scene_;
 		Scene * loading_scene_;
-		SceneTransitionListenerInterface * listener_;
+		SceneTransitionListener * listener_;
 		int transition_phase_;
-		int render_count_;								//!< number of render calls after transition
-		Transition transition_type_;
-		bool transition_finalization_;					//!< whether we need to do some render calls after transition
+		int render_count_;				//!< number of render calls after transition
+		SceneTransition transition_type_;
+		bool transition_finalization_;	//!< whether we need to do some render calls after transition
 	};
 
 } // namespace scythe

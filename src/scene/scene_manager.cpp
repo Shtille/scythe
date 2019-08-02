@@ -17,7 +17,7 @@ namespace scythe {
 	, listener_(nullptr)
 	, transition_phase_(0)
 	, render_count_(0)
-	, transition_type_(Transition::kNone)
+	, transition_type_(SceneTransition::kNone)
 	, transition_finalization_(false)
 	{
 
@@ -54,44 +54,19 @@ namespace scythe {
 		else if (current_scene_)
 			current_scene_->Render();
 	}
-	void SceneManager::OnChar(unsigned short code)
-	{
-		if (current_scene_)
-			current_scene_->OnChar(code);
-	}
-	void SceneManager::OnKeyDown(PublicKey key, int mods)
-	{
-		if (current_scene_)
-			current_scene_->OnKeyDown(key, mods);
-	}
-	void SceneManager::OnMouseDown(MouseButton button, int modifiers, float x, float y)
-	{
-		if (current_scene_)
-			current_scene_->OnMouseDown(button, modifiers, x, y);
-	}
-	void SceneManager::OnMouseUp(MouseButton button, int modifiers, float x, float y)
-	{
-		if (current_scene_)
-			current_scene_->OnMouseUp(button, modifiers, x, y);
-	}
-	void SceneManager::OnMouseMove(float x, float y)
-	{
-		if (current_scene_)
-			current_scene_->OnMouseMove(x, y);
-	}
 	void SceneManager::RequestImmediateTransition(Scene * scene)
 	{
 		next_scene_ = scene;
 		loading_scene_ = nullptr;
 		listener_ = nullptr;
-		transition_type_ = Transition::kImmediate;
+		transition_type_ = SceneTransition::kImmediate;
 	}
-	void SceneManager::RequestDeferredTransition(Scene * scene, Scene * loading_scene, SceneTransitionListenerInterface * listener)
+	void SceneManager::RequestDeferredTransition(Scene * scene, Scene * loading_scene, SceneTransitionListener * listener)
 	{
 		next_scene_ = scene;
 		loading_scene_ = loading_scene;
 		listener_ = listener;
-		transition_type_ = Transition::kDeferred;
+		transition_type_ = SceneTransition::kDeferred;
 	}
 	bool SceneManager::ImmediateTransition()
 	{
@@ -113,13 +88,13 @@ namespace scythe {
 		while (scene != nullptr)
 		{
 			scene->RequestUnload();
-			scene = scene->next();
+			scene = scene->attached_scene();
 		}
 		scene = next_scene_;
 		while (scene != nullptr)
 		{
 			scene->RequestLoad();
-			scene = scene->next();
+			scene = scene->attached_scene();
 		}
 
 		ResourceManager::GetInstance()->Perform();
@@ -128,13 +103,13 @@ namespace scythe {
 		while (scene != nullptr)
 		{
 			scene->Unload();
-			scene = scene->next();
+			scene = scene->attached_scene();
 		}
 		scene = next_scene_;
 		while (scene != nullptr)
 		{
 			scene->Load();
-			scene = scene->next();
+			scene = scene->attached_scene();
 		}
 		// Nullify the current scene
 		current_scene_ = nullptr;
@@ -153,13 +128,13 @@ namespace scythe {
 			while (scene != nullptr)
 			{
 				scene->RequestUnload();
-				scene = scene->next();
+				scene = scene->attached_scene();
 			}
 			scene = next_scene_;
 			while (scene != nullptr)
 			{
 				scene->RequestLoad();
-				scene = scene->next();
+				scene = scene->attached_scene();
 			}
 			++transition_phase_;
 			if (listener_)
@@ -177,13 +152,13 @@ namespace scythe {
 			while (scene != nullptr)
 			{
 				scene->Unload();
-				scene = scene->next();
+				scene = scene->attached_scene();
 			}
 			scene = next_scene_;
 			while (scene != nullptr)
 			{
 				scene->Load();
-				scene = scene->next();
+				scene = scene->attached_scene();
 			}
 			// Nullify the current scene
 			current_scene_ = nullptr;
@@ -194,7 +169,7 @@ namespace scythe {
 				transition_finalization_ = true;
 			if (render_count_ >= kRequiredRenderCount)
 			{
-				// Transition has been completed
+				// SceneTransition has been completed
 				if (listener_)
 					listener_->OnFinish();
 				transition_phase_ = 0;
@@ -210,19 +185,19 @@ namespace scythe {
 	}
 	void SceneManager::UpdateTransition()
 	{
-		if (transition_type_ != Transition::kNone)
+		if (transition_type_ != SceneTransition::kNone)
 		{
-			if (transition_type_ == Transition::kImmediate)
+			if (transition_type_ == SceneTransition::kImmediate)
 			{
 				if (ImmediateTransition())
 				{
 					current_scene_ = next_scene_;
 					next_scene_ = nullptr;
 					// Immediate transition doesn't use a listener
-					transition_type_ = Transition::kNone;
+					transition_type_ = SceneTransition::kNone;
 				}
 			}
-			else if (transition_type_ == Transition::kDeferred)
+			else if (transition_type_ == SceneTransition::kDeferred)
 			{
 				if (DeferredTransition())
 				{
@@ -230,10 +205,10 @@ namespace scythe {
 					next_scene_ = nullptr;
 					loading_scene_ = nullptr;
 					listener_ = nullptr;
-					transition_type_ = Transition::kNone;
+					transition_type_ = SceneTransition::kNone;
 				}
 			}
-			else if (transition_type_ == Transition::kAsyncronous)
+			else if (transition_type_ == SceneTransition::kAsyncronous)
 			{
 				// Haven't been done yet
 			}

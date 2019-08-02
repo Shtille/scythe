@@ -3,21 +3,29 @@
 
 #include "resource.h"
 #include "string_id.h"
-#include "graphics/renderer.h"
-#include "input/keys.h"
-#include "input/mouse.h"
 
 #include <vector>
 
 namespace scythe {
 
+	/**
+	 * Defines base scene class
+	 */
 	class Scene {
 	public:
-		Scene(Renderer * renderer);
+		Scene();
 		virtual ~Scene();
 
-		void SetNextScene(Scene * scene);
-		Scene * next();
+		/**
+		 * Attaches scene to be loaded with this one
+		 */
+		void Attach(Scene * scene);
+
+		/**
+		 * Detaches scene
+		 */
+		void Detach();
+		Scene * attached_scene();
 
 		virtual void Update() = 0;
 		virtual void UpdatePhysics(float sec);
@@ -29,19 +37,10 @@ namespace scythe {
 		void RequestLoad();
 		void RequestUnload();
 
-		// TODO: remove input processing from here
-		// Desktop-based user input message processing
-		virtual void OnChar(unsigned short code);
-		virtual void OnKeyDown(PublicKey key, int mods);
-		virtual void OnMouseDown(MouseButton button, int modifiers, float x, float y);
-		virtual void OnMouseUp(MouseButton button, int modifiers, float x, float y);
-		virtual void OnMouseMove(float x, float y);
-
 	protected:
 		ResourceID AddResourceIdByName(StringID string_id);
 
-		Renderer * renderer_;
-		Scene * next_;
+		Scene * attached_scene_;
 		std::vector<ResourceID> resources_;
 	};
 
