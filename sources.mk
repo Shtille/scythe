@@ -38,6 +38,7 @@ SRC_DIRS += src/platform
 ifeq ($(OS),Windows_NT)
 	# Windows
 	SRC_DIRS += src/platform/windows
+	INCLUDE += -I$(THIRDPARTY)/glew/include
 	DEFINES += -DGLEW_STATIC
 else
 	# Posix based
