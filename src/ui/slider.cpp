@@ -1,6 +1,8 @@
 #include "slider.h"
 #include "math/constants.h"
 
+#include <math.h>
+
 namespace scythe {
 
 	Slider::Slider(F32 x, F32 y, F32 width, F32 height, F32 bar_radius, U32 flags)
