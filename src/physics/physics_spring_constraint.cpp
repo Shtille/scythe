@@ -16,7 +16,7 @@ namespace scythe {
 		b_ = b;
 
 		Vector3 origin = centerOfMassMidpoint(a->GetNode(), b->GetNode());
-		constraint_ = new btGeneric6DofSpringConstraint(*a->body_, *b->body_, getTransformOffset(a->GetNode(), origin), getTransformOffset(b->GetNode(), origin), true);
+		constraint_ = new btGeneric6DofSpringConstraint(*a->body_, *b->body_, GetTransformOffset(a->GetNode(), origin), GetTransformOffset(b->GetNode(), origin), true);
 	}
 
 	PhysicsSpringConstraint::PhysicsSpringConstraint(PhysicsRigidBody* a, const Quaternion& rotationOffsetA, const Vector3& translationOffsetA,
@@ -31,11 +31,11 @@ namespace scythe {
 
 		// Take scale into account for the translation offsets.
 		Vector3 sA;
-		a->GetNode()->getWorldMatrix().getScale(&sA);
+		a->GetNode()->GetWorldMatrix().GetScale(&sA);
 		Vector3 tA(translationOffsetA.x * sA.x, translationOffsetA.y * sA.y, translationOffsetA.z * sA.z);
 
 		Vector3 sB;
-		b->GetNode()->getWorldMatrix().getScale(&sB);
+		b->GetNode()->GetWorldMatrix().GetScale(&sB);
 		Vector3 tB(translationOffsetB.x * sB.x, translationOffsetB.y * sB.y, translationOffsetB.z * sB.z);
 
 		btTransform frameInA(BQ(rotationOffsetA), BV(tA));
@@ -51,7 +51,7 @@ namespace scythe {
 	void PhysicsSpringConstraint::SetStrength(SpringProperty property, float strength)
 	{
 		SC_ASSERT(constraint_);
-		if (strength < MATH_EPSILON)
+		if (strength < kFloatEpsilon)
 			((btGeneric6DofSpringConstraint*)constraint_)->enableSpring(property, false);
 		else
 		{

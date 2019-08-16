@@ -59,7 +59,7 @@ namespace scythe {
 		return ghost_object_;
 	}
 
-	void PhysicsGhostObject::transformChanged(Transform* transform, long cookie)
+	void PhysicsGhostObject::TransformChanged(Transform* transform, long cookie)
 	{
 		SC_ASSERT(motion_state_);
 		SC_ASSERT(ghost_object_);

@@ -26,7 +26,7 @@ namespace scythe {
 		/**
 		 * Used to synchronize the transform between Scythe and Bullet.
 		 */
-		void transformChanged(Transform* transform, long cookie);
+		void TransformChanged(Transform* transform, long cookie) override;
 
 	protected:
 

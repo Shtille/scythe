@@ -22,7 +22,7 @@ namespace scythe {
 
 		// Take scale into account for the first node's translation offset.
 		Vector3 sA;
-		a->GetNode()->getWorldMatrix().getScale(&sA);
+		a->GetNode()->GetWorldMatrix().GetScale(&sA);
 		Vector3 tA(translationOffsetA.x * sA.x, translationOffsetA.y * sA.y, translationOffsetA.z * sA.z);
 
 		if (b)
@@ -31,7 +31,7 @@ namespace scythe {
 
 			// Take scale into account for the second node's translation offset.
 			Vector3 sB;
-			b->GetNode()->getWorldMatrix().getScale(&sB);
+			b->GetNode()->GetWorldMatrix().GetScale(&sB);
 			Vector3 tB(translationOffsetB.x * sB.x, translationOffsetB.y * sB.y, translationOffsetB.z * sB.z);
 
 			btTransform frameInA(BQ(rotationOffsetA), BV(tA));

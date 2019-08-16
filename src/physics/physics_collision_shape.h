@@ -138,7 +138,7 @@ namespace scythe {
 		 *
 		 * @return Definition of a box shape.
 		 */
-		static PhysicsCollisionShape::Definition DefineBox(const Vector3& extents, const Vector3& center = Vector3::zero(), bool absolute = false);
+		static PhysicsCollisionShape::Definition DefineBox(const Vector3& extents, const Vector3& center = Vector3::Zero(), bool absolute = false);
 
 		/**
 		 * Defines a sphere shape, using the bounding volume of the node it is attached to.
@@ -158,7 +158,7 @@ namespace scythe {
 		 *
 		 * @return Definition of a sphere shape.
 		 */
-		static PhysicsCollisionShape::Definition DefineSphere(float radius, const Vector3& center = Vector3::zero(), bool absolute = false);
+		static PhysicsCollisionShape::Definition DefineSphere(float radius, const Vector3& center = Vector3::Zero(), bool absolute = false);
 
 		/**
 		 * Defines a capsule shape, using the bounding volume of the node it is attached to.
@@ -179,7 +179,7 @@ namespace scythe {
 		 *
 		 * @return Definition of a capsule shape.
 		 */
-		static PhysicsCollisionShape::Definition DefineCapsule(float radius, float height, const Vector3& center = Vector3::zero(), bool absolute = false);
+		static PhysicsCollisionShape::Definition DefineCapsule(float radius, float height, const Vector3& center = Vector3::Zero(), bool absolute = false);
 
 		/**
 		 * Defines a mesh shape using the specified mesh.

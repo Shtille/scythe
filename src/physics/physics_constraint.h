@@ -60,7 +60,7 @@ namespace scythe {
 		 * @param a The first node.
 		 * @param b The second node.
 		 */
-		static Vector3 centerOfMassMidpoint(const Node* a, const Node* b);
+		static Vector3 CenterOfMassMidpoint(const Node* a, const Node* b);
 
 		/**
 		 * Calculates the rotation offset to the given point in the given node's local space.
@@ -68,7 +68,7 @@ namespace scythe {
 		 * @param node The node to calculate a rotation offset for.
 		 * @param point The point to calculate the rotation offset to.
 		 */
-		static Quaternion getRotationOffset(const Node* node, const Vector3& point);
+		static Quaternion GetRotationOffset(const Node* node, const Vector3& point);
 
 		/**
 		 * Calculates the translation offset to the given point in the given node's local space.
@@ -76,7 +76,7 @@ namespace scythe {
 		 * @param node The node to calculate a translation offset for.
 		 * @param point The point to calculate the translation offset to.
 		 */
-		static Vector3 getTranslationOffset(const Node* node, const Vector3& point);
+		static Vector3 GetTranslationOffset(const Node* node, const Vector3& point);
 
 	protected:
 
@@ -94,17 +94,17 @@ namespace scythe {
 		 * Calculates the transform to be used as the offset (i.e. "frame in" 
 		 * parameter in Bullet terms) to the given constraint origin.
 		 */
-		static btTransform getTransformOffset(const Node* node, const Vector3& origin);
+		static btTransform GetTransformOffset(const Node* node, const Vector3& origin);
 		
 		/**
 		 * Calculates the center of mass in world space of the given node.
 		 */
-		static Vector3 getWorldCenterOfMass(const Node* node);
+		static Vector3 GetWorldCenterOfMass(const Node* node);
 
 		/**
 		 * Offsets the given vector by the given node's center of mass.
 		 */
-		static Vector3 offsetByCenterOfMass(const Node* node, const Vector3& v);
+		static Vector3 OffsetByCenterOfMass(const Node* node, const Vector3& v);
 
 		/**
 		 * Pointer to the one rigid body bound by this constraint.

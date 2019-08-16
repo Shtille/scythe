@@ -109,8 +109,8 @@ namespace scythe {
 			 */
 			virtual void CollisionEvent(PhysicsCollisionObject::CollisionListener::EventType type,
 										const PhysicsCollisionObject::CollisionPair& collisionPair,
-										const Vector3& contactPointA = Vector3::zero(),
-										const Vector3& contactPointB = Vector3::zero()) = 0;
+										const Vector3& contactPointA = Vector3::Zero(),
+										const Vector3& contactPointB = Vector3::Zero()) = 0;
 		};
 
 		/**

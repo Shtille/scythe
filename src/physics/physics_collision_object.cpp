@@ -33,7 +33,7 @@ namespace scythe {
 	, collision_shape_(nullptr)
 	, enabled_(true)
 	, script_listeners_(nullptr)
-	, motion_state_(NULL)
+	, motion_state_(nullptr)
 	, group_(group)
 	, mask_(mask)
 	{

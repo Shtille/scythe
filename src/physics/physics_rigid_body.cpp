@@ -24,13 +24,13 @@ namespace scythe {
 		SC_ASSERT(collision_shape_ && collision_shape_->shape());
 
 		// Create motion state object.
-		motion_state_ = new PhysicsMotionState(node, this, (centerOfMassOffset.Sqr() > MATH_EPSILON) ? &centerOfMassOffset : NULL);
+		motion_state_ = new PhysicsMotionState(node, this, (centerOfMassOffset.Sqr() > kFloatEpsilon) ? &centerOfMassOffset : NULL);
 
 		// If the mass is non-zero, then the object is dynamic so we calculate the local 
 		// inertia. However, if the collision shape is a triangle mesh, we don't calculate 
 		// inertia since Bullet doesn't currently support this.
-		btVector3 localInertia(0.0, 0.0, 0.0);
-		if (parameters.mass != 0.0)
+		btVector3 localInertia(0.0f, 0.0f, 0.0f);
+		if (parameters.mass != 0.0f)
 			collision_shape_->shape()->calculateLocalInertia(parameters.mass, localInertia);
 
 		// Create the Bullet physics rigid body object.
@@ -105,7 +105,7 @@ namespace scythe {
 	{
 		// If the force is significant enough, activate the rigid body 
 		// to make sure that it isn't sleeping and apply the force.
-		if (force.Sqr() > MATH_EPSILON)
+		if (force.Sqr() > kFloatEpsilon)
 		{
 			SC_ASSERT(body_);
 			body_->activate();
@@ -119,7 +119,7 @@ namespace scythe {
 	{
 		// If the impulse is significant enough, activate the rigid body 
 		// to make sure that it isn't sleeping and apply the impulse.
-		if (impulse.Sqr() > MATH_EPSILON)
+		if (impulse.Sqr() > kFloatEpsilon)
 		{
 			SC_ASSERT(body_);
 			body_->activate();
@@ -135,7 +135,7 @@ namespace scythe {
 	{
 		// If the torque is significant enough, activate the rigid body 
 		// to make sure that it isn't sleeping and apply the torque.
-		if (torque.Sqr() > MATH_EPSILON)
+		if (torque.Sqr() > kFloatEpsilon)
 		{
 			SC_ASSERT(body_);
 			body_->activate();
@@ -146,7 +146,7 @@ namespace scythe {
 	{
 		// If the torque impulse is significant enough, activate the rigid body 
 		// to make sure that it isn't sleeping and apply the torque impulse.
-		if (torque.Sqr() > MATH_EPSILON)
+		if (torque.Sqr() > kFloatEpsilon)
 		{
 			SC_ASSERT(body_);
 			body_->activate();

@@ -11,9 +11,9 @@ namespace scythe {
 		if (b)
 		{
 			SC_ASSERT(b->body_ && b->GetNode());
-			Vector3 origin = centerOfMassMidpoint(a->GetNode(), b->GetNode());
-			btTransform frameInA = getTransformOffset(a->GetNode(), origin);
-			btTransform frameInB = getTransformOffset(b->GetNode(), origin);
+			Vector3 origin = CenterOfMassMidpoint(a->GetNode(), b->GetNode());
+			btTransform frameInA = GetTransformOffset(a->GetNode(), origin);
+			btTransform frameInB = GetTransformOffset(b->GetNode(), origin);
 
 			constraint_ = new btPoint2PointConstraint(*a->body_, *b->body_, frameInA.getOrigin(), frameInB.getOrigin());
 		}
@@ -31,7 +31,7 @@ namespace scythe {
 
 		// Take scale into account for the first node's translation offset.
 		Vector3 sA;
-		a->GetNode()->getWorldMatrix().getScale(&sA);
+		a->GetNode()->GetWorldMatrix().GetScale(&sA);
 		Vector3 tA(translationOffsetA.x * sA.x, translationOffsetA.y * sA.y, translationOffsetA.z * sA.z);
 
 		if (b)
@@ -40,7 +40,7 @@ namespace scythe {
 
 			// Take scale into account for the second node's translation offset.
 			Vector3 sB;
-			b->GetNode()->getWorldMatrix().getScale(&sB);
+			b->GetNode()->GetWorldMatrix().GetScale(&sB);
 			Vector3 tB(translationOffsetB.x * sB.x, translationOffsetB.y * sB.y, translationOffsetB.z * sB.z);
 
 			constraint_ = new btPoint2PointConstraint(*a->body_, *b->body_, BV(tA), BV(tB));

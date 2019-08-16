@@ -11,7 +11,7 @@ namespace scythe {
 
 		SC_ASSERT(constraint_);
 		btQuaternion ro = static_cast<btGeneric6DofConstraint*>(constraint_)->getFrameOffsetA().getRotation();
-		rotation_offset_a_->set(ro.x(), ro.y(), ro.z(), ro.w());
+		rotation_offset_a_->Set(ro.x(), ro.y(), ro.z(), ro.w());
 		return *rotation_offset_a_;
 	}
 
@@ -22,7 +22,7 @@ namespace scythe {
 
 		SC_ASSERT(constraint_);
 		btQuaternion ro = static_cast<btGeneric6DofConstraint*>(constraint_)->getFrameOffsetB().getRotation();
-		rotation_offset_b_->set(ro.x(), ro.y(), ro.z(), ro.w());
+		rotation_offset_b_->Set(ro.x(), ro.y(), ro.z(), ro.w());
 		return *rotation_offset_b_;
 	}
 
@@ -33,7 +33,7 @@ namespace scythe {
 
 		SC_ASSERT(constraint_);
 		btVector3 to = static_cast<btGeneric6DofConstraint*>(constraint_)->getFrameOffsetA().getOrigin();
-		translation_offset_a_->set(to.x(), to.y(), to.z());
+		translation_offset_a_->Set(to.x(), to.y(), to.z());
 		return *translation_offset_a_;
 	}
 
@@ -44,7 +44,7 @@ namespace scythe {
 
 		SC_ASSERT(constraint_);
 		btVector3 to = static_cast<btGeneric6DofConstraint*>(constraint_)->getFrameOffsetB().getOrigin();
-		translation_offset_b_->set(to.x(), to.y(), to.z());
+		translation_offset_b_->Set(to.x(), to.y(), to.z());
 		return *translation_offset_b_;
 	}
 
