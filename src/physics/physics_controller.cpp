@@ -1,5 +1,14 @@
 #include "physics_controller.h.h"
 
+#include "physics_fixed_constraint.h"
+#include "physics_generic_constraint.h"
+#include "physics_hinge_constraint.h"
+#include "physics_socket_constraint.h"
+#include "physics_spring_constraint.h"
+
+#include "math/bounding_box.h"
+#include "math/bounding_sphere.h"
+
 #include "common/sc_assert.h"
 #include "common/sc_delete.h"
 
@@ -134,7 +143,7 @@ namespace scythe {
 					for (size_t i = 0; i < size; i++)
 					{
 						PhysicsCollisionObject::CollisionPair cp(iter->first.objectA, NULL);
-						iter->second.listeners[i]->CollisionEvent(PhysicsCollisionObject::CollisionListener::NOT_COLLIDING, cp);
+						iter->second.listeners[i]->CollisionEvent(PhysicsCollisionObject::CollisionListener::kNotColliding, cp);
 					}
 				}
 
@@ -177,7 +186,7 @@ namespace scythe {
 					size_t size = iter->second.listeners.size();
 					for (size_t i = 0; i < size; i++)
 					{
-						iter->second.listeners[i]->CollisionEvent(PhysicsCollisionObject::CollisionListener::NOT_COLLIDING, iter->first);
+						iter->second.listeners[i]->CollisionEvent(PhysicsCollisionObject::CollisionListener::kNotColliding, iter->first);
 					}
 				}
 
@@ -326,8 +335,8 @@ namespace scythe {
 
 		SC_ASSERT(world_);
 
-		btVector3 rayFromWorld(BV(ray.getOrigin()));
-		btVector3 rayToWorld(rayFromWorld + BV(ray.getDirection() * distance));
+		btVector3 rayFromWorld(BV(ray.GetOrigin()));
+		btVector3 rayToWorld(rayFromWorld + BV(ray.GetDirection() * distance));
 
 		RayTestCallback callback(rayFromWorld, rayToWorld, filter);
 		world_->rayTest(rayFromWorld, rayToWorld, callback);
@@ -400,24 +409,24 @@ namespace scythe {
 			PhysicsController::HitResult hitResult;
 		};
 
-		SC_ASSERT(object && object->getCollisionShape());
-		PhysicsCollisionShape* shape = object->getCollisionShape();
-		PhysicsCollisionShape::Type type = shape->getType();
-		if (type != PhysicsCollisionShape::SHAPE_BOX &&
-			type != PhysicsCollisionShape::SHAPE_SPHERE &&
-			type != PhysicsCollisionShape::SHAPE_CAPSULE)
+		SC_ASSERT(object && object->GetCollisionShape());
+		PhysicsCollisionShape* shape = object->GetCollisionShape();
+		PhysicsCollisionShape::Type type = shape->type();
+		if (type != PhysicsCollisionShape::kBox &&
+			type != PhysicsCollisionShape::kSphere &&
+			type != PhysicsCollisionShape::kCapsule)
 			return false; // unsupported type
 
 		// Define the start transform.
 		btTransform start;
 		start.setIdentity();
-		if (object->getNode())
+		if (object->GetNode())
 		{
 			Vector3 translation;
 			Quaternion rotation;
-			const Matrix& m = object->getNode()->getWorldMatrix();
-			m.getTranslation(&translation);
-			m.getRotation(&rotation);
+			const Matrix& m = object->GetNode()->GetWorldMatrix();
+			m.GetTranslation(&translation);
+			m.GetRotation(&rotation);
 
 			start.setIdentity();
 			start.setOrigin(BV(translation));
@@ -447,7 +456,7 @@ namespace scythe {
 		}*/
 
 		SC_ASSERT(world_);
-		world_->convexSweepTest(static_cast<btConvexShape*>(shape->getShape()), start, end, callback, world_->getDispatchInfo().m_allowedCcdPenetration);
+		world_->convexSweepTest(static_cast<btConvexShape*>(shape->shape()), start, end, callback, world_->getDispatchInfo().m_allowedCcdPenetration);
 
 		// Check for hits and store results.
 		if (callback.hasHit())
@@ -524,7 +533,7 @@ namespace scythe {
 				SC_ASSERT(*iter);
 				if ((collisionInfo->status & CollisionStatus::kRemove) == 0)
 				{
-					(*iter)->collisionEvent(PhysicsCollisionObject::CollisionListener::COLLIDING, pair, Vector3(cp.getPositionWorldOnA().x(), cp.getPositionWorldOnA().y(), cp.getPositionWorldOnA().z()),
+					(*iter)->CollisionEvent(PhysicsCollisionObject::CollisionListener::kColliding, pair, Vector3(cp.getPositionWorldOnA().x(), cp.getPositionWorldOnA().y(), cp.getPositionWorldOnA().z()),
 						Vector3(cp.getPositionWorldOnB().x(), cp.getPositionWorldOnB().y(), cp.getPositionWorldOnB().z()));
 				}
 			}
@@ -570,18 +579,18 @@ namespace scythe {
 		// Assign user pointer for the bullet collision object to allow efficient
 		// lookups of bullet objects -> gameplay objects.
 		object->GetCollisionObject()->setUserPointer(object);
-		short group = (short)object->_group;
-		short mask = (short)object->_mask;
+		short group = (short)object->group_;
+		short mask = (short)object->mask_;
 
 		// Add the object to the physics world.
-		switch (object->getType())
+		switch (object->type())
 		{
-		case PhysicsCollisionObject::RIGID_BODY:
+		case PhysicsCollisionObject::kRigidBody:
 			world_->addRigidBody(static_cast<btRigidBody*>(object->GetCollisionObject()), group, mask);
 			break;
 
-		case PhysicsCollisionObject::CHARACTER:
-		case PhysicsCollisionObject::GHOST_OBJECT:
+		case PhysicsCollisionObject::kCharacter:
+		case PhysicsCollisionObject::kGhostObject:
 			world_->addCollisionObject(object->GetCollisionObject(), group, mask);
 			break;
 
@@ -590,23 +599,23 @@ namespace scythe {
 			break;
 		}
 	}
-	void PhysicsController::RemoveCollisionObject(PhysicsCollisionObject* object, bool removeListeners)
+	void PhysicsController::RemoveCollisionObject(PhysicsCollisionObject * object, bool removeListeners)
 	{
 		SC_ASSERT(object);
 		SC_ASSERT(world_);
-		SC_ASSERT(!_isUpdating);
+		SC_ASSERT(!is_updating_);
 
 		// Remove the collision object from the world.
 		if (object->GetCollisionObject())
 		{
-			switch (object->getType())
+			switch (object->type())
 			{
-			case PhysicsCollisionObject::RIGID_BODY:
+			case PhysicsCollisionObject::kRigidBody:
 				world_->removeRigidBody(static_cast<btRigidBody*>(object->GetCollisionObject()));
 				break;
 
-			case PhysicsCollisionObject::CHARACTER:
-			case PhysicsCollisionObject::GHOST_OBJECT:
+			case PhysicsCollisionObject::kCharacter:
+			case PhysicsCollisionObject::kGhostObject:
 				world_->removeCollisionObject(object->GetCollisionObject());
 				break;
 
@@ -638,25 +647,25 @@ namespace scythe {
 		SC_ASSERT(node);
 		SC_ASSERT(out);
 
-		Model* model = dynamic_cast<Model*>(node->getDrawable());
+		Model* model = dynamic_cast<Model*>(node->GetDrawable());
 		if (model != NULL)
 		{
 			SC_ASSERT(model->getMesh());
 
 			if (merge)
-				out->merge(model->getMesh()->GetBoundingBox());
+				out->Merge(model->getMesh()->GetBoundingBox());
 			else
 			{
-				out->set(model->getMesh()->GetBoundingBox());
+				out->Set(model->getMesh()->GetBoundingBox());
 				merge = true;
 			}
 		}
 
-		Node* child = node->getFirstChild();
+		Node * child = node->GetFirstChild();
 		while (child)
 		{
 			GetBoundingBox(child, out, merge);
-			child = child->getNextSibling();
+			child = child->GetNextSibling();
 		}
 	}
 	static void GetBoundingSphere(Node* node, BoundingSphere* out, bool merge = false)
@@ -664,25 +673,25 @@ namespace scythe {
 		SC_ASSERT(node);
 		SC_ASSERT(out);
 
-		Model* model = dynamic_cast<Model*>(node->getDrawable());
+		Model* model = dynamic_cast<Model*>(node->GetDrawable());
 		if (model != NULL)
 		{
 			SC_ASSERT(model->getMesh());
 
 			if (merge)
-				out->merge(model->getMesh()->GetBoundingSphere());
+				out->Merge(model->getMesh()->GetBoundingSphere());
 			else
 			{
-				out->set(model->getMesh()->GetBoundingSphere());
+				out->Set(model->getMesh()->GetBoundingSphere());
 				merge = true;
 			}
 		}
 
-		Node* child = node->getFirstChild();
+		Node * child = node->GetFirstChild();
 		while (child)
 		{
 			GetBoundingSphere(child, out, merge);
-			child = child->getNextSibling();
+			child = child->GetNextSibling();
 		}
 	}
 	static void ComputeCenterOfMass(const Vector3& center, const Vector3& scale, Vector3* center_of_mass_offset)
@@ -694,7 +703,7 @@ namespace scythe {
 		center_of_mass_offset->x *= scale.x;
 		center_of_mass_offset->y *= scale.y;
 		center_of_mass_offset->z *= scale.z;
-		center_of_mass_offset->negate();
+		center_of_mass_offset->Negate();
 	}
 	PhysicsCollisionShape* PhysicsController::CreateShape(Node* node, const PhysicsCollisionShape::Definition& shape, Vector3* center_of_mass_offset, bool dynamic)
 	{
@@ -704,7 +713,7 @@ namespace scythe {
 
 		// Get the node's world scale (we need to apply this during creation since rigid bodies don't scale dynamically).
 		Vector3 scale;
-		node->getWorldMatrix().getScale(&scale);
+		node->GetWorldMatrix().GetScale(&scale);
 
 		switch (shape.type)
 		{
@@ -712,17 +721,17 @@ namespace scythe {
 			if (shape.is_explicit)
 			{
 				// Use the passed in box information.
-				collision_shape = CreateBox(Vector3(shape.data.box.extents), Vector3::one());
+				collision_shape = CreateBox(Vector3(shape.data.box.extents), Vector3::One());
 
 				if (shape.center_absolute)
 				{
-					ComputeCenterOfMass(Vector3(shape.data.box.center), Vector3::one(), center_of_mass_offset);
+					ComputeCenterOfMass(Vector3(shape.data.box.center), Vector3::One(), center_of_mass_offset);
 				}
 				else
 				{
 					BoundingBox box;
 					GetBoundingBox(node, &box);
-					ComputeCenterOfMass(box.getCenter() + Vector3(shape.data.box.center), scale, center_of_mass_offset);
+					ComputeCenterOfMass(box.GetCenter() + Vector3(shape.data.box.center), scale, center_of_mass_offset);
 				}
 			}
 			else
@@ -732,7 +741,7 @@ namespace scythe {
 				GetBoundingBox(node, &box);
 				collision_shape = CreateBox(Vector3(std::fabs(box.max.x - box.min.x), std::fabs(box.max.y - box.min.y), std::fabs(box.max.z - box.min.z)), scale);
 
-				ComputeCenterOfMass(box.getCenter(), scale, center_of_mass_offset);
+				ComputeCenterOfMass(box.GetCenter(), scale, center_of_mass_offset);
 			}
 			break;
 
@@ -740,11 +749,11 @@ namespace scythe {
 			if (shape.is_explicit)
 			{
 				// Use the passed in sphere information.
-				collision_shape = CreateSphere(shape.data.sphere.radius, Vector3::one());
+				collision_shape = CreateSphere(shape.data.sphere.radius, Vector3::One());
 
 				if (shape.center_absolute)
 				{
-					ComputeCenterOfMass(Vector3(shape.data.sphere.center), Vector3::one(), center_of_mass_offset);
+					ComputeCenterOfMass(Vector3(shape.data.sphere.center), Vector3::One(), center_of_mass_offset);
 				}
 				else
 				{
@@ -768,17 +777,17 @@ namespace scythe {
 			if (shape.is_explicit)
 			{
 				// Use the passed in capsule information.
-				collision_shape = CreateCapsule(shape.data.capsule.radius, shape.data.capsule.height, Vector3::one());
+				collision_shape = CreateCapsule(shape.data.capsule.radius, shape.data.capsule.height, Vector3::One());
 
 				if (shape.center_absolute)
 				{
-					ComputeCenterOfMass(Vector3(shape.data.capsule.center), Vector3::one(), center_of_mass_offset);
+					ComputeCenterOfMass(Vector3(shape.data.capsule.center), Vector3::One(), center_of_mass_offset);
 				}
 				else
 				{
 					BoundingBox box;
 					GetBoundingBox(node, &box);
-					ComputeCenterOfMass(box.getCenter() + Vector3(shape.data.capsule.center), scale, center_of_mass_offset);
+					ComputeCenterOfMass(box.GetCenter() + Vector3(shape.data.capsule.center), scale, center_of_mass_offset);
 				}
 			}
 			else
@@ -790,7 +799,7 @@ namespace scythe {
 				float height = box.max.y - box.min.y;
 				collision_shape = CreateCapsule(radius, height, scale);
 
-				ComputeCenterOfMass(box.getCenter(), scale, center_of_mass_offset);
+				ComputeCenterOfMass(box.GetCenter(), scale, center_of_mass_offset);
 			}
 			break;
 
@@ -847,7 +856,7 @@ namespace scythe {
 		}
 
 		// Create the box shape and add it to the cache.
-		shape = new PhysicsCollisionShape(PhysicsCollisionShape::kBox, bullet_new<btBoxShape>(halfExtents));
+		shape = new PhysicsCollisionShape(PhysicsCollisionShape::kBox, new btBoxShape(halfExtents));
 		shapes_.push_back(shape);
 
 		return shape;
@@ -883,7 +892,7 @@ namespace scythe {
 		}
 
 		// Create the sphere shape and add it to the cache.
-		shape = new PhysicsCollisionShape(PhysicsCollisionShape::kSphere, bullet_new<btSphereShape>(scaledRadius));
+		shape = new PhysicsCollisionShape(PhysicsCollisionShape::kSphere, new btSphereShape(scaledRadius));
 		shapes_.push_back(shape);
 
 		return shape;
@@ -915,7 +924,7 @@ namespace scythe {
 		}
 
 		// Create the capsule shape and add it to the cache.
-		shape = new PhysicsCollisionShape(PhysicsCollisionShape::kCapsule, bullet_new<btCapsuleShape>(scaledRadius, scaledHeight));
+		shape = new PhysicsCollisionShape(PhysicsCollisionShape::kCapsule, new btCapsuleShape(scaledRadius, scaledHeight));
 		shapes_.push_back(shape);
 
 		return shape;
@@ -975,7 +984,7 @@ namespace scythe {
 
 		// Copy the scaled vertex position data to the rigid body's local buffer.
 		Matrix m;
-		Matrix::createScale(scale, &m);
+		Matrix::CreateScale(scale, &m);
 		unsigned int vertexCount = data->vertexCount;
 		shapeMeshData->vertexData = new float[vertexCount * 3];
 		Vector3 v;

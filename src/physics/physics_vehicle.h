@@ -8,8 +8,6 @@
 
 namespace scythe {
 
-	class PhysicsVehicleWheel;
-
 	/**
 	 * Defines a class for vehicle physics.
 	 *
@@ -32,7 +30,7 @@ namespace scythe {
 		/**
 		 * Returns the rigid body associated with this vehicle.
 		 */
-		PhysicsRigidBody* getRigidBody() const;
+		PhysicsRigidBody * GetRigidBody() const;
 
 		/**
 		 * Sets whether the associated rigid body is enabled or disabled
@@ -319,7 +317,7 @@ namespace scythe {
 		/**
 		 * Initializes this vehicle and advertises itself among its ancestor nodes.
 		 */
-		void initialize();
+		void Initialize();
 
 		/**
 		 * Destructor.

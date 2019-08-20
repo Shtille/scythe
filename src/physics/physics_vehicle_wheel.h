@@ -6,8 +6,6 @@
 
 namespace scythe {
 
-	class PhysicsVehicle;
-
 	/**
 	 * Defines a class for vehicle wheel physics which represents the individual wheel
 	 * itself as well as the tire and suspension.

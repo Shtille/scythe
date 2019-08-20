@@ -1,8 +1,11 @@
 #include "physics_vehicle.h"
 #include "physics_vehicle_wheel.h"
 
-#define AIR_DENSITY (1.2f)
-#define KPH_TO_MPS (1.0f / 3.6f)
+#include "common/sc_assert.h"
+#include "common/sc_delete.h"
+#include "math/common_math.h"
+
+#include <cmath>
 
 namespace scythe {
 
@@ -83,47 +86,51 @@ namespace scythe {
 	private:
 
 		btDynamicsWorld * dynamics_world_;
-		btCollisionObject* me_;
+		btCollisionObject * me_;
 	};
 
 	PhysicsVehicle::PhysicsVehicle(Node* node, const PhysicsCollisionShape::Definition& shape, const PhysicsRigidBody::Parameters& parameters)
 	: PhysicsCollisionObject(node)
-	, speed_smoothed_(0)
+	, speed_smoothed_(0.0f)
 	{
 		// Note that the constructor for PhysicsRigidBody calls addCollisionObject and so
 		// that is where the rigid body gets added to the dynamics world.
 		rigid_body_ = new PhysicsRigidBody(node, shape, parameters);
 
-		initialize();
+		Initialize();
 	}
 
 	PhysicsVehicle::PhysicsVehicle(Node* node, PhysicsRigidBody* rigidBody)
-		: PhysicsCollisionObject(node), speed_smoothed_(0)
+	: PhysicsCollisionObject(node)
+	, speed_smoothed_(0.0f)
 	{
 		rigid_body_ = rigidBody;
 
-		initialize();
+		Initialize();
 	}
 
-	void PhysicsVehicle::initialize()
+	void PhysicsVehicle::Initialize()
 	{
-		SC_ASSERT(getNode());
+		SC_ASSERT(GetNode());
 
 		// Safe default values
 		SetSteeringGain(0.5f);
 		SetBrakingForce(350.0f);
 		SetDrivingForce(2000.0f);
-		SetSteerdown(0, 1);
-		SetBrakedown(1000, 0);
-		SetDrivedown(1000, 0);
-		SetBoost(0, 1);
-		SetDownforce(0);
+		SetSteerdown(0.f, 1.f);
+		SetBrakedown(1000.f, 0.f);
+		SetDrivedown(1000.f, 0.f);
+		SetBoost(0.f, 1.f);
+		SetDownforce(0.f);
+
+		PhysicsController * controller = PhysicsController::GetInstance();
+		SC_ASSERT(controller);
 
 		// Create the vehicle and add it to world
-		btRigidBody* body = static_cast<btRigidBody*>(rigid_body_->getCollisionObject());
-		btDynamicsWorld* dynamicsWorld = Game::getInstance()->getPhysicsController()->_world;
+		btRigidBody * body = static_cast<btRigidBody*>(rigid_body_->getCollisionObject());
+		btDynamicsWorld * dynamicsWorld = controller->world_;
 		vehicle_raycaster_ = new VehicleNotMeRaycaster(dynamicsWorld, body);
-		vehicle_ = bullet_new<btRaycastVehicle>(vehicle_tuning_, body, vehicle_raycaster_);
+		vehicle_ = new btRaycastVehicle(vehicle_tuning_, body, vehicle_raycaster_);
 		body->setActivationState(DISABLE_DEACTIVATION);
 		dynamicsWorld->addVehicle(vehicle_);
 		vehicle_->setCoordinateSystem(0, 1, 2);
@@ -151,7 +158,7 @@ namespace scythe {
 		return PhysicsCollisionObject::kVehicle;
 	}
 
-	PhysicsRigidBody* PhysicsVehicle::GetRigidBody() const
+	PhysicsRigidBody * PhysicsVehicle::GetRigidBody() const
 	{
 		SC_ASSERT(rigid_body_);
 
@@ -160,7 +167,7 @@ namespace scythe {
 
 	void PhysicsVehicle::SetEnabled(bool enable)
 	{
-		getRigidBody()->SetEnabled(enable);
+		GetRigidBody()->SetEnabled(enable);
 	}
 
 	unsigned int PhysicsVehicle::GetWheelCount() const
@@ -173,7 +180,7 @@ namespace scythe {
 		return wheels_.at(index);
 	}
 
-	void PhysicsVehicle::AddWheel(PhysicsVehicleWheel* wheel)
+	void PhysicsVehicle::AddWheel(PhysicsVehicleWheel * wheel)
 	{
 		unsigned int i = (unsigned int)wheels_.size();
 		wheels_.push_back(wheel);
@@ -234,17 +241,17 @@ namespace scythe {
 
 	void PhysicsVehicle::Reset()
 	{
-		rigid_body_->SetLinearVelocity(Vector3::zero());
-		rigid_body_->SetAngularVelocity(Vector3::zero());
+		rigid_body_->SetLinearVelocity(Vector3::Zero());
+		rigid_body_->SetAngularVelocity(Vector3::Zero());
 		speed_smoothed_ = 0.0f;
 	}
 
 	float PhysicsVehicle::GetSteering(float v, float rawSteering) const
 	{
 		float gain = 1.0f;
-		if (steerdown_speed_ > MATH_FLOAT_SMALL)
+		if (steerdown_speed_ > kFloatSmall)
 		{
-			gain = std::max(steerdown_gain_, 1.0f - (1.0f - steerdown_gain_) * fabs(v) / steerdown_speed_);
+			gain = Max(steerdown_gain_, 1.0f - (1.0f - steerdown_gain_) * fabs(v) / steerdown_speed_);
 		}
 
 		return rawSteering * gain;
@@ -254,29 +261,29 @@ namespace scythe {
 	{
 		float reduc = 0.0f;
 		float delta = brakedown_full_ - brakedown_start_;
-		if (delta > MATH_FLOAT_SMALL)
+		if (delta > kFloatSmall)
 		{
-			reduc = std::max(0.0f, (v - brakedown_start_) / delta);
+			reduc = Max(0.0f, (v - brakedown_start_) / delta);
 			reduc *= reduc;
 		}
 
-		return std::max(0.0f, rawBraking - reduc);
+		return Max(0.0f, rawBraking - reduc);
 	}
 
 	float PhysicsVehicle::GetDriving(float v, float rawDriving, float rawBraking) const
 	{
 		float reduc = 0.0f;
 		float delta = drivedown_full_ - drivedown_start_;
-		if (rawBraking == 0.0f && delta > MATH_FLOAT_SMALL)
+		if (rawBraking == 0.0f && delta > kFloatSmall)
 		{
-			reduc = max(0.0f, (v - drivedown_start_) / delta);
+			reduc = Max(0.0f, (v - drivedown_start_) / delta);
 			reduc *= reduc;
 		}
 
 		float gain = 1.0f;
-		if (boost_speed_ > MATH_FLOAT_SMALL)
+		if (boost_speed_ > kFloatSmall)
 		{
-			gain = max(1.0f, boost_gain_ - (boost_gain_ - 1.0f) * fabs(v) / boost_speed_);
+			gain = Max(1.0f, boost_gain_ - (boost_gain_ - 1.0f) * fabs(v) / boost_speed_);
 		}
 
 		return gain * rawDriving - reduc;
@@ -284,10 +291,13 @@ namespace scythe {
 
 	void PhysicsVehicle::ApplyDownforce()
 	{
-		float v = speed_smoothed_ * KPH_TO_MPS;
+		const float kAirDensity = 1.2f;
+		const float kKphToMps = 1.0f / 3.6f;
+
+		float v = speed_smoothed_ * kKphToMps;
 
 		// Dynamic pressure
-		float q = 0.5f * AIR_DENSITY * v * v;
+		float q = 0.5f * kAirDensity * v * v;
 
 		// downforce_ is the product of reference area and the aerodynamic coefficient
 		rigid_body_->ApplyForce(Vector3(0.0f, -downforce_ * q, 0.0f));

@@ -1,11 +1,13 @@
 #include "physics_vehicle_wheel.h"
 #include "physics_vehicle.h"
 
+#include "common/sc_assert.h"
+
 namespace scythe {
 
 	PhysicsVehicleWheel::PhysicsVehicleWheel(Node* node, const PhysicsCollisionShape::Definition& shape, const PhysicsRigidBody::Parameters& parameters)
 	: PhysicsCollisionObject(node)
-	, host_(NULL)
+	, host_(nullptr)
 	, index_in_host_(0)
 	{
 		FindAncestorAndBind();
@@ -13,7 +15,7 @@ namespace scythe {
 
 	PhysicsVehicleWheel::PhysicsVehicleWheel(Node* node)
 	: PhysicsCollisionObject(node)
-	, host_(NULL)
+	, host_(nullptr)
 	, index_in_host_(0)
 	{
 		FindAncestorAndBind();
@@ -37,7 +39,7 @@ namespace scythe {
 
 	void PhysicsVehicleWheel::SetEnabled(bool enable)
 	{
-		GP_ERROR("Operation not supported (PhysicsVehicleWheel::setEnabled(bool)). Use host vehicle instead.");
+		SC_ASSERT(!"Operation not supported (PhysicsVehicleWheel::setEnabled(bool)). Use host vehicle instead.");
 	}
 
 	void PhysicsVehicleWheel::FindAncestorAndBind()
@@ -55,7 +57,7 @@ namespace scythe {
 		// 2: Visit each sibling of n and perform a breadth-first search of its descendants
 		// 3: Let n = the parent of n
 		// 4: Go to 2.
-		PhysicsVehicle* host = NULL;
+		PhysicsVehicle* host = nullptr;
 		Node* m;
 		for (Node* n = GetNode(); n && !host; n = n->GetParent())
 		{
@@ -76,7 +78,7 @@ namespace scythe {
 		if (host)
 		{
 			host->AddWheel(this);
-			initial_offset_ = node_->getTranslation() - host->node_->getTranslation();
+			initial_offset_ = node_->GetTranslation() - host->node_->GetTranslation();
 		}
 	}
 
@@ -129,10 +131,10 @@ namespace scythe {
 		// Use only the component parallel to the defined strut line
 		Vector3 strutLine;
 		GetWheelDirection(&strutLine);
-		host_->node_->GetMatrix().transformVector(&strutLine);
+		host_->node_->GetMatrix().TransformVector(&strutLine);
 		Vector3 wheelPos;
 		GetWheelPos(&wheelPos);
-		node->setTranslation(wheelPos + strutLine*(strutLine.dot(position_delta_) / strutLine.lengthSquared()));
+		node->SetTranslation(wheelPos + strutLine*(strutLine.Dot(position_delta_) / strutLine.LengthSquared()));
 	}
 
 	void PhysicsVehicleWheel::Update(float elapsedTime)
@@ -153,8 +155,8 @@ namespace scythe {
 		// Filter out noise from Bullet
 		Vector3 delta(position_delta_, commandedPosition);
 		float threshold = GetStrutRestLength() * 2.0f;
-		float responseTime = (delta.lengthSquared() > threshold*threshold) ? 0 : 60;
-		position_delta_.smooth(commandedPosition, elapsedTime, responseTime);
+		float responseTime = (delta.LengthSquared() > threshold*threshold) ? 0.f : 60.f;
+		position_delta_.Smooth(commandedPosition, elapsedTime, responseTime);
 	}
 
 	void PhysicsVehicleWheel::GetConnectionDefault(Vector3* result) const
@@ -168,7 +170,7 @@ namespace scythe {
 		// nudge wheel contact point to outer edge of tire for stability
 		Vector3 nudge;
 		GetWheelAxle(&nudge);
-		nudge *= nudge.dot(initial_offset_);
+		nudge *= nudge.Dot(initial_offset_);
 		nudge.Normalize();
 		*result += nudge * 0.068f * GetWheelRadius(); // rough-in for tire width
 
@@ -182,7 +184,7 @@ namespace scythe {
 		SC_ASSERT(host_->node_);
 
 		*result = initial_offset_;
-		host_->node_->getMatrix().transformPoint(result);
+		host_->node_->GetMatrix().TransformPoint(result);
 	}
 
 	bool PhysicsVehicleWheel::IsSteerable() const
@@ -232,7 +234,7 @@ namespace scythe {
 		SC_ASSERT(host_);
 		SC_ASSERT(host_->vehicle_);
 
-		host_->vehicle_->getWheelInfo(index_in_host_).m_wheelAxleCS.setValue( wheelAxle.x, wheelAxle.y, wheelAxle.z);
+		host_->vehicle_->getWheelInfo(index_in_host_).m_wheelAxleCS.setValue(wheelAxle.x, wheelAxle.y, wheelAxle.z);
 	}
 
 	void PhysicsVehicleWheel::GetStrutConnectionOffset(Vector3* strutConnectionOffset) const

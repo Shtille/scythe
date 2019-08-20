@@ -170,7 +170,7 @@ namespace scythe {
 		 * @param b The second rigid body to constrain (optional).
 		 * @return Pointer to the created PhysicsFixedConstraint object.
 		 */
-		PhysicsFixedConstraint* CreateFixedConstraint(PhysicsRigidBody* a, PhysicsRigidBody* b = NULL);
+		PhysicsFixedConstraint* CreateFixedConstraint(PhysicsRigidBody* a, PhysicsRigidBody* b = nullptr);
 
 		/**
 		 * Creates a generic constraint so that the rigid body (or bodies) is
@@ -181,7 +181,7 @@ namespace scythe {
 		 * @param b The second rigid body to constrain (optional).
 		 * @return Pointer to the created PhysicsGenericConstraint object.
 		 */
-		PhysicsGenericConstraint* CreateGenericConstraint(PhysicsRigidBody* a, PhysicsRigidBody* b = NULL);
+		PhysicsGenericConstraint* CreateGenericConstraint(PhysicsRigidBody* a, PhysicsRigidBody* b = nullptr);
 
 		/**
 		 * Creates a generic constraint.
@@ -200,7 +200,7 @@ namespace scythe {
 		 * @return Pointer to the created PhysicsGenericConstraint object.
 		 */
 		PhysicsGenericConstraint* CreateGenericConstraint(PhysicsRigidBody* a, const Quaternion& rotationOffsetA, const Vector3& translationOffsetA, 
-														  PhysicsRigidBody* b = NULL, const Quaternion& rotationOffsetB = Quaternion(), const Vector3& translationOffsetB = Vector3());
+														  PhysicsRigidBody* b = nullptr, const Quaternion& rotationOffsetB = Quaternion(), const Vector3& translationOffsetB = Vector3());
 
 		/**
 		 * Creates a hinge constraint.
@@ -219,7 +219,7 @@ namespace scythe {
 		 * @return Pointer to the created PhysicsHingeConstraint object.
 		 */
 		PhysicsHingeConstraint* CreateHingeConstraint(PhysicsRigidBody* a, const Quaternion& rotationOffsetA, const Vector3& translationOffsetA,
-													  PhysicsRigidBody* b = NULL, const Quaternion& rotationOffsetB = Quaternion(), const Vector3& translationOffsetB = Vector3());
+													  PhysicsRigidBody* b = nullptr, const Quaternion& rotationOffsetB = Quaternion(), const Vector3& translationOffsetB = Vector3());
 
 		/**
 		 * Creates a socket constraint so that the rigid body (or bodies) is
@@ -231,7 +231,7 @@ namespace scythe {
 		 * @param b The second rigid body to constrain (optional).
 		 * @return Pointer to the created PhysicsSocketConstraint object.
 		 */
-		PhysicsSocketConstraint* CreateSocketConstraint(PhysicsRigidBody* a, PhysicsRigidBody* b = NULL);
+		PhysicsSocketConstraint* CreateSocketConstraint(PhysicsRigidBody* a, PhysicsRigidBody* b = nullptr);
 
 		/**
 		 * Creates a socket constraint.
@@ -246,7 +246,7 @@ namespace scythe {
 		 * @return Pointer to the created PhysicsSocketConstraint object.
 		 */
 		PhysicsSocketConstraint* CreateSocketConstraint(PhysicsRigidBody* a, const Vector3& translationOffsetA,
-														PhysicsRigidBody* b = NULL, const Vector3& translationOffsetB = Vector3());
+														PhysicsRigidBody* b = nullptr, const Vector3& translationOffsetB = Vector3());
 
 		/**
 		 * Creates a spring constraint so that the rigid body (or bodies) is
@@ -306,7 +306,7 @@ namespace scythe {
 		 *
 		 * @return True if the ray test collided with a physics object, false otherwise.
 		 */
-		bool RayTest(const Ray& ray, float distance, HitResult* result = NULL, HitFilter* filter = NULL);
+		bool RayTest(const Ray& ray, float distance, HitResult* result = nullptr, HitFilter* filter = nullptr);
 
 		/**
 		 * Performs a sweep test of the given collision object on the physics world.
@@ -324,7 +324,7 @@ namespace scythe {
 		 * 
 		 * @return True if the object intersects any other physics objects, false otherwise.
 		 */
-		bool SweepTest(PhysicsCollisionObject* object, const Vector3& endPosition, HitResult* result = NULL, HitFilter* filter = NULL);
+		bool SweepTest(PhysicsCollisionObject* object, const Vector3& endPosition, HitResult* result = nullptr, HitFilter* filter = nullptr);
 
 	protected:
 

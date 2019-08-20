@@ -17,6 +17,32 @@ namespace scythe {
 	float Sign(float x);
 
 	/**
+	 * Standard min function.
+	 *
+	 * @param[in] a The first value.
+	 * @param[in] b The second value.
+	 * @return Minimum value of two.
+	 */
+	template <typename T>
+	inline T Min(T a, T b)
+	{
+		return (a < b) ? (a) : (b);
+	}
+
+	/**
+	 * Standard max function.
+	 *
+	 * @param[in] a The first value.
+	 * @param[in] b The second value.
+	 * @return Maximum value of two.
+	 */
+	template <typename T>
+	inline T Max(T a, T b)
+	{
+		return (a < b) ? (b) : (a);
+	}
+
+	/**
 	 * Standard clamp function.
 	 *
 	 * @param[in] x The value.
