@@ -1,7 +1,8 @@
 #include "image.h"
 
+#include "common/log.h"
+
 #include "stream/file_stream.h"
-#include "stream/log_stream.h"
 
 #include "png.h"
 
@@ -14,28 +15,28 @@ namespace scythe {
 		FileStream stream;
 		if (!stream.Open(filename, StreamAccess::kWriteBinary))
 		{
-			LOG_ERROR("failed to open file '%s' for saving", filename);
+			SC_ERROR("failed to open file '%s' for saving", filename);
 			return false;
 		}
 
 		png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 		if (!png)
 		{
-			LOG_ERROR("png_create_write_struct failed during saving '%s'", filename);
+			SC_ERROR("png_create_write_struct failed during saving '%s'", filename);
 			return false;
 		}
 
 		png_infop info = png_create_info_struct(png);
 		if (!info)
 		{
-			LOG_ERROR("png_create_info_struct failed during saving '%s'", filename);
+			SC_ERROR("png_create_info_struct failed during saving '%s'", filename);
 			png_destroy_write_struct(&png, NULL);
 			return false;
 		}
 
 		if (setjmp(png_jmpbuf(png)))
 		{
-			LOG_ERROR("set_jmp failed during saving '%s'", filename);
+			SC_ERROR("set_jmp failed during saving '%s'", filename);
 			png_destroy_write_struct(&png, NULL);
 			return false;
 		}
@@ -87,28 +88,28 @@ namespace scythe {
 		FileStream stream;
 		if (!stream.Open(filename, StreamAccess::kReadBinary))
 		{
-			LOG_ERROR("failed to open file '%s' for loading", filename);
+			SC_ERROR("failed to open file '%s' for loading", filename);
 			return false;
 		}
 
 		png_structp png = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 		if (!png)
 		{
-			LOG_ERROR("png_create_read_struct failed during loading '%s'", filename);
+			SC_ERROR("png_create_read_struct failed during loading '%s'", filename);
 			return false;
 		}
 
 		png_infop info = png_create_info_struct(png);
 		if (!info)
 		{
-			LOG_ERROR("png_create_info_struct failed during loading '%s'", filename);
+			SC_ERROR("png_create_info_struct failed during loading '%s'", filename);
 			png_destroy_read_struct(&png, NULL, NULL);
 			return false;
 		}
 
 		if (setjmp(png_jmpbuf(png)))
 		{
-			LOG_ERROR("setjmp failed during loading '%s'", filename);
+			SC_ERROR("setjmp failed during loading '%s'", filename);
 			png_destroy_read_struct(&png, NULL, NULL);
 			return false;
 		}
@@ -204,21 +205,21 @@ namespace scythe {
 		png_structp png = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 		if (!png)
 		{
-			LOG_ERROR("png_create_read_struct failed");
+			SC_ERROR("png_create_read_struct failed");
 			return false;
 		}
 
 		png_infop info = png_create_info_struct(png);
 		if (!info)
 		{
-			LOG_ERROR("png_create_info_struct failed");
+			SC_ERROR("png_create_info_struct failed");
 			png_destroy_read_struct(&png, NULL, NULL);
 			return false;
 		}
 
 		if (setjmp(png_jmpbuf(png)))
 		{
-			LOG_ERROR("setjmp failed");
+			SC_ERROR("setjmp failed");
 			png_destroy_read_struct(&png, NULL, NULL);
 			return false;
 		}

@@ -65,8 +65,4 @@ namespace scythe {
 
 } // namespace scythe
 
-// Useful defines
-#define LOG_INFO scythe::CommonLogStream::GetInstance()->PrintLine
-#define LOG_ERROR scythe::ErrorLogStream::GetInstance()->PrintLine
-
 #endif

@@ -1,10 +1,11 @@
 #include "complex_mesh.h"
 
+#include "common/log.h"
+
 #include "mesh.h"
 #include "material.h"
 
 #include "stream/file_stream.h"
-#include "stream/log_stream.h"
 
 #include "string_id.h"
 
@@ -25,7 +26,7 @@ namespace scythe {
 		FileStream file;
 		if (!file.Open(filename, StreamAccess::kWriteBinary))
 		{
-			LOG_ERROR("can't open for write %s", filename);
+			SC_ERROR("can't open for write %s", filename);
 			return false;
 		}
 
@@ -70,7 +71,7 @@ namespace scythe {
 		FileStream file;
 		if (!file.Open(filename, StreamAccess::kReadBinary))
 		{
-			LOG_ERROR("can't open %s", filename);
+			SC_ERROR("can't open %s", filename);
 			return false;
 		}
 
@@ -79,14 +80,14 @@ namespace scythe {
 		file.ReadValue(signature);
 		if (signature != kSignature)
 		{
-			LOG_ERROR("wrong file signature (%s)", filename);
+			SC_ERROR("wrong file signature (%s)", filename);
 			return false;
 		}
 		uint32_t version;
 		file.ReadValue(version);
 		if (version != kVersion)
 		{
-			LOG_ERROR("wrong file version (%s)", filename);
+			SC_ERROR("wrong file version (%s)", filename);
 			return false;
 		}
 

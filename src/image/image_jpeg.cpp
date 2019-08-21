@@ -1,7 +1,8 @@
 #include "image.h"
 
+#include "common/log.h"
+
 #include "stream/file_stream.h"
-#include "stream/log_stream.h"
 
 #include "jpeglib.h"
 
@@ -55,7 +56,7 @@ namespace scythe {
 		*/
 		if (!stream.Open(filename, StreamAccess::kWriteBinary))
 		{
-			LOG_ERROR("can't open %s", filename);
+			SC_ERROR("can't open %s", filename);
 			return false;
 		}
 		jpeg_stdio_dest(&cinfo, stream.GetFilePointer());
@@ -170,7 +171,7 @@ namespace scythe {
 
 		if (!stream.Open(filename, StreamAccess::kReadBinary))
 		{
-			LOG_ERROR("can't open %s", filename);
+			SC_ERROR("can't open %s", filename);
 			return false;
 		}
 

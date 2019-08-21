@@ -1,9 +1,10 @@
 #include "complex_mesh.h"
 
+#include "common/log.h"
+
 #include "mesh.h"
 #include "material.h"
 
-#include "stream/log_stream.h"
 #include "filesystem/filename.h"
 #include "filesystem/directory.h"
 
@@ -39,13 +40,13 @@ namespace scythe {
 		if (! tinyobj::LoadObj(&attrib, &shapes, &materials, &err, filename, base_dir.c_str(), true))
 		{
 			if (!err.empty())
-				LOG_ERROR("%s", err.c_str());
-			LOG_ERROR("can't open %s", filename);
+				SC_ERROR("%s", err.c_str());
+			SC_ERROR("can't open %s", filename);
 			return false;
 		}
 
 		if (!err.empty())
-			LOG_ERROR("%s", err.c_str());
+			SC_ERROR("%s", err.c_str());
 
 		// Fill materials
 		materials_.resize(materials.size());
@@ -87,7 +88,7 @@ namespace scythe {
 				int material_id = shape.mesh.material_ids[f];
 				if (material_id == -1)
 				{
-					LOG_ERROR("some face(s) don't have material(s) in %s", filename);
+					SC_ERROR("some face(s) don't have material(s) in %s", filename);
 					return false;
 				}
 				else
