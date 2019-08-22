@@ -43,10 +43,12 @@
 	#elif TARGET_OS_MAC == 1
 		/* OSX */
 		#define SCYTHE_TARGET_MAC
+	#else
+		#error "Unsupported Apple device"
 	#endif
 #else
 
-	#error Unknown target platform
+	#error "Unknown target platform"
 
 #endif
 

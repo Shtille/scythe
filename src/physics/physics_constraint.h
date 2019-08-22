@@ -1,13 +1,7 @@
 #ifndef __SCYTHE_PHYSICS_CONSTRAINT_H__
 #define __SCYTHE_PHYSICS_CONSTRAINT_H__
 
-#include "math/vector.h"
-#include "math/quaternion.h"
-
 #include "bullet_include.h"
-
-// Forward Bullet declarations
-class btTypedConstraint;
 
 namespace scythe {
 

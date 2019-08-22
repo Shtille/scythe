@@ -2,6 +2,7 @@
 #include "physics_vehicle.h"
 
 #include "common/sc_assert.h"
+#include "common/log.h"
 
 namespace scythe {
 
@@ -39,7 +40,7 @@ namespace scythe {
 
 	void PhysicsVehicleWheel::SetEnabled(bool enable)
 	{
-		SC_ASSERT(!"Operation not supported (PhysicsVehicleWheel::setEnabled(bool)). Use host vehicle instead.");
+		SC_ERROR("Operation not supported (PhysicsVehicleWheel::SetEnabled(bool)). Use host vehicle instead.");
 	}
 
 	void PhysicsVehicleWheel::FindAncestorAndBind()

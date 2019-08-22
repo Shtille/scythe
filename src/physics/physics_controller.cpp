@@ -11,6 +11,7 @@
 
 #include "common/sc_assert.h"
 #include "common/sc_delete.h"
+#include "common/log.h"
 
 namespace scythe {
 
@@ -595,7 +596,7 @@ namespace scythe {
 			break;
 
 		default:
-			GP_ERROR("Unsupported collision object type (%d).", object->getType());
+			SC_ERROR("Unsupported collision object type (%d).", object->type());
 			break;
 		}
 	}
@@ -620,7 +621,7 @@ namespace scythe {
 				break;
 
 			default:
-				GP_ERROR("Unsupported collision object type (%d).", object->getType());
+				SC_ERROR("Unsupported collision object type (%d).", object->getType());
 				break;
 			}
 		}
@@ -814,7 +815,7 @@ namespace scythe {
 		// 		{
 		// 			// Build the heightfield from an attached terrain's height array
 		// 			if (dynamic_cast<Terrain*>(node->getDrawable()) == NULL)
-		// 				GP_ERROR("Empty heightfield collision shapes can only be used on nodes that have an attached Terrain.");
+		// 				SC_ERROR("Empty heightfield collision shapes can only be used on nodes that have an attached Terrain.");
 		// 			else
 		// 				collision_shape = CreateHeightfield(node, dynamic_cast<Terrain*>(node->getDrawable())->_heightfield, center_of_mass_offset);
 		// 		}
@@ -827,7 +828,7 @@ namespace scythe {
 			break;
 
 		default:
-			GP_ERROR("Unsupported collision shape type (%d).", shape.type);
+			SC_ERROR("Unsupported collision shape type (%d).", shape.type);
 			break;
 		}
 
@@ -937,7 +938,7 @@ namespace scythe {
 		// in order to fetch mesh data for computing mesh rigid body.
 		if (strlen(mesh->getUrl()) == 0)
 		{
-			GP_ERROR("Cannot create mesh rigid body for mesh without valid URL.");
+			SC_ERROR("Cannot create mesh rigid body for mesh without valid URL.");
 			return NULL;
 		}
 
@@ -965,7 +966,7 @@ namespace scythe {
 
 			if (!triMesh)
 			{
-				GP_ERROR("Mesh rigid bodies are currently only supported on meshes with TRIANGLES primitive type.");
+				SC_ERROR("Mesh rigid bodies are currently only supported on meshes with TRIANGLES primitive type.");
 				return NULL;
 			}
 		}
@@ -974,7 +975,7 @@ namespace scythe {
 		Bundle::MeshData* data = Bundle::readMeshData(mesh->getUrl());
 		if (data == NULL)
 		{
-			GP_ERROR("Failed to load mesh data from url '%s'.", mesh->getUrl());
+			SC_ERROR("Failed to load mesh data from url '%s'.", mesh->getUrl());
 			return NULL;
 		}
 
@@ -1045,7 +1046,7 @@ namespace scythe {
 						indexStride = 4;
 						break;
 					default:
-						GP_ERROR("Unsupported index format (%d).", meshPart->indexFormat);
+						SC_ERROR("Unsupported index format (%d).", meshPart->indexFormat);
 						SAFE_DELETE(meshInterface);
 						SAFE_DELETE_ARRAY(shapeMeshData->vertexData);
 						SAFE_DELETE(shapeMeshData);
@@ -1150,14 +1151,14 @@ namespace scythe {
 		if (!a->SupportsConstraints())
 		{
 			SC_ASSERT(a->_node);
-			GP_ERROR("Rigid body '%s' does not support constraints; unexpected behavior may occur.", a->_node->getId());
+			SC_ERROR("Rigid body '%s' does not support constraints; unexpected behavior may occur.", a->_node->getId());
 			return false;
 		}
 		
 		if (b && !b->SupportsConstraints())
 		{
 			SC_ASSERT(b->_node);
-			GP_ERROR("Rigid body '%s' does not support constraints; unexpected behavior may occur.", b->_node->getId());
+			SC_ERROR("Rigid body '%s' does not support constraints; unexpected behavior may occur.", b->_node->getId());
 			return false;
 		}
 
