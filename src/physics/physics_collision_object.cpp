@@ -246,8 +246,8 @@ namespace scythe {
 		const btQuaternion& rot = world_transform_.getRotation();
 		const btVector3& pos = world_transform_.getOrigin();
 
-		node_->setRotation(rot.x(), rot.y(), rot.z(), rot.w());
-		node_->setTranslation(pos.x(), pos.y(), pos.z());
+		node_->SetRotation(rot.x(), rot.y(), rot.z(), rot.w());
+		node_->SetTranslation(pos.x(), pos.y(), pos.z());
 	}
 	void PhysicsCollisionObject::PhysicsMotionState::UpdateTransformFromNode() const
 	{
@@ -255,8 +255,8 @@ namespace scythe {
 
 		// Store the initial world transform (minus the scale) for use by Bullet later on.
 		Quaternion rotation;
-		const Matrix& m = node_->getWorldMatrix();
-		m.getRotation(&rotation);
+		const Matrix4& m = node_->GetWorldMatrix();
+		m.GetRotation(&rotation);
 
 		if (!center_of_mass_offset_.getOrigin().isZero())
 		{
