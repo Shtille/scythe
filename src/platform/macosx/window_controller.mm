@@ -809,6 +809,10 @@ bool PlatformWindowCreate()
 
 	g_window.view = [[ScytheContentView alloc] init];
 
+	// Opt-In to Retina resolution
+	if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_6)
+		[g_window.view setWantsBestResolutionOpenGLSurface:YES];
+
 	[g_window.object setContentView:g_window.view];
 
 	// Create a fullscreen window initially
@@ -942,6 +946,7 @@ bool PlatformInitOpenGLContext(int color_bits, int depth_bits, int stencil_bits)
 	if (g_window.pixel_format == nil)
 	{
 		NSLog(@"No OpenGL pixel format");
+		return false;
 	}
 	   
 	g_window.context = [[NSOpenGLContext alloc] initWithFormat:g_window.pixel_format shareContext:nil];
@@ -952,15 +957,13 @@ bool PlatformInitOpenGLContext(int color_bits, int depth_bits, int stencil_bits)
 	// Without this we'd simply get GL_INVALID_OPERATION error for calling legacy functions
 	// but it would be more difficult to see where that function was called.
 	CGLEnable([g_window.context CGLContextObj], kCGLCECrashOnRemovedFunctions);
-	
-	[g_window.view setPixelFormat:g_window.pixel_format];
-	
-	[g_window.view setOpenGLContext:g_window.context];
-	
-	// Opt-In to Retina resolution
-	if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_6)
-		[g_window.view setWantsBestResolutionOpenGLSurface:YES];
 
+	// NOTE: If you set the pixel format before the context it creates another
+	//       context, only to have it destroyed by the next line
+	//       We cannot use the view to create the context because that interface
+	//       does not support context resource sharing
+	[g_window.view setOpenGLContext:g_window.context];
+	[g_window.view setPixelFormat:g_window.pixel_format];
 	[g_window.context setView:g_window.view];
 
 	return true;
