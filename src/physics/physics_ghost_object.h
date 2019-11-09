@@ -3,6 +3,8 @@
 
 #include "physics_collision_object.h"
 
+#include "math/transform.h"
+
 namespace scythe {
 
 	/**

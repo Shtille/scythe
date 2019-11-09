@@ -2,7 +2,7 @@
 #define __SCYTHE_PHYSICS_COLLISION_SHAPE_H__
 
 #include "common/ref.h"
-#include "math/vector.h"
+#include "math/vector3.h"
 
 // Forward Bullet declarations
 class btCollisionShape;

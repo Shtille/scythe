@@ -873,7 +873,8 @@ bool PlatformWindowMakeFullscreen()
 }
 void PlatformWindowCenter()
 {
-	[g_window.object center];
+	ScytheWindow * window = (ScytheWindow *)g_window.object;
+	[window center];
 }
 void PlatformWindowResize(int width, int height)
 {

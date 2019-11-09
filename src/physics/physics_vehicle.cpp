@@ -1,5 +1,6 @@
 #include "physics_vehicle.h"
 #include "physics_vehicle_wheel.h"
+#include "physics_controller.h"
 
 #include "common/sc_assert.h"
 #include "common/sc_delete.h"

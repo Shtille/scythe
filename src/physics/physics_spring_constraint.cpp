@@ -15,7 +15,7 @@ namespace scythe {
 		a_ = a;
 		b_ = b;
 
-		Vector3 origin = centerOfMassMidpoint(a->GetNode(), b->GetNode());
+		Vector3 origin = CenterOfMassMidpoint(a->GetNode(), b->GetNode());
 		constraint_ = new btGeneric6DofSpringConstraint(*a->body_, *b->body_, GetTransformOffset(a->GetNode(), origin), GetTransformOffset(b->GetNode(), origin), true);
 	}
 

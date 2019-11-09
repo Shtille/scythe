@@ -2,7 +2,7 @@
 #define __SCYTHE_PHYSICS_CONTROLLER_H__
 
 #include "common/singleton.h"
-#include "math/vector.h"
+#include "math/vector3.h"
 #include "math/ray.h"
 
 #include <vector>

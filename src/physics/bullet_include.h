@@ -1,7 +1,7 @@
 #ifndef __SCYTHE_BULLET_INCLUDE_H__
 #define __SCYTHE_BULLET_INCLUDE_H__
 
-#include "math/vector.h"
+#include "math/vector3.h"
 #include "math/quaternion.h"
 
 #include <btBulletDynamicsCommon.h>

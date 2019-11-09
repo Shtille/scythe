@@ -1,5 +1,7 @@
 #include "physics_contraint.h"
 
+#include "physics_controller.h"
+
 #include "common/sc_assert.h"
 #include "common/sc_delete.h"
 
@@ -52,13 +54,13 @@ namespace scythe {
 		SC_ASSERT(node);
 
 		// Create a translation matrix that translates to the given origin.
-		Matrix m;
-		Matrix::CreateTranslation(point, &m);
+		Matrix4 m;
+		Matrix4::CreateTranslation(point, &m);
 
 		// Calculate the rotation offset to the rigid body by transforming 
 		// the translation matrix above into the rigid body's local space 
 		// (multiply by the inverse world matrix) and extracting the rotation.
-		Matrix mi;
+		Matrix4 mi;
 		node->GetWorldMatrix().Invert(&mi);
 		mi.Multiply(m);
 		
@@ -73,13 +75,13 @@ namespace scythe {
 		SC_ASSERT(node);
 
 		// Create a translation matrix that translates to the given origin.
-		Matrix m;
-		Matrix::CreateTranslation(point, &m);
+		Matrix4 m;
+		Matrix4::CreateTranslation(point, &m);
 
 		// Calculate the translation offset to the rigid body by transforming 
 		// the translation matrix above into the rigid body's local space 
 		// (multiply by the inverse world matrix) and extracting the translation.
-		Matrix mi;
+		Matrix4 mi;
 		node->GetWorldMatrix().Invert(&mi);
 		mi.Multiply(m);
 		
@@ -103,13 +105,13 @@ namespace scythe {
 		SC_ASSERT(node);
 
 		// Create a translation matrix that translates to the given origin.
-		Matrix m;
-		Matrix::CreateTranslation(origin, &m);
+		Matrix4 m;
+		Matrix4::CreateTranslation(origin, &m);
 
 		// Calculate the translation and rotation offset to the rigid body
 		// by transforming the translation matrix above into the rigid body's
 		// local space (multiply by the inverse world matrix and extract components).
-		Matrix mi;
+		Matrix4 mi;
 		node->GetWorldMatrix().Invert(&mi);
 		mi.Multiply(m);
 

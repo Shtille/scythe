@@ -1,0 +1,72 @@
+Physics requirements:
+Requirements with prefix physics_ are not considered as ones.
+
+physics_collision_shape.h:
+	OK
+physics_collision_shape.cpp:
+	uses Mesh
+physics_collision_object.h:
+	OK
+physics_collision_object.cpp:
+	uses Node:
+		GetWorldMatrix
+		SetRotation
+		SetTranslation
+physics_constraint.h:
+	OK
+physics_constraint.cpp:
+	uses Node
+physics_generic_constraint.h:
+	OK
+physics_generic_constraint.cpp:
+	uses Node:
+		GetWorldMatrix
+physics_fixed_constraint.h:
+	OK
+physics_fixed_constraint.cpp:
+	OK
+physics_hinge_constraint.h:
+	OK
+physics_hinge_constraint.cpp:
+	uses Node:
+		GetWorldMatrix
+physics_socket_constraint.h:
+	OK
+physics_socket_constraint.cpp:
+	uses Node:
+		GetWorldMatrix
+physics_spring_constraint.h:
+	OK
+physics_spring_constraint.cpp:
+	uses Node:
+		GetWorldMatrix
+physics_ghost_object.h:
+	OK
+physics_ghost_object.cpp:
+	OK
+physics_rigid_body.h:
+	OK
+physics_rigid_body.cpp:
+	uses Node:
+		AddListener
+		RemoveListener
+physics_vehicle_wheel.h:
+	OK
+physics_vehicle_wheel.cpp:
+	uses Node:
+		GetFirstChild
+		GetParent
+		GetPreviousSibling
+		GetNextSibling
+		GetTranslation
+		SetRotation
+		SetTranslation
+		GetMatrix
+physics_vehicle.h:
+	OK
+physics_vehicle.cpp:
+	OK
+physics_controller.h:
+	OK
+physics_controller.cpp:
+	OK
