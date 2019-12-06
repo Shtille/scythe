@@ -19,6 +19,9 @@ class btCollisionObject;
 
 namespace scythe {
 
+	class Node;
+	class Mesh;
+
 	class PhysicsController : public ManagedSingleton<PhysicsController> {
 
 		friend class ManagedSingleton<PhysicsController>;

@@ -10,8 +10,6 @@
 
 namespace scythe {
 
-	//class NodeCloneContext;
-
 	/**
 	 * Defines a 3-dimensional transformation.
 	 *
@@ -844,14 +842,6 @@ namespace scythe {
 		 * Called when the transform changes.
 		 */
 		virtual void TransformChanged();
-
-		/**
-		 * Copies from data from this node into transform for the purpose of cloning.
-		 * 
-		 * @param transform The transform to copy into.
-		 * @param context The clone context.
-		 */
-		//void CloneInto(Transform* transform, NodeCloneContext &context) const;
 
 		/**
 		 * The scale component of the Transform.

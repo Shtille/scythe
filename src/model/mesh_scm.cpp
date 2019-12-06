@@ -1,8 +1,8 @@
-#include "complex_mesh.h"
+#include "mesh.h"
 
 #include "common/log.h"
 
-#include "mesh.h"
+#include "mesh_part.h"
 #include "material.h"
 
 #include "stream/file_stream.h"
@@ -21,7 +21,7 @@ namespace {
 
 namespace scythe {
 
-	bool ComplexMesh::SaveToFileScm(const char *filename)
+	bool Mesh::SaveToFileScm(const char *filename)
 	{
 		FileStream file;
 		if (!file.Open(filename, StreamAccess::kWriteBinary))
@@ -66,7 +66,7 @@ namespace scythe {
 
 		return true;
 	}
-	bool ComplexMesh::LoadFromFileScm(const char *filename)
+	bool Mesh::LoadFromFileScm(const char *filename)
 	{
 		FileStream file;
 		if (!file.Open(filename, StreamAccess::kReadBinary))
@@ -112,7 +112,7 @@ namespace scythe {
 			uint32_t primitive_mode;
 			file.ReadValue(primitive_mode);
 
-			mesh = new Mesh(renderer_);
+			mesh = new MeshPart(renderer_);
 			mesh->primitive_mode_ = static_cast<PrimitiveType>(primitive_mode);
 			mesh->material_ = &materials_[material_index];
 

@@ -4,6 +4,8 @@
 #include "common/ref.h"
 #include "math/vector3.h"
 
+#include <vector>
+
 // Forward Bullet declarations
 class btCollisionShape;
 class btStridingMeshInterface;
@@ -16,6 +18,10 @@ namespace scythe {
 	 * Defines the physics collision shape class that all supported shapes derive from.
 	 */
 	class PhysicsCollisionShape : public Ref {
+
+		friend class PhysicsController;
+		friend class PhysicsRigidBody;
+
 	public:
 		/**
 		 * Defines the supported collision shape types.
@@ -189,6 +195,21 @@ namespace scythe {
 		static PhysicsCollisionShape::Definition DefineMesh(Mesh* mesh);
 
 	private:
+
+		struct MeshData
+		{
+			float* vertexData;
+			std::vector<unsigned char*> indexData;
+		};
+
+		// struct HeightfieldData
+		// {
+		//     HeightField* heightfield;
+		//     bool inverseIsDirty;
+		//     Matrix inverse;
+		//     float minHeight;
+		//     float maxHeight;
+		// };
 
 		/**
 		 * Constructor.

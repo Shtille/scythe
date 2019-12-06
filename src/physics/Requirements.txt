@@ -69,4 +69,17 @@ physics_vehicle.cpp:
 physics_controller.h:
 	OK
 physics_controller.cpp:
-	OK
+	uses Node:
+		GetDrawable
+		GetFirstChild
+		GetNextSibling
+		GetWorldMatrix
+	uses Model:
+		getMesh
+	uses Mesh:
+		GetBoundingBox
+		getUrl
+		getPartCount
+		getPart
+	uses MeshPart:
+		getPrimitiveType

@@ -3,14 +3,13 @@
 
 #include "common/ref.h"
 #include "math/transform.h"
+#include "physics/physics_rigid_body.h"
+
+#include <string>
 
 namespace scythe {
 
 	class Scene;
-	class Camera;
-	class Light;
-	class AudioSource;
-	class AIAgent;
 	class Drawable;
 
 	/**
@@ -22,10 +21,6 @@ namespace scythe {
 	class Node : public Transform, public Ref
 	{
 		friend class Scene;
-		friend class SceneLoader;
-		friend class Bundle;
-		friend class MeshSkin;
-		friend class Light;
 
 	public:
 
@@ -133,74 +128,11 @@ namespace scythe {
 		Node * GetRootNode() const;
 
 		/**
-		 * Returns the first child node that matches the given ID.
-		 *
-		 * This method checks the specified ID against its immediate child nodes
-		 * but does not check the ID against itself.
-		 * If recursive is true, it also traverses the Node's hierarchy with a breadth first search.
-		 *
-		 * @param id The ID of the child to find.
-		 * @param recursive True to search recursively all the node's children, false for only direct children.
-		 * @param exactMatch true if only nodes whose ID exactly matches the specified ID are returned,
-		 *        or false if nodes that start with the given ID are returned.
-		 *
-		 * @return The Node found or NULL if not found.
-		 */
-		Node * FindNode(const char* id, bool recursive = true, bool exactMatch = true) const;
-
-		/**
-		 * Returns all child nodes that match the given ID.
-		 *
-		 * @param id The ID of the node to find.
-		 * @param nodes A vector of nodes to be populated with matches.
-		 * @param recursive true if a recursive search should be performed, false otherwise.
-		 * @param exactMatch true if only nodes whose ID exactly matches the specified ID are returned,
-		 *        or false if nodes that start with the given ID are returned.
-		 *
-		 * @return The number of matches found.
-		 * @script{ignore}
-		 */
-		unsigned int FindNodes(const char* id, std::vector<Node*>& nodes, bool recursive = true, bool exactMatch = true) const;
-
-		/**
 		 * Gets the scene this node is currenlty within.
 		 *
 		 * @return The scene.
 		 */
 		virtual Scene * GetScene() const;
-
-		/**
-		 * Sets a tag on this Node.
-		 *
-		 * tags can be used for a variety of purposes within a game. For example,
-		 * a tag called "transparent" can be added to nodes, to indicate which nodes in
-		 * a scene are transparent. This tag can then be read during rendering to sort
-		 * transparent and opaque objects for correct drawing order.
-		 *
-		 * Setting a tag to NULL removes the tag from the Node.
-		 *
-		 * @param name Name of the tag to set.
-		 * @param value Optional value of the tag (empty string by default).
-		 */
-		void SetTag(const char* name, const char* value = "");
-
-		/**
-		 * Returns the value of the custom tag with the given name.
-		 *
-		 * @param name Name of the tag to return.
-		 *
-		 * @return The value of the given tag, or NULL if the tag is not set.
-		 */
-		const char* GetTag(const char* name) const;
-
-		/**
-		 * Determines if a custom tag with the specified name is set.
-		 *
-		 * @param name Name of the tag to query.
-		 *
-		 * @return true if the tag is set, false otherwise.
-		 */
-		bool HasTag(const char* name) const;
 
 		/**
 		 * Sets if the node is enabled in the scene.
@@ -254,143 +186,6 @@ namespace scythe {
 		virtual const Matrix& GetWorldMatrix() const;
 
 		/**
-		 * Gets the world view matrix corresponding to this node.
-		 *
-		 * @return The world view matrix of this node.
-		 */
-		const Matrix& GetWorldViewMatrix() const;
-
-		/**
-		 * Gets the inverse transpose world matrix corresponding to this node.
-		 *
-		 * This matrix is typically used to transform normal vectors into world space.
-		 *
-		 * @return The inverse world matrix of this node.
-		 */
-		const Matrix& GetInverseTransposeWorldMatrix() const;
-
-		/**
-		 * Gets the inverse transpose world view matrix corresponding to this node.
-		 *
-		 * This matrix is typically used to transform normal vectors into view space.
-		 *
-		 * @return The inverse world view matrix of this node.
-		 */
-		const Matrix& GetInverseTransposeWorldViewMatrix() const;
-
-		/**
-		 * Gets the view matrix corresponding to this node based
-		 * on the scene's active camera.
-		 *
-		 * @return The view matrix of this node.
-		 */
-		const Matrix& GetViewMatrix() const;
-
-		/**
-		 * Gets the inverse view matrix corresponding to this node based
-		 * on the scene's active camera.
-		 *
-		 * @return The inverse view matrix of this node.
-		 */
-		const Matrix& GetInverseViewMatrix() const;
-
-		/**
-		 * Gets the projection matrix corresponding to this node based
-		 * on the scene's active camera.
-		 *
-		 * @return The projection matrix of this node.
-		 */
-		const Matrix& GetProjectionMatrix() const;
-
-		/**
-		 * Gets the view * projection matrix corresponding to this node based
-		 * on the scene's active camera.
-		 *
-		 * @return The view * projection matrix of this node.
-		 */
-		const Matrix& GetViewProjectionMatrix() const;
-
-		/**
-		 * Gets the inverse view * projection matrix corresponding to this node based
-		 * on the scene's active camera.
-		 *
-		 * @return The inverse view * projection matrix of this node.
-		 */
-		const Matrix& GetInverseViewProjectionMatrix() const;
-
-		/**
-		 * Gets the world * view * projection matrix corresponding to this node based
-		 * on the scene's active camera.
-		 *
-		 * @return The world * view * projection matrix of this node.
-		 */
-		const Matrix& GetWorldViewProjectionMatrix() const;
-
-		/**
-		 * Gets the translation vector (or position) of this Node in world space.
-		 *
-		 * @return The world translation vector.
-		 */
-		Vector3 GetTranslationWorld() const;
-
-		/**
-		 * Gets the translation vector (or position) of this Node in view space.
-		 *
-		 * @return The view space translation vector.
-		 */
-		Vector3 GetTranslationView() const;
-
-		/**
-		 * Returns the forward vector of the Node in world space.
-		 *
-		 * @return The forward vector in world space.
-		 */
-		Vector3 GetForwardVectorWorld() const;
-
-		/**
-		 * Returns the forward vector of the Node in view space.
-		 *
-		 * @return The forward vector in view space.
-		 */
-		Vector3 GetForwardVectorView() const;
-
-		/**
-		 * Returns the right vector of the Node in world space.
-		 *
-		 * @return The right vector in world space.
-		 */
-		Vector3 GetRightVectorWorld() const;
-
-		/**
-		 * Returns the up vector of the Node in world space.
-		 *
-		 * @return The up vector in world space.
-		 */
-		Vector3 GetUpVectorWorld() const;
-
-		/**
-		 * Returns the translation vector of the currently active camera for this node's scene.
-		 *
-		 * @return The translation vector of the scene's active camera.
-		 */
-		Vector3 GetActiveCameraTranslationWorld() const;
-
-		/**
-		 * Returns the view-space translation vector of the currently active camera for this node's scene.
-		 *
-		 * @return The translation vector of the scene's active camera, in view-space.
-		 */
-		Vector3 GetActiveCameraTranslationView() const;
-
-		/**
-		 * Gets the first animation in the node hierarchy with the specified ID.
-		 *
-		 * @param id The ID of the animation to get. Returns the first animation if ID is NULL.
-		 * @return The first animation with the specified ID.
-		 */
-		Animation * GetAnimation(const char* id = NULL) const;
-
-		/**
 		 * Gets the drawable object attached to this node.
 		 *
 		 * @return The drawable component attached to this node.
@@ -407,58 +202,7 @@ namespace scythe {
 		 *
 		 * @param drawable The new drawable component. May be NULL.
 		 */
-		void SetDrawable(Drawable* drawable);
-
-		/**
-		 * Gets the camera attached to this node.
-		 *
-		 * @return Gets the camera attached to this node.
-		 */
-		Camera * GetCamera() const;
-
-		/**
-		 * Attaches a camera to this node.
-		 *
-		 * This will increase the reference count of the new camera and decrease
-		 * the reference count of the old camera.
-		 *
-		 * @param camera The new camera. May be NULL.
-		 */
-		void SetCamera(Camera * camera);
-
-		/**
-		 * Get the light attached to this node.
-		 *
-		 * @return The light attached to this node.
-		 */
-		Light * GetLight() const;
-
-		/**
-		 * Attaches a light to this node.
-		 *
-		 * This will increase the reference count of the new light and decrease
-		 * the reference count of the old light.
-		 *
-		 * @param light The new light. May be NULL.
-		 */
-		void SetLight(Light * light);
-
-		/**
-		 * Gets the audio source attached to this node.
-		 *
-		 * @return The audio source attached to this node.
-		 */
-		AudioSource * GetAudioSource() const;
-
-		/**
-		 * Attaches an audio source to this node.
-		 *
-		 * This will increase the reference count of the new audio source and decrease
-		 * the reference count of the old audio source.
-		 *
-		 * @param audio The new audio source. May be NULL.
-		 */
-		void SetAudioSource(AudioSource * audio);
+		void SetDrawable(Drawable * drawable);
 
 		/**
 		 * Returns the pointer to this node's physics collision object.
@@ -518,28 +262,6 @@ namespace scythe {
 												   PhysicsRigidBody::Parameters* rigidBodyParameters = NULL,
 												   int group = PHYSICS_COLLISION_GROUP_DEFAULT,
 												   int mask = PHYSICS_COLLISION_MASK_DEFAULT);
-		/**
-		 * Sets the physics collision object for this node using the data from the Properties object defined at the specified URL,
-		 * where the URL is of the format "<file-path>.<extension>#<namespace-id>/<namespace-id>/.../<namespace-id>"
-		 * (and "#<namespace-id>/<namespace-id>/.../<namespace-id>" is optional).
-		 *
-		 * @param url The URL pointing to the Properties object defining the physics collision object.
-		 */
-		PhysicsCollisionObject* SetCollisionObject(const char* url);
-
-		/**
-		 * Gets the AI agent assigned to this node
-		 *
-		 * @return The AI agent for this node.
-		 */
-		AIAgent* GetAgent() const;
-
-		/**
-		 * Sets the AI agent for this node.
-		 *
-		 * @param agent The AI agent to set.
-		 */
-		void SetAgent(AIAgent* agent);
 
 		/**
 		 * Gets the user object assigned to this node.
@@ -576,14 +298,6 @@ namespace scythe {
 		 */
 		const BoundingSphere& GetBoundingSphere() const;
 
-		/**
-		 * Clones the node and all of its child nodes.
-		 *
-		 * @return A new node.
-		 * @script{create}
-		 */
-		Node* Clone() const;
-
 	protected:
 
 		/**
@@ -595,32 +309,6 @@ namespace scythe {
 		 * Destructor.
 		 */
 		virtual ~Node();
-
-		/**
-		 * Clones a single node and its data but not its children.
-		 *
-		 * @param context The clone context.
-		 *
-		 * @return Pointer to the newly created node.
-		 */
-		virtual Node* CloneSingleNode(NodeCloneContext &context) const;
-
-		/**
-		 * Recursively clones this node and its children.
-		 *
-		 * @param context The clone context.
-		 *
-		 * @return The newly created node.
-		 */
-		Node* CloneRecursive(NodeCloneContext &context) const;
-
-		/**
-		 * Copies the data from this node into the given node.
-		 *
-		 * @param node The node to copy the data to.
-		 * @param context The clone context.
-		 */
-		void CloneInto(Node* node, NodeCloneContext &context) const;
 
 		/**
 		 * Removes this node from its parent.
@@ -642,39 +330,6 @@ namespace scythe {
 		 */
 		void SetBoundsDirty();
 
-		/**
-		 * Returns the first child node that matches the given ID.
-		 *
-		 * This method checks the specified ID against its immediate child nodes
-		 * but does not check the ID against itself.
-		 * If recursive is true, it also traverses the Node's hierarchy with a breadth first search.
-		 *
-		 * @param id The ID of the child to find.
-		 * @param recursive True to search recursively all the node's children, false for only direct children.
-		 * @param exactMatch true if only nodes whose ID exactly matches the specified ID are returned,
-		 *        or false if nodes that start with the given ID are returned.
-		 * @param skipSkin Set true to skip skin hierarchy, initial find may set false to include skin hierarchy.
-		 *
-		 * @return The Node found or NULL if not found.
-		 */
-		Node* FindNode(const char* id, bool recursive, bool exactMatch, bool skipSkin) const;
-
-
-		/**
-		 * Returns all child nodes that match the given ID.
-		 *
-		 * @param id The ID of the node to find.
-		 * @param nodes A vector of nodes to be populated with matches.
-		 * @param recursive true if a recursive search should be performed, false otherwise.
-		 * @param exactMatch true if only nodes whose ID exactly matches the specified ID are returned,
-		 *        or false if nodes that start with the given ID are returned.
-		 * @param skipSkin Set true to skip skin hierarchy, initial find may set false to include skin hierarchy.
-		 * 
-		 * @return The number of matches found.
-		 * @script{ignore}
-		 */
-		unsigned int FindNodes(const char* id, std::vector<Node*>& nodes, bool recursive, bool exactMatch, bool skipSkin) const;
-
 	private:
 
 		/**
@@ -687,116 +342,36 @@ namespace scythe {
 		 */
 		Node& operator=(const Node&);
 
-		PhysicsCollisionObject* SetCollisionObject(Properties* properties);
-
 	protected:
 
 		/** The scene this node is attached to. */
-		Scene* _scene;
+		Scene * _scene;
 		/** The nodes id. */
 		std::string _id;
 		/** The nodes first child. */
-		Node* _firstChild;
+		Node * _firstChild;
 		/** The nodes next sibiling. */
-		Node* _nextSibling;
+		Node * _nextSibling;
 		/** The nodes previous sibiling. */
-		Node* _prevSibling;
+		Node * _prevSibling;
 		/** The nodes parent. */
-		Node* _parent;
+		Node * _parent;
 		/** The number of child nodes. */
 		unsigned int _childCount;
 		/** If this node is enabled. Maybe different if parent is enabled/disabled. */
 		bool _enabled; 
-		/** Tags assigned to this node. */
-		std::map<std::string, std::string>* _tags;
 		/** The drawble component attached to this node. */
-		Drawable* _drawable;
-		/** The camera component attached to this node. */
-		Camera* _camera;
-		/** The light component attached to this node. */
-		Light* _light;
-		/** The audio source component attached to this node. */
-		AudioSource* _audioSource;
+		Drawable * _drawable;
 		/** The collision object component attached to this node. */
-		PhysicsCollisionObject* _collisionObject;
-		/** The AI agent component attached to this node. */
-		mutable AIAgent* _agent;
+		PhysicsCollisionObject * _collisionObject;
 		/** The user object component attached to this node. */
-		Ref* _userObject;
+		Ref * _userObject;
 		/** The world matrix for this node. */
-		mutable Matrix _world;
+		mutable Matrix4 _world;
 		/** The bounding sphere for this node. */
 		mutable BoundingSphere _bounds;
 		/** The dirty bits used for optimization. */
 		mutable int _dirtyBits;
-	};
-
-	/**
-	 * NodeCloneContext represents the context data that is kept when cloning a node.
-	 * The NodeCloneContext is used to make sure objects don't get cloned twice.
-	 */
-	class NodeCloneContext
-	{
-	public:
-
-		/**
-		 * Constructor.
-		 */
-		NodeCloneContext();
-
-		/**
-		 * Destructor.
-		 */
-		~NodeCloneContext();
-
-		/**
-		 * Finds the cloned animation of the given animation or NULL if this animation was not registered with this context.
-		 *
-		 * @param animation The animation to search for the cloned copy of.
-		 *
-		 * @return The cloned animation or NULL if not found.
-		 */
-		Animation* FindClonedAnimation(const Animation* animation);
-
-		/**
-		 * Registers the cloned animation with this context so that it doesn't get cloned twice.
-		 *
-		 * @param original The pointer to the original animation.
-		 * @param clone The pointer to the cloned animation.
-		 */
-		void RegisterClonedAnimation(const Animation* original, Animation* clone);
-
-		/**
-		 * Finds the cloned node of the given node or NULL if this node was not registered with this context.
-		 *
-		 * @param node The node to search for the cloned copy of.
-		 *
-		 * @return The cloned node or NULL if not found.
-		 */
-		Node* FindClonedNode(const Node* node);
-
-		/**
-		 * Registers the cloned node with this context so that it doens't get cloned twice.
-		 *
-		 * @param original The pointer to the original node.
-		 * @param clone The pointer to the cloned node.
-		 */
-		void RegisterClonedNode(const Node* original, Node* clone);
-
-	private:
-
-		/**
-		 * Hidden copy constructor.
-		 */
-		NodeCloneContext(const NodeCloneContext&);
-
-		/**
-		 * Hidden copy assignment operator.
-		 */
-		NodeCloneContext& operator=(const NodeCloneContext&);
-
-		std::map<const Animation*, Animation*> _clonedAnimations;
-		std::map<const Node*, Node*> _clonedNodes;
 	};
 
 } // namespace scythe

@@ -1,21 +1,21 @@
 #include "mesh_vertices_enumerator.h"
 
-#include "complex_mesh.h"
 #include "mesh.h"
+#include "mesh_part.h"
 
 namespace scythe {
 
-	MeshVerticesEnumerator::MeshVerticesEnumerator(ComplexMesh * complex_mesh)
-	: complex_mesh_(complex_mesh)
+	MeshVerticesEnumerator::MeshVerticesEnumerator(Mesh * mesh)
+	: mesh_(mesh)
 	, index_(0)
 	{
 
 	}
 	bool MeshVerticesEnumerator::GetNextObject(MeshVerticesInfo * info)
 	{
-		if (index_ < static_cast<unsigned int>(complex_mesh_->meshes_.size()))
+		if (index_ < static_cast<unsigned int>(mesh_->meshes_.size()))
 		{
-			Mesh * mesh = complex_mesh_->meshes_[index_];
+			MeshPart * mesh = mesh_->meshes_[index_];
 			if (!mesh->vertices_.empty())
 			{
 				info->vertices = &mesh->vertices_[0];

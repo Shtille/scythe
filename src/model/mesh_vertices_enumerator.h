@@ -5,7 +5,7 @@
 
 namespace scythe {
 
-	class ComplexMesh;
+	class Mesh;
 
 	struct MeshVerticesInfo {
 		const Vertex * vertices;
@@ -14,12 +14,12 @@ namespace scythe {
 
 	class MeshVerticesEnumerator {
 	public:
-		MeshVerticesEnumerator(ComplexMesh * complex_mesh);
+		MeshVerticesEnumerator(Mesh * mesh);
 
 		bool GetNextObject(MeshVerticesInfo * info);
 
 	private:
-		ComplexMesh * complex_mesh_;
+		Mesh * mesh_;
 		unsigned int index_;
 	};
 

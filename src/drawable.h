@@ -4,7 +4,6 @@
 namespace scythe {
 
 	class Node;
-	class NodeCloneContext;
 
 	/**
 	 * Defines a drawable object that can be attached to a Node.
@@ -42,14 +41,6 @@ namespace scythe {
 		Node* GetNode() const;
 
 	protected:
-
-		/**
-		 * Clones the drawable and returns a new drawable.
-		 *
-		 * @param context The clone context.
-		 * @return The newly created drawable.
-		 */
-		virtual Drawable* Clone(NodeCloneContext& context) = 0;
 
 		/**
 		 * Sets the node this drawable is attached to.

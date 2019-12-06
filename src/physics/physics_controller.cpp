@@ -425,7 +425,7 @@ namespace scythe {
 		{
 			Vector3 translation;
 			Quaternion rotation;
-			const Matrix& m = object->GetNode()->GetWorldMatrix();
+			const Matrix4& m = object->GetNode()->GetWorldMatrix();
 			m.GetTranslation(&translation);
 			m.GetRotation(&rotation);
 
@@ -934,6 +934,9 @@ namespace scythe {
 	{
 		SC_ASSERT(mesh);
 
+		// TODO:
+		return nullptr;
+		/*
 		// The mesh must have a valid URL (i.e. it must have been loaded from a Bundle)
 		// in order to fetch mesh data for computing mesh rigid body.
 		if (strlen(mesh->getUrl()) == 0)
@@ -984,8 +987,8 @@ namespace scythe {
 		shapeMeshData->vertexData = NULL;
 
 		// Copy the scaled vertex position data to the rigid body's local buffer.
-		Matrix m;
-		Matrix::CreateScale(scale, &m);
+		Matrix4 m;
+		Matrix4::CreateScale(scale, &m);
 		unsigned int vertexCount = data->vertexCount;
 		shapeMeshData->vertexData = new float[vertexCount * 3];
 		Vector3 v;
@@ -1113,6 +1116,7 @@ namespace scythe {
 		SAFE_DELETE(data);
 
 		return shape;
+		*/
 	}
 	void PhysicsController::DestroyShape(PhysicsCollisionShape* shape)
 	{

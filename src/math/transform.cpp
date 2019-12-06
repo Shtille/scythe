@@ -981,19 +981,6 @@ namespace scythe {
 	}
 
 	/*
-	void Transform::CloneInto(Transform* transform, NodeCloneContext &context) const
-	{
-		SC_ASSERT(transform);
-
-		AnimationTarget::cloneInto(transform, context);
-		transform->scale_.set(scale_);
-		transform->rotation_.set(rotation_);
-		transform->translation_.set(translation_);
-		transform->dirty(DIRTY_TRANSLATION | DIRTY_ROTATION | DIRTY_SCALE);
-	}
-	*/
-
-	/*
 	void Transform::applyAnimationValueRotation(AnimationValue* value, unsigned int index, float blendWeight)
 	{
 		if (isStatic())

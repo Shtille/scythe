@@ -1,8 +1,8 @@
-#include "complex_mesh.h"
+#include "mesh.h"
 
 #include "common/log.h"
 
-#include "mesh.h"
+#include "mesh_part.h"
 #include "material.h"
 
 #include "filesystem/filename.h"
@@ -22,12 +22,12 @@
 
 namespace scythe {
 
-	bool ComplexMesh::SaveToFileObj(const char *filename)
+	bool Mesh::SaveToFileObj(const char *filename)
 	{
 		assert(!"Haven't been implemented yet");
 		return true;
 	}
-	bool ComplexMesh::LoadFromFileObj(const char *filename)
+	bool Mesh::LoadFromFileObj(const char *filename)
 	{
 		tinyobj::attrib_t attrib;
 		std::vector<tinyobj::shape_t> shapes;
@@ -67,7 +67,7 @@ namespace scythe {
 		Vector3 min = Vector3(1e8), max = Vector3(-1e8);
 
 		// Make unique mesh per material per shape
-		typedef std::map<int, std::unique_ptr<Mesh> > MaterialMap;
+		typedef std::map<int, std::unique_ptr<MeshPart> > MaterialMap;
 		std::vector< MaterialMap > shape_meshes;
 
 		// Loop over shapes
@@ -84,7 +84,7 @@ namespace scythe {
 			for (size_t f = 0; f < shape.mesh.num_face_vertices.size(); ++f)
 			{
 				// Per-face material
-				Mesh * mesh = nullptr;
+				MeshPart * mesh = nullptr;
 				int material_id = shape.mesh.material_ids[f];
 				if (material_id == -1)
 				{
@@ -97,7 +97,7 @@ namespace scythe {
 					auto it = materials_map.find(material_id);
 					if (it == materials_map.end())
 					{
-						mesh = new Mesh(renderer_);
+						mesh = new MeshPart(renderer_);
 						mesh->primitive_mode_ = PrimitiveType::kTriangles;
 						mesh->material_ = &materials_[material_id];
 						materials_map[material_id].reset(mesh);
@@ -137,7 +137,7 @@ namespace scythe {
 		{
 			for (auto& pair : map)
 			{
-				Mesh * mesh = pair.second.release();
+				MeshPart * mesh = pair.second.release();
 				meshes_.push_back(mesh);
 			}
 		}
