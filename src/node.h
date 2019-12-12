@@ -3,6 +3,7 @@
 
 #include "common/ref.h"
 #include "math/transform.h"
+#include "math/bounding_sphere.h"
 #include "physics/physics_rigid_body.h"
 
 #include <string>
@@ -29,8 +30,8 @@ namespace scythe {
 		 */
 		enum Type
 		{
-			NODE = 1,
-			JOINT
+			kNode = 1,
+			kJoint
 		};
 
 		/**
@@ -73,14 +74,14 @@ namespace scythe {
 		 *
 		 * @param child The child to add.
 		 */
-		virtual void AddChild(Node* child);
+		virtual void AddChild(Node * child);
 
 		/**
 		 * Removes a child node.
 		 *
 		 * @param child The child to remove.
 		 */
-		virtual void RemoveChild(Node* child);
+		virtual void RemoveChild(Node * child);
 
 		/**
 		 * Removes all child nodes.
@@ -106,7 +107,7 @@ namespace scythe {
 		 *
 		 * @return The previous sibling.
 		 */
-		Node* GetPreviousSibling() const;
+		Node * GetPreviousSibling() const;
 
 		/**
 		 * Returns the parent of this node.
@@ -183,7 +184,7 @@ namespace scythe {
 		 *
 		 * @return The world matrix of this node.
 		 */
-		virtual const Matrix& GetWorldMatrix() const;
+		virtual const Matrix4& GetWorldMatrix() const;
 
 		/**
 		 * Gets the drawable object attached to this node.
@@ -258,7 +259,7 @@ namespace scythe {
 		 * @param mask Bitmask to filter groups of objects to collide with this one.
 		 */
 		PhysicsCollisionObject* SetCollisionObject(PhysicsCollisionObject::Type type,
-												   const PhysicsCollisionShape::Definition& shape = PhysicsCollisionShape::Box(),
+												   const PhysicsCollisionShape::Definition& shape = PhysicsCollisionShape::DefineBox(),
 												   PhysicsRigidBody::Parameters* rigidBodyParameters = NULL,
 												   int group = PHYSICS_COLLISION_GROUP_DEFAULT,
 												   int mask = PHYSICS_COLLISION_MASK_DEFAULT);
@@ -268,14 +269,14 @@ namespace scythe {
 		 *
 		 * @return The user object assigned object to this node.
 		 */
-		Ref* GetUserObject() const;
+		Ref * GetUserObject() const;
 
 		/**
 		* Sets a user object to be assigned object to this node.
 		*
 		* @param obj The user object assigned object to this node.
 		*/
-		void SetUserObject(Ref* obj);
+		void SetUserObject(Ref * obj);
 
 		/**
 		 * Returns the bounding sphere for the Node, in world space.
@@ -344,34 +345,41 @@ namespace scythe {
 
 	protected:
 
+		enum DirtyBits {
+			kNodeDirtyWorld = 1,
+			kNodeDirtyBounds = 2,
+			kNodeDirtyHierarchy = 4,
+			kNodeDirtyAll = 7
+		};
+
 		/** The scene this node is attached to. */
-		Scene * _scene;
+		Scene * scene_;
 		/** The nodes id. */
-		std::string _id;
+		std::string id_;
 		/** The nodes first child. */
-		Node * _firstChild;
+		Node * first_child_;
 		/** The nodes next sibiling. */
-		Node * _nextSibling;
+		Node * next_sibling_;
 		/** The nodes previous sibiling. */
-		Node * _prevSibling;
+		Node * prev_sibling_;
 		/** The nodes parent. */
-		Node * _parent;
+		Node * parent_;
 		/** The number of child nodes. */
-		unsigned int _childCount;
+		unsigned int child_count_;
 		/** If this node is enabled. Maybe different if parent is enabled/disabled. */
-		bool _enabled; 
+		bool enabled_; 
 		/** The drawble component attached to this node. */
-		Drawable * _drawable;
+		Drawable * drawable_;
 		/** The collision object component attached to this node. */
-		PhysicsCollisionObject * _collisionObject;
+		PhysicsCollisionObject * collision_object_;
 		/** The user object component attached to this node. */
-		Ref * _userObject;
+		Ref * user_object_;
 		/** The world matrix for this node. */
-		mutable Matrix4 _world;
+		mutable Matrix4 world_;
 		/** The bounding sphere for this node. */
-		mutable BoundingSphere _bounds;
+		mutable BoundingSphere bounding_sphere_;
 		/** The dirty bits used for optimization. */
-		mutable int _dirtyBits;
+		mutable unsigned int dirty_bits_;
 	};
 
 } // namespace scythe

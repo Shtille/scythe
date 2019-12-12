@@ -55,7 +55,8 @@ namespace scythe {
 		//! Specify separate material binder manually
 		void SetMaterialBinder(MaterialBinderInterface * material_binder);
 
-		const BoundingBox& bounding_box() const;
+		const BoundingBox& GetBoundingBox() const;
+		const BoundingSphere& GetBoundingSphere() const;
 
 		unsigned int GetNumberOfParts() const;
 		
@@ -72,6 +73,7 @@ namespace scythe {
 		MaterialBinderInterface * material_binder_;
 		VertexFormat * vertex_format_;
 		BoundingBox bounding_box_;
+		BoundingSphere bounding_sphere_;
 
 		std::vector<VertexAttribute> attribs_;
 		std::vector<MeshPart *> meshes_;

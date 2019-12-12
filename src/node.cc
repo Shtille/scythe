@@ -5,42 +5,42 @@
 #include "physics/physics_vehicle.h"
 #include "physics/physics_vehicle_wheel.h"
 
-// Node dirty flags
-#define NODE_DIRTY_WORLD 1
-#define NODE_DIRTY_BOUNDS 2
-#define NODE_DIRTY_HIERARCHY 4
-#define NODE_DIRTY_ALL (NODE_DIRTY_WORLD | NODE_DIRTY_BOUNDS | NODE_DIRTY_HIERARCHY)
+#include "model/model.h"
+#include "model/mesh.h"
+
+#include "common/sc_assert.h"
+#include "common/sc_delete.h"
 
 namespace scythe {
 
 Node::Node(const char* id)
-: _scene(nullptr)
-, _firstChild(nullptr)
-, _nextSibling(nullptr)
-, _prevSibling(nullptr)
-, _parent(nullptr)
-, _childCount(0)
-, _enabled(true)
-, _drawable(nullptr)
-, _collisionObject(nullptr)
-, _userObject(nullptr)
-, _dirtyBits(NODE_DIRTY_ALL)
+: scene_(nullptr)
+, first_child_(nullptr)
+, next_sibling_(nullptr)
+, prev_sibling_(nullptr)
+, parent_(nullptr)
+, child_count_(0)
+, enabled_(true)
+, drawable_(nullptr)
+, collision_object_(nullptr)
+, user_object_(nullptr)
+, dirty_bits_(kNodeDirtyAll)
 {
 	if (id)
 	{
-		_id = id;
+		id_ = id;
 	}
 }
 
 Node::~Node()
 {
 	RemoveAllChildren();
-	if (_drawable)
-		_drawable->SetNode(nullptr);
-	Ref* ref = dynamic_cast<Ref*>(_drawable);
+	if (drawable_)
+		drawable_->SetNode(nullptr);
+	Ref* ref = dynamic_cast<Ref*>(drawable_);
 	SC_SAFE_RELEASE(ref);
-	SC_SAFE_DELETE(_collisionObject);
-	SC_SAFE_RELEASE(_userObject);
+	SC_SAFE_DELETE(collision_object_);
+	SC_SAFE_RELEASE(user_object_);
 }
 
 Node * Node::Create(const char* id)
@@ -55,27 +55,27 @@ const char* Node::GetTypeName() const
 
 const char* Node::id() const
 {
-	return _id.c_str();
+	return id_.c_str();
 }
 
 void Node::SetId(const char* id)
 {
 	if (id)
 	{
-		_id = id;
+		id_ = id;
 	}
 }
 
 Node::Type Node::type() const
 {
-	return Node::NODE;
+	return Node::kNode;
 }
 
 void Node::AddChild(Node* child)
 {
 	SC_ASSERT(child);
 
-	if (child->_parent == this)
+	if (child->parent_ == this)
 	{
 		// This node is already present in our hierarchy
 		return;
@@ -83,36 +83,36 @@ void Node::AddChild(Node* child)
 	child->AddRef();
 
 	// If the item belongs to another hierarchy, remove it first.
-	if (child->_parent)
+	if (child->parent_)
 	{
-		child->_parent->RemoveChild(child);
+		child->parent_->RemoveChild(child);
 	}
-	else if (child->_scene)
+	else if (child->scene_)
 	{
-		child->_scene->RemoveNode(child);
+		child->scene_->RemoveNode(child);
 	}
 	// Add child to the end of the list.
 	// NOTE: This is different than the original behavior which inserted nodes
 	// into the beginning of the list. Although slightly slower to add to the
 	// end of the list, it makes scene traversal and drawing order more
 	// predictable, so I've changed it.
-	if (_firstChild)
+	if (first_child_)
 	{
-		Node* n = _firstChild;
-		while (n->_nextSibling)
-			n = n->_nextSibling;
-		n->_nextSibling = child;
-		child->_prevSibling = n;
+		Node* n = first_child_;
+		while (n->next_sibling_)
+			n = n->next_sibling_;
+		n->next_sibling_ = child;
+		child->prev_sibling_ = n;
 	}
 	else
 	{
-		_firstChild = child;
+		first_child_ = child;
 	}
-	child->_parent = this;
-	++_childCount;
+	child->parent_ = this;
+	++child_count_;
 	SetBoundsDirty();
 
-	if (_dirtyBits & NODE_DIRTY_HIERARCHY)
+	if (dirty_bits_ & kNodeDirtyHierarchy)
 	{
 		HierarchyChanged();
 	}
@@ -120,7 +120,7 @@ void Node::AddChild(Node* child)
 
 void Node::RemoveChild(Node* child)
 {
-	if (child == nullptr || child->_parent != this)
+	if (child == nullptr || child->parent_ != this)
 	{
 		// The child is not in our hierarchy.
 		return;
@@ -132,41 +132,41 @@ void Node::RemoveChild(Node* child)
 
 void Node::RemoveAllChildren()
 {
-	_dirtyBits &= ~NODE_DIRTY_HIERARCHY;
-	while (_firstChild)
+	dirty_bits_ &= ~kNodeDirtyHierarchy;
+	while (first_child_)
 	{
-		RemoveChild(_firstChild);
+		RemoveChild(first_child_);
 	}
-	_dirtyBits |= NODE_DIRTY_HIERARCHY;
+	dirty_bits_ |= kNodeDirtyHierarchy;
 	HierarchyChanged();
 }
 
 void Node::Remove()
 {
 	// Re-link our neighbours.
-	if (_prevSibling)
+	if (prev_sibling_)
 	{
-		_prevSibling->_nextSibling = _nextSibling;
+		prev_sibling_->next_sibling_ = next_sibling_;
 	}
-	if (_nextSibling)
+	if (next_sibling_)
 	{
-		_nextSibling->_prevSibling = _prevSibling;
+		next_sibling_->prev_sibling_ = prev_sibling_;
 	}
 	// Update our parent.
-	Node * parent = _parent;
+	Node * parent = parent_;
 	if (parent)
 	{
-		if (this == parent->_firstChild)
+		if (this == parent->first_child_)
 		{
-			parent->_firstChild = _nextSibling;
+			parent->first_child_ = next_sibling_;
 		}
-		--parent->_childCount;
+		--parent->child_count_;
 	}
-	_nextSibling = nullptr;
-	_prevSibling = nullptr;
-	_parent = nullptr;
+	next_sibling_ = nullptr;
+	prev_sibling_ = nullptr;
+	parent_ = nullptr;
 
-	if (parent && parent->_dirtyBits & NODE_DIRTY_HIERARCHY)
+	if (parent && parent->dirty_bits_ & kNodeDirtyHierarchy)
 	{
 		parent->HierarchyChanged();
 	}
@@ -174,48 +174,48 @@ void Node::Remove()
 
 Node * Node::GetFirstChild() const
 {
-	return _firstChild;
+	return first_child_;
 }
 
 Node * Node::GetNextSibling() const
 {
-	return _nextSibling;
+	return next_sibling_;
 }
 
 Node * Node::GetPreviousSibling() const
 {
-	return _prevSibling;
+	return prev_sibling_;
 }
 
 Node * Node::GetParent() const
 {
-	return _parent;
+	return parent_;
 }
 
 unsigned int Node::GetChildCount() const
 {
-	return _childCount;
+	return child_count_;
 }
 
 Node * Node::GetRootNode() const
 {
-	Node * n = const_cast<Node*>(this);
-	while (n->GetParent())
+	Node * node = const_cast<Node*>(this);
+	while (node->GetParent())
 	{
-		n = n->GetParent();
+		node = node->GetParent();
 	}
-	return n;
+	return node;
 }
 
 Scene * Node::GetScene() const
 {
-	if (_scene)
-		return _scene;
+	if (scene_)
+		return scene_;
 
 	// Search our parent for the scene
-	if (_parent)
+	if (parent_)
 	{
-		Scene* scene = _parent->GetScene();
+		Scene* scene = parent_->GetScene();
 		if (scene)
 			return scene;
 	}
@@ -224,41 +224,41 @@ Scene * Node::GetScene() const
 
 void Node::SetEnabled(bool enabled)
 {
-	if (_enabled != enabled)
+	if (enabled_ != enabled)
 	{
-		if (_collisionObject)
+		if (collision_object_)
 		{
-			_collisionObject->SetEnabled(enabled);
+			collision_object_->SetEnabled(enabled);
 		}
-		_enabled = enabled;
+		enabled_ = enabled;
 	}
 }
 
 bool Node::IsEnabled() const
 {
-	return _enabled;
+	return enabled_;
 }
 
 bool Node::IsEnabledInHierarchy() const
 {
-	if (!_enabled)
+	if (!enabled_)
 	   return false;
 
-   Node* node = _parent;
+   Node* node = parent_;
    while (node)
    {
-	   if (!node->_enabled)
+	   if (!node->enabled_)
 	   {
 		   return false;
 	   }
-	   node = node->_parent;
+	   node = node->parent_;
    }
    return true;
 }
 
 void Node::Update(float elapsedTime)
 {
-	for (Node* node = _firstChild; node != nullptr; node = node->_nextSibling)
+	for (Node* node = first_child_; node != nullptr; node = node->next_sibling_)
 	{
 		if (node->IsEnabled())
 		{
@@ -272,29 +272,29 @@ void Node::Update(float elapsedTime)
 
 bool Node::IsStatic() const
 {
-	return (_collisionObject && _collisionObject->IsStatic());
+	return (collision_object_ && collision_object_->IsStatic());
 }
 
 const Matrix4& Node::GetWorldMatrix() const
 {
-	if (_dirtyBits & NODE_DIRTY_WORLD)
+	if (dirty_bits_ & kNodeDirtyWorld)
 	{
 		// Clear our dirty flag immediately to prevent this block from being entered if our
 		// parent calls our getWorldMatrix() method as a result of the following calculations.
-		_dirtyBits &= ~NODE_DIRTY_WORLD;
+		dirty_bits_ &= ~kNodeDirtyWorld;
 
 		if (!IsStatic())
 		{
 			// If we have a parent, multiply our parent world transform by our local
 			// transform to obtain our final resolved world transform.
 			Node* parent = GetParent();
-			if (parent && (!_collisionObject || _collisionObject->IsKinematic()))
+			if (parent && (!collision_object_ || collision_object_->IsKinematic()))
 			{
-				Matrix4::Multiply(parent->GetWorldMatrix(), GetMatrix(), &_world);
+				Matrix4::Multiply(parent->GetWorldMatrix(), GetMatrix(), &world_);
 			}
 			else
 			{
-				_world = GetMatrix();
+				world_ = GetMatrix();
 			}
 
 			// Our world matrix was just updated, so call getWorldMatrix() on all child nodes
@@ -305,36 +305,36 @@ const Matrix4& Node::GetWorldMatrix() const
 			}
 		}
 	}
-	return _world;
+	return world_;
 }
 
 void Node::HierarchyChanged()
 {
 	// When our hierarchy changes our world transform is affected, so we must dirty it.
-	_dirtyBits |= NODE_DIRTY_HIERARCHY;
+	dirty_bits_ |= kNodeDirtyHierarchy;
 	TransformChanged();
 }
 
 void Node::TransformChanged()
 {
 	// Our local transform was changed, so mark our world matrices dirty.
-	_dirtyBits |= NODE_DIRTY_WORLD | NODE_DIRTY_BOUNDS;
+	dirty_bits_ |= kNodeDirtyWorld | kNodeDirtyBounds;
 
 	// Notify our children that their transform has also changed (since transforms are inherited).
-	for (Node* n = GetFirstChild(); n != nullptr; n = n->GetNextSibling())
+	for (Node* node = GetFirstChild(); node != nullptr; node = node->GetNextSibling())
 	{
 		if (Transform::IsTransformChangedSuspended())
 		{
 			// If the DIRTY_NOTIFY bit is not set
-			if (!n->IsDirty(Transform::DIRTY_NOTIFY))
+			if (!node->IsDirty(Transform::DIRTY_NOTIFY))
 			{
-				n->TransformChanged();
+				node->TransformChanged();
 				SuspendTransformChange(n);
 			}
 		}
 		else
 		{
-			n->TransformChanged();
+			node->TransformChanged();
 		}
 	}
 	Transform::TransformChanged();
@@ -343,38 +343,38 @@ void Node::TransformChanged()
 void Node::SetBoundsDirty()
 {
 	// Mark ourself and our parent nodes as dirty
-	_dirtyBits |= NODE_DIRTY_BOUNDS;
+	dirty_bits_ |= kNodeDirtyBounds;
 
 	// Mark our parent bounds as dirty as well
-	if (_parent)
-		_parent->SetBoundsDirty();
+	if (parent_)
+		parent_->SetBoundsDirty();
 }
 
 Drawable * Node::GetDrawable() const
 {
-	return _drawable;
+	return drawable_;
 }
 
 void Node::SetDrawable(Drawable* drawable)
 {
-	if (_drawable != drawable)
+	if (drawable_ != drawable)
 	{
-		if (_drawable)
+		if (drawable_)
 		{
-			_drawable->SetNode(nullptr);
-			Ref* ref = dynamic_cast<Ref*>(_drawable);
+			drawable_->SetNode(nullptr);
+			Ref* ref = dynamic_cast<Ref*>(drawable_);
 			if (ref)
 				ref->Release();
 		}
 
-		_drawable = drawable;
+		drawable_ = drawable;
 
-		if (_drawable)
+		if (drawable_)
 		{
-			Ref* ref = dynamic_cast<Ref*>(_drawable);
+			Ref* ref = dynamic_cast<Ref*>(drawable_);
 			if (ref)
 				ref->AddRef();
-			_drawable->SetNode(this);
+			drawable_->SetNode(this);
 		}
 	}
 	SetBoundsDirty();
@@ -382,33 +382,33 @@ void Node::SetDrawable(Drawable* drawable)
 
 const BoundingSphere& Node::GetBoundingSphere() const
 {
-	if (_dirtyBits & NODE_DIRTY_BOUNDS)
+	if (dirty_bits_ & kNodeDirtyBounds)
 	{
-		_dirtyBits &= ~NODE_DIRTY_BOUNDS;
+		dirty_bits_ &= ~kNodeDirtyBounds;
 
 		const Matrix4& worldMatrix = GetWorldMatrix();
 
 		// Start with our local bounding sphere
 		// TODO: Incorporate bounds from entities other than mesh (i.e. particleemitters, audiosource, etc)
 		bool empty = true;
-		Model* model = dynamic_cast<Model*>(_drawable);
+		Model* model = dynamic_cast<Model*>(drawable_);
 		if (model && model->GetMesh())
 		{
 			if (empty)
 			{
-				_bounds.Set(model->GetMesh()->GetBoundingSphere());
+				bounding_sphere_.Set(model->GetMesh()->GetBoundingSphere());
 				empty = false;
 			}
 			else
 			{
-				_bounds.Merge(model->GetMesh()->GetBoundingSphere());
+				bounding_sphere_.Merge(model->GetMesh()->GetBoundingSphere());
 			}
 		}
 		if (empty)
 		{
 			// Empty bounding sphere, set the world translation with zero radius
-			worldMatrix.GetTranslation(&_bounds.center);
-			_bounds.radius = 0;
+			worldMatrix.GetTranslation(&bounding_sphere_.center);
+			bounding_sphere_.radius = 0;
 		}
 
 		// Transform the sphere (if not empty) into world space.
@@ -434,71 +434,71 @@ const BoundingSphere& Node::GetBoundingSphere() const
 					// in the node hierachy of the model (this is normally not the case)?
 					Matrix4 boundsMatrix;
 					Matrix4::Multiply(GetWorldMatrix(), jointParent->GetWorldMatrix(), &boundsMatrix);
-					_bounds.Transform(boundsMatrix);
+					bounding_sphere_.Transform(boundsMatrix);
 					applyWorldTransform = false;
 				}
 			}
 			*/
 			if (applyWorldTransform)
 			{
-				_bounds.Transform(GetWorldMatrix());
+				bounding_sphere_.Transform(GetWorldMatrix());
 			}
 		}
 
 		// Merge this world-space bounding sphere with our childrens' bounding volumes.
-		for (Node* n = GetFirstChild(); n != nullptr; n = n->GetNextSibling())
+		for (Node * node = GetFirstChild(); node != nullptr; node = node->GetNextSibling())
 		{
-			const BoundingSphere& childSphere = n->GetBoundingSphere();
+			const BoundingSphere& childSphere = node->GetBoundingSphere();
 			if (!childSphere.IsEmpty())
 			{
 				if (empty)
 				{
-					_bounds.Set(childSphere);
+					bounding_sphere_.Set(childSphere);
 					empty = false;
 				}
 				else
 				{
-					_bounds.Merge(childSphere);
+					bounding_sphere_.Merge(childSphere);
 				}
 			}
 		}
 	}
 
-	return _bounds;
+	return bounding_sphere_;
 }
 
 PhysicsCollisionObject* Node::GetCollisionObject() const
 {
-	return _collisionObject;
+	return collision_object_;
 }
 
 PhysicsCollisionObject* Node::SetCollisionObject(PhysicsCollisionObject::Type type, const PhysicsCollisionShape::Definition& shape, PhysicsRigidBody::Parameters* rigidBodyParameters, int group, int mask)
 {
-	SC_SAFE_DELETE(_collisionObject);
+	SC_SAFE_DELETE(collision_object_);
 
 	switch (type)
 	{
 	case PhysicsCollisionObject::kRigidBody:
 		{
-			_collisionObject = new PhysicsRigidBody(this, shape, rigidBodyParameters ? *rigidBodyParameters : PhysicsRigidBody::Parameters(), group, mask);
+			collision_object_ = new PhysicsRigidBody(this, shape, rigidBodyParameters ? *rigidBodyParameters : PhysicsRigidBody::Parameters(), group, mask);
 		}
 		break;
 
 	case PhysicsCollisionObject::kGhostObject:
 		{
-			_collisionObject = new PhysicsGhostObject(this, shape, group, mask);
+			collision_object_ = new PhysicsGhostObject(this, shape, group, mask);
 		}
 		break;
 
 	case PhysicsCollisionObject::kCharacter:
 		{
-			//_collisionObject = new PhysicsCharacter(this, shape, rigidBodyParameters ? rigidBodyParameters->mass : 1.0f);
+			//collision_object_ = new PhysicsCharacter(this, shape, rigidBodyParameters ? rigidBodyParameters->mass : 1.0f);
 		}
 		break;
 
 	case PhysicsCollisionObject::kVehicle:
 		{
-			_collisionObject = new PhysicsVehicle(this, shape, rigidBodyParameters ? *rigidBodyParameters : PhysicsRigidBody::Parameters());
+			collision_object_ = new PhysicsVehicle(this, shape, rigidBodyParameters ? *rigidBodyParameters : PhysicsRigidBody::Parameters());
 		}
 		break;
 
@@ -513,7 +513,7 @@ PhysicsCollisionObject* Node::SetCollisionObject(PhysicsCollisionObject::Type ty
 			//
 			// IMPORTANT: The VEHICLE must come before the VEHICLE_WHEEL in the ".scene" (properties) file!
 			//
-			_collisionObject = new PhysicsVehicleWheel(this, shape, rigidBodyParameters ? *rigidBodyParameters : PhysicsRigidBody::Parameters());
+			collision_object_ = new PhysicsVehicleWheel(this, shape, rigidBodyParameters ? *rigidBodyParameters : PhysicsRigidBody::Parameters());
 		}
 		break;
 
@@ -521,17 +521,17 @@ PhysicsCollisionObject* Node::SetCollisionObject(PhysicsCollisionObject::Type ty
 		break;  // Already deleted, Just don't add a new collision object back.
 	}
 
-	return _collisionObject;
+	return collision_object_;
 }
 
 Ref* Node::GetUserObject() const
 {
-	return _userObject;
+	return user_object_;
 }
 
 void Node::SetUserObject(Ref* obj)
 {
-	_userObject = obj;
+	user_object_ = obj;
 }
 
 } // namespace scythe

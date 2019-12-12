@@ -93,6 +93,7 @@ namespace scythe {
 
 		// Read bounding box
 		file.Read(&bounding_box_, sizeof(BoundingBox));
+		bounding_sphere_.Set(bounding_box_);
 
 		// Read materials
 		uint32_t num_materials;

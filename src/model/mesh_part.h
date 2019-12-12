@@ -2,6 +2,7 @@
 #define __SCYTHE_MESH_PART_H__
 
 #include "vertex.h"
+#include "math/bounding_box.h"
 #include "graphics/renderer.h"
 
 #include <vector>
@@ -21,7 +22,7 @@ namespace scythe {
 		MeshPart(Renderer * renderer);
 		virtual ~MeshPart();
 
-		bool MakeRenderable(VertexFormat * vertex_format, const std::vector<VertexAttribute>& attribs);
+		bool MakeRenderable(VertexFormat * vertex_format, const std::vector<VertexAttribute>& attribs, BoundingBox& bounding_box);
 		
 		void Render();
 
@@ -36,7 +37,7 @@ namespace scythe {
 		
 	private:
 		void FreeArrays();
-		void TransformVertices(VertexFormat * vertex_format, const std::vector<VertexAttribute>& attribs);
+		void TransformVertices(VertexFormat * vertex_format, const std::vector<VertexAttribute>& attribs, BoundingBox& bounding_box);
 		
 		Renderer * renderer_;
 		Material * material_;

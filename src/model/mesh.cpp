@@ -78,11 +78,16 @@ namespace scythe {
 		}
 		renderer_->AddVertexFormat(vertex_format_, &attribs_[0], (U32)attribs_.size());
 
+		// Set initial values for bounding box
+		bounding_box_.Set(Vector3(1e8), Vector3(-1e8));
+
 		for (auto mesh : meshes_)
 		{
-			if (!mesh->MakeRenderable(vertex_format_, attribs_))
+			if (!mesh->MakeRenderable(vertex_format_, attribs_, bounding_box_))
 				return false;
 		}
+		// Also calculate bounding sphere from bounding box
+		bounding_sphere_.Set(bounding_box_);
 
 		return true;
 	}
@@ -107,9 +112,13 @@ namespace scythe {
 	{
 		material_binder_ = material_binder;
 	}
-	const BoundingBox& Mesh::bounding_box() const
+	const BoundingBox& Mesh::GetBoundingBox() const
 	{
 		return bounding_box_;
+	}
+	const BoundingSphere& Mesh::GetBoundingSphere() const
+	{
+		return bounding_sphere_;
 	}
 	unsigned int Mesh::GetNumberOfParts() const
 	{
