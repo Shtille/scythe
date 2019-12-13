@@ -2,6 +2,8 @@
 
 #include "physics_rigid_body.h"
 
+#include "node.h"
+
 namespace scythe {
 
 	PhysicsSocketConstraint::PhysicsSocketConstraint(PhysicsRigidBody* a, PhysicsRigidBody* b)

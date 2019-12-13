@@ -87,10 +87,6 @@ void Node::AddChild(Node* child)
 	{
 		child->parent_->RemoveChild(child);
 	}
-	else if (child->scene_)
-	{
-		child->scene_->RemoveNode(child);
-	}
 	// Add child to the end of the list.
 	// NOTE: This is different than the original behavior which inserted nodes
 	// into the beginning of the list. Although slightly slower to add to the
@@ -329,7 +325,7 @@ void Node::TransformChanged()
 			if (!node->IsDirty(Transform::DIRTY_NOTIFY))
 			{
 				node->TransformChanged();
-				SuspendTransformChange(n);
+				SuspendTransformChange(node);
 			}
 		}
 		else

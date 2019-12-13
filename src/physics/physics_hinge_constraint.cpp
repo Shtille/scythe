@@ -5,6 +5,8 @@
 #include "common/sc_assert.h"
 #include "common/sc_delete.h"
 
+#include "node.h"
+
 namespace scythe {
 
 	void PhysicsHingeConstraint::SetLimits(float minAngle, float maxAngle, float bounciness)

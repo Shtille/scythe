@@ -128,7 +128,7 @@ namespace scythe {
 		SC_ASSERT(controller);
 
 		// Create the vehicle and add it to world
-		btRigidBody * body = static_cast<btRigidBody*>(rigid_body_->getCollisionObject());
+		btRigidBody * body = static_cast<btRigidBody*>(rigid_body_->GetCollisionObject());
 		btDynamicsWorld * dynamicsWorld = controller->world_;
 		vehicle_raycaster_ = new VehicleNotMeRaycaster(dynamicsWorld, body);
 		vehicle_ = new btRaycastVehicle(vehicle_tuning_, body, vehicle_raycaster_);
@@ -221,7 +221,7 @@ namespace scythe {
 		}
 
 		PhysicsVehicleWheel* wheel;
-		for (int i = 0; i < vehicle_->GetNumWheels(); ++i)
+		for (int i = 0; i < vehicle_->getNumWheels(); ++i)
 		{
 			wheel = GetWheel(i);
 

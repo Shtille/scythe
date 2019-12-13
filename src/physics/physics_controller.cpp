@@ -1,4 +1,4 @@
-#include "physics_controller.h.h"
+#include "physics_controller.h"
 
 #include "physics_fixed_constraint.h"
 #include "physics_generic_constraint.h"
@@ -12,6 +12,11 @@
 #include "common/sc_assert.h"
 #include "common/sc_delete.h"
 #include "common/log.h"
+
+#include "model/model.h"
+#include "model/mesh.h"
+
+#include <cmath>
 
 namespace scythe {
 
@@ -621,7 +626,7 @@ namespace scythe {
 				break;
 
 			default:
-				SC_ERROR("Unsupported collision object type (%d).", object->getType());
+				SC_ERROR("Unsupported collision object type (%d).", object->type());
 				break;
 			}
 		}
@@ -651,13 +656,13 @@ namespace scythe {
 		Model* model = dynamic_cast<Model*>(node->GetDrawable());
 		if (model != NULL)
 		{
-			SC_ASSERT(model->getMesh());
+			SC_ASSERT(model->GetMesh());
 
 			if (merge)
-				out->Merge(model->getMesh()->GetBoundingBox());
+				out->Merge(model->GetMesh()->GetBoundingBox());
 			else
 			{
-				out->Set(model->getMesh()->GetBoundingBox());
+				out->Set(model->GetMesh()->GetBoundingBox());
 				merge = true;
 			}
 		}
@@ -677,13 +682,13 @@ namespace scythe {
 		Model* model = dynamic_cast<Model*>(node->GetDrawable());
 		if (model != NULL)
 		{
-			SC_ASSERT(model->getMesh());
+			SC_ASSERT(model->GetMesh());
 
 			if (merge)
-				out->Merge(model->getMesh()->GetBoundingSphere());
+				out->Merge(model->GetMesh()->GetBoundingSphere());
 			else
 			{
-				out->Set(model->getMesh()->GetBoundingSphere());
+				out->Set(model->GetMesh()->GetBoundingSphere());
 				merge = true;
 			}
 		}
@@ -1154,15 +1159,15 @@ namespace scythe {
 
 		if (!a->SupportsConstraints())
 		{
-			SC_ASSERT(a->_node);
-			SC_ERROR("Rigid body '%s' does not support constraints; unexpected behavior may occur.", a->_node->getId());
+			SC_ASSERT(a->node_);
+			SC_ERROR("Rigid body '%s' does not support constraints; unexpected behavior may occur.", a->node_->id());
 			return false;
 		}
 		
 		if (b && !b->SupportsConstraints())
 		{
-			SC_ASSERT(b->_node);
-			SC_ERROR("Rigid body '%s' does not support constraints; unexpected behavior may occur.", b->_node->getId());
+			SC_ASSERT(b->node_);
+			SC_ERROR("Rigid body '%s' does not support constraints; unexpected behavior may occur.", b->node_->id());
 			return false;
 		}
 

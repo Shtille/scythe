@@ -346,10 +346,10 @@ namespace scythe {
 	protected:
 
 		enum DirtyBits {
-			kNodeDirtyWorld = 1,
-			kNodeDirtyBounds = 2,
-			kNodeDirtyHierarchy = 4,
-			kNodeDirtyAll = 7
+			kNodeDirtyWorld 	= 0x1,
+			kNodeDirtyBounds 	= 0x2,
+			kNodeDirtyHierarchy = 0x4,
+			kNodeDirtyAll 		= 0x7
 		};
 
 		/** The scene this node is attached to. */

@@ -4,6 +4,8 @@
 #include "common/sc_assert.h"
 #include "common/log.h"
 
+#include "node.h"
+
 namespace scythe {
 
 	PhysicsVehicleWheel::PhysicsVehicleWheel(Node* node, const PhysicsCollisionShape::Definition& shape, const PhysicsRigidBody::Parameters& parameters)

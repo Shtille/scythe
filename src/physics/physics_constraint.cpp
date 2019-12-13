@@ -1,4 +1,4 @@
-#include "physics_contraint.h"
+#include "physics_constraint.h"
 
 #include "physics_controller.h"
 
@@ -160,5 +160,3 @@ namespace scythe {
 	}
 
 } // namespace scythe
-
-#endif

@@ -4,6 +4,10 @@
 
 #include "common/sc_assert.h"
 
+#include "math/constants.h"
+
+#include "node.h"
+
 namespace scythe {
 
 	PhysicsSpringConstraint::PhysicsSpringConstraint(PhysicsRigidBody* a, PhysicsRigidBody* b)

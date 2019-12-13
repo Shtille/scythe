@@ -19,7 +19,8 @@ SRC_DIRS = \
 	src/tasks \
 	src/time \
 	src/ui \
-	src/planet
+	src/planet \
+	src/physics
 
 # Includes
 THIRDPARTY = ../thirdparty
@@ -30,7 +31,8 @@ INCLUDE = \
 	-I$(THIRDPARTY)/libjpeg/src \
 	-I$(THIRDPARTY)/libpng/include \
 	-I$(THIRDPARTY)/libpng/src \
-	-I$(THIRDPARTY)/freetype/include
+	-I$(THIRDPARTY)/freetype/include \
+	-I$(THIRDPARTY)/bullet/src
 
 # Platform specific
 

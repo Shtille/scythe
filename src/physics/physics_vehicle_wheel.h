@@ -6,6 +6,8 @@
 
 namespace scythe {
 
+	class PhysicsVehicle;
+
 	/**
 	 * Defines a class for vehicle wheel physics which represents the individual wheel
 	 * itself as well as the tire and suspension.
@@ -23,7 +25,7 @@ namespace scythe {
 		/**
 		 * @see PhysicsCollisionObject#type
 		 */
-		PhysicsCollisionObject::Type type() const;
+		PhysicsCollisionObject::Type type() const override;
 
 		/**
 		 * Operation not supported. Use host vehicle's SetEnabled() instead.
@@ -242,7 +244,7 @@ namespace scythe {
 		/**
 		 * @see PhysicsCollisionObject::getCollisionObject
 		 */
-		btCollisionObject* GetCollisionObject() const;
+		btCollisionObject* GetCollisionObject() const override;
 
 	private:
 

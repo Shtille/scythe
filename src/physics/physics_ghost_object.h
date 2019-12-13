@@ -23,7 +23,7 @@ namespace scythe {
 		/**
 		 * @see PhysicsCollisionObject::type
 		 */
-		PhysicsCollisionObject::Type type() const;
+		PhysicsCollisionObject::Type type() const override;
 
 		/**
 		 * Used to synchronize the transform between Scythe and Bullet.
@@ -35,7 +35,7 @@ namespace scythe {
 		/**
 		 * @see PhysicsCollisionObject::GetCollisionObject
 		 */
-		btCollisionObject* GetCollisionObject() const;
+		btCollisionObject* GetCollisionObject() const override;
 
 	protected:
 

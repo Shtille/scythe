@@ -1,9 +1,18 @@
 #ifndef __SCYTHE_PHYSICS_CONTROLLER_H__
 #define __SCYTHE_PHYSICS_CONTROLLER_H__
 
+#include "physics_constraint.h"
+#include "physics_fixed_constraint.h"
+#include "physics_generic_constraint.h"
+#include "physics_hinge_constraint.h"
+#include "physics_socket_constraint.h"
+#include "physics_spring_constraint.h"
+#include "physics_collision_object.h"
+
 #include "common/singleton.h"
 #include "math/vector3.h"
 #include "math/ray.h"
+#include "node.h"
 
 #include <vector>
 #include <map>
@@ -19,7 +28,6 @@ class btCollisionObject;
 
 namespace scythe {
 
-	class Node;
 	class Mesh;
 
 	class PhysicsController : public ManagedSingleton<PhysicsController> {

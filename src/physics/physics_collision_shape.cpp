@@ -3,6 +3,8 @@
 #include "common/sc_assert.h"
 #include "common/sc_delete.h"
 
+#include "model/mesh.h"
+
 #include "bullet_include.h"
 
 #include <cstring>
@@ -20,12 +22,14 @@ namespace scythe {
 	{
 		if (shape_)
 		{
-			switch (type_)
+			if (type_ == kMesh)
 			{
-			case kMesh:
 				// Also need to delete the btTriangleIndexVertexArray, if it exists.
 				SC_SAFE_DELETE(mesh_interface_);
-				break;
+			}
+			else if (type_ == kHeightfield)
+			{
+				//
 			}
 			// Free the bullet shape.
 			SC_SAFE_DELETE(shape_);
@@ -143,30 +147,26 @@ namespace scythe {
 		memcpy(this, &definition, sizeof(PhysicsCollisionShape::Definition));
 
 		// Handle the types that have reference-counted members.
-		switch (type)
+		if (type == PhysicsCollisionShape::kMesh)
 		{
-		// case PhysicsCollisionShape::kHeightfield:
-		// 	if (data.heightfield)
-		// 		data.heightfield->AddRef();
-		// 	break;
-
-		case PhysicsCollisionShape::kMesh:
 			SC_ASSERT(data.mesh);
 			data.mesh->AddRef();
-			break;
+		}
+		else if (type == PhysicsCollisionShape::kHeightfield)
+		{
+			// 	if (data.heightfield)
+			// 		data.heightfield->AddRef();
 		}
 	}
 	PhysicsCollisionShape::Definition::~Definition()
 	{
-		switch (type)
+		if (type == PhysicsCollisionShape::kMesh)
 		{
-		// case PhysicsCollisionShape::kHeightfield:
-		// 	SC_SAFE_RELEASE(data.heightfield);
-		// 	break;
-
-		case PhysicsCollisionShape::kMesh:
 			SC_SAFE_RELEASE(data.mesh);
-			break;
+		}
+		else if (type == PhysicsCollisionShape::kHeightfield)
+		{
+			// 	SC_SAFE_RELEASE(data.heightfield);
 		}
 	}
 	PhysicsCollisionShape::Definition& PhysicsCollisionShape::Definition::operator=(const Definition& definition)
@@ -177,17 +177,15 @@ namespace scythe {
 			memcpy(this, &definition, sizeof(PhysicsCollisionShape::Definition));
 
 			// Handle the types that have reference-counted members.
-			switch (type)
+			if (type == PhysicsCollisionShape::kMesh)
 			{
-			// case PhysicsCollisionShape::kHeightfield:
-			// 	if (data.heightfield)
-			// 		data.heightfield->AddRef();
-			// 	break;
-
-			case PhysicsCollisionShape::kMesh:
 				SC_ASSERT(data.mesh);
 				data.mesh->AddRef();
-				break;
+			}
+			else if (type == PhysicsCollisionShape::kHeightfield)
+			{
+				// 	if (data.heightfield)
+				// 		data.heightfield->AddRef();
 			}
 		}
 
@@ -199,5 +197,3 @@ namespace scythe {
 	}
 
 } // namespace scythe
-
-#endif

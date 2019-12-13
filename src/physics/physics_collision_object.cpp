@@ -32,7 +32,7 @@ namespace scythe {
 	: node_(node)
 	, collision_shape_(nullptr)
 	, enabled_(true)
-	, script_listeners_(nullptr)
+	//, script_listeners_(nullptr)
 	, motion_state_(nullptr)
 	, group_(group)
 	, mask_(mask)
@@ -232,7 +232,7 @@ namespace scythe {
 		SC_ASSERT(node_);
 		SC_ASSERT(collision_object_);
 
-		if (collision_object_->isKinematic())
+		if (collision_object_->IsKinematic())
 			UpdateTransformFromNode();
 
 		transform = center_of_mass_offset_.inverse() * world_transform_;
@@ -280,5 +280,3 @@ namespace scythe {
 	}
 
 } // namespace scythe
-
-#endif

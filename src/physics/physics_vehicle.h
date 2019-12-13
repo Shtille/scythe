@@ -8,6 +8,8 @@
 
 namespace scythe {
 
+	class PhysicsVehicleWheel;
+
 	/**
 	 * Defines a class for vehicle physics.
 	 *

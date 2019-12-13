@@ -5,6 +5,8 @@
 #include "common/sc_assert.h"
 #include "common/sc_delete.h"
 
+#include "math/constants.h"
+
 namespace scythe {
 
 	PhysicsRigidBody::PhysicsRigidBody(Node * node, const PhysicsCollisionShape::Definition& shape, const Parameters& parameters, int group, int mask)
@@ -24,7 +26,7 @@ namespace scythe {
 		SC_ASSERT(collision_shape_ && collision_shape_->shape());
 
 		// Create motion state object.
-		motion_state_ = new PhysicsMotionState(node, this, (centerOfMassOffset.Sqr() > kFloatEpsilon) ? &centerOfMassOffset : NULL);
+		motion_state_ = new PhysicsMotionState(node, this, (centerOfMassOffset.LengthSquared() > kFloatEpsilon) ? &centerOfMassOffset : NULL);
 
 		// If the mass is non-zero, then the object is dynamic so we calculate the local 
 		// inertia. However, if the collision shape is a triangle mesh, we don't calculate 
@@ -105,7 +107,7 @@ namespace scythe {
 	{
 		// If the force is significant enough, activate the rigid body 
 		// to make sure that it isn't sleeping and apply the force.
-		if (force.Sqr() > kFloatEpsilon)
+		if (force.LengthSquared() > kFloatEpsilon)
 		{
 			SC_ASSERT(body_);
 			body_->activate();
@@ -119,7 +121,7 @@ namespace scythe {
 	{
 		// If the impulse is significant enough, activate the rigid body 
 		// to make sure that it isn't sleeping and apply the impulse.
-		if (impulse.Sqr() > kFloatEpsilon)
+		if (impulse.LengthSquared() > kFloatEpsilon)
 		{
 			SC_ASSERT(body_);
 			body_->activate();
@@ -135,7 +137,7 @@ namespace scythe {
 	{
 		// If the torque is significant enough, activate the rigid body 
 		// to make sure that it isn't sleeping and apply the torque.
-		if (torque.Sqr() > kFloatEpsilon)
+		if (torque.LengthSquared() > kFloatEpsilon)
 		{
 			SC_ASSERT(body_);
 			body_->activate();
@@ -146,7 +148,7 @@ namespace scythe {
 	{
 		// If the torque impulse is significant enough, activate the rigid body 
 		// to make sure that it isn't sleeping and apply the torque impulse.
-		if (torque.Sqr() > kFloatEpsilon)
+		if (torque.LengthSquared() > kFloatEpsilon)
 		{
 			SC_ASSERT(body_);
 			body_->activate();
@@ -204,7 +206,9 @@ namespace scythe {
 		return (GetShapeType() != PhysicsCollisionShape::kHeightfield &&
 				GetShapeType() != PhysicsCollisionShape::kMesh);
 	}
+	void PhysicsRigidBody::TransformChanged(Transform * transform, long cookie)
+	{
+		// Needed for heightfield only
+	}
 
 } // namespace scythe
-
-#endif

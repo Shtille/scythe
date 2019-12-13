@@ -4,6 +4,8 @@
 #include "physics_constraint.h"
 #include "physics_collision_object.h"
 
+#include "math/transform.h"
+
 #include <vector>
 
 class btRigidBody;
@@ -16,7 +18,7 @@ namespace scythe {
 	 * A rigid body can receive forces and torque to make your objects react to other collision
 	 * objects around it.
 	 */
-	class PhysicsRigidBody : public PhysicsCollisionObject
+	class PhysicsRigidBody : public PhysicsCollisionObject, public Transform::Listener
 	{
 		friend class Node;
 		friend class PhysicsCharacter;
@@ -96,15 +98,15 @@ namespace scythe {
 			 */
 			Parameters(float mass, float friction = 0.5f, float restitution = 0.0f,
 				float linearDamping = 0.0f, float angularDamping = 0.0f, bool kinematic = false,
-				const Vector3& anisotropicFriction = Vector3::one(),
-				const Vector3& linearFactor = Vector3::one(), 
-				const Vector3& angularFactor = Vector3::one());
+				const Vector3& anisotropicFriction = Vector3::One(),
+				const Vector3& linearFactor = Vector3::One(), 
+				const Vector3& angularFactor = Vector3::One());
 		};
 
 		/**
 		 * @see PhysicsCollisionObject::type
 		 */
-		PhysicsCollisionObject::Type type() const;
+		PhysicsCollisionObject::Type type() const override;
 
 		/**
 		 * Gets the rigid body's mass.
@@ -368,7 +370,7 @@ namespace scythe {
 		/**
 		 * @see PhysicsCollisionObject::getCollisionObject
 		 */
-		btCollisionObject* GetCollisionObject() const;
+		btCollisionObject* GetCollisionObject() const override;
 
 	private:
 		/**
@@ -401,6 +403,9 @@ namespace scythe {
 
 		// Whether or not the rigid body supports constraints fully.
 		bool SupportsConstraints();
+
+		// Used for implementing getHeight() when the heightfield has a transform that can change.
+		void TransformChanged(Transform * transform, long cookie) override;
 
 		btRigidBody * body_;
 		float mass_;

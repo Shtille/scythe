@@ -14,6 +14,7 @@ namespace scythe {
 	*/
 	class PhysicsConstraint {
 
+		friend class PhysicsController;
 		friend class PhysicsRigidBody;
 
 	public:
