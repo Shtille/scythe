@@ -8,6 +8,7 @@
 
 #include "math/bounding_box.h"
 #include "math/bounding_sphere.h"
+#include "math/common_math.h"
 
 #include "common/sc_assert.h"
 #include "common/sc_delete.h"
@@ -801,7 +802,7 @@ namespace scythe {
 				// Compute a capsule shape that roughly matches the bounding box of the mesh.
 				BoundingBox box;
 				GetBoundingBox(node, &box);
-				float radius = std::max((box.max.x - box.min.x) * 0.5f, (box.max.z - box.min.z) * 0.5f);
+				float radius = Max<float>((box.max.x - box.min.x) * 0.5f, (box.max.z - box.min.z) * 0.5f);
 				float height = box.max.y - box.min.y;
 				collision_shape = CreateCapsule(radius, height, scale);
 
@@ -841,7 +842,7 @@ namespace scythe {
 	}
 	PhysicsCollisionShape* PhysicsController::CreateBox(const Vector3& extents, const Vector3& scale)
 	{
-		btVector3 halfExtents(scale.x * 0.5 * extents.x, scale.y * 0.5 * extents.y, scale.z * 0.5 * extents.z);
+		btVector3 halfExtents(scale.x * 0.5f * extents.x, scale.y * 0.5f * extents.y, scale.z * 0.5f * extents.z);
 
 		PhysicsCollisionShape* shape;
 
@@ -909,7 +910,7 @@ namespace scythe {
 		if (girthScale < scale.z)
 			girthScale = scale.z;
 		float scaledRadius = radius * girthScale;
-		float scaledHeight = height * scale.y - radius * 2;
+		float scaledHeight = height * scale.y - radius * 2.0f;
 
 		PhysicsCollisionShape* shape;
 
