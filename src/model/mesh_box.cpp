@@ -4,7 +4,7 @@
 
 namespace scythe {
 
-	void Mesh::CreateBox(float size_x, float size_y, float size_z)
+	void Mesh::CreateBox(const Vector3& extents)
 	{
 		MeshPart * mesh_part = new MeshPart(renderer_);
 		auto& vertices = mesh_part->vertices_;
@@ -97,7 +97,7 @@ namespace scythe {
 		vertices[23].texcoord.Set(0.0f,  0.0f);
 
 		// Scale cube to box
-		mesh_part->ScaleVertices(Vector3(size_x, size_y, size_z));
+		mesh_part->ScaleVertices(extents);
 		
 		indices.resize(34);
 		indices = {
@@ -110,6 +110,13 @@ namespace scythe {
 		};
 
 		meshes_.push_back(mesh_part);
+
+		// Set bounds
+		Vector3 min = -extents;
+		Vector3 max = extents;
+		bounding_box_.Set(min, max);
+		bounding_sphere_.Set(bounding_box_);
+		has_bounds_ = true;
 	}
 
 } // namespace scythe {

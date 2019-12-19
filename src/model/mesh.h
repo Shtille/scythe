@@ -42,7 +42,7 @@ namespace scythe {
 		void CreateSphere(float radius = 1.0f, U32 slices = 20, U32 loops = 10);
 		void CreateTetrahedron();
 		void CreateCube();
-		void CreateBox(float size_x, float size_y, float size_z);
+		void CreateBox(const Vector3& extents);
 		void CreatePhysicalBox(float size_x, float size_y, float size_z, float size_u, float size_v);
 
 		void AddFormat(const VertexAttribute& attrib);
@@ -74,6 +74,7 @@ namespace scythe {
 		VertexFormat * vertex_format_;
 		BoundingBox bounding_box_;
 		BoundingSphere bounding_sphere_;
+		bool has_bounds_; // if bounds have been set
 
 		std::vector<VertexAttribute> attribs_;
 		std::vector<MeshPart *> meshes_;

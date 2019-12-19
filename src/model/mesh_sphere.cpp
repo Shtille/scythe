@@ -63,6 +63,13 @@ namespace scythe {
 		}
 
 		meshes_.push_back(mesh_part);
+
+		// Set bounds
+		Vector3 max(radius);
+		Vector3 min = -max;
+		bounding_box_.Set(min, max);
+		bounding_sphere_.Set(Vector3::Zero(), radius);
+		has_bounds_ = true;
 	}
 
 } // namespace scythe {

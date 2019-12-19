@@ -9,6 +9,33 @@
 
 namespace scythe {
 
+	PhysicsRigidBody::Parameters::Parameters()
+	: mass(0.0f)
+	, friction(0.5f)
+	, restitution(0.0f)
+	, linearDamping(0.0f)
+	, angularDamping(0.0f)
+	, kinematic(false)
+	, anisotropicFriction(Vector3::One())
+	, linearFactor(Vector3::One())
+	, angularFactor(Vector3::One())
+	{
+	}
+	PhysicsRigidBody::Parameters::Parameters(float mass, float friction, float restitution,
+			float linearDamping, float angularDamping, bool kinematic,
+			const Vector3& anisotropicFriction, const Vector3& linearFactor, const Vector3& angularFactor)
+	: mass(mass)
+	, friction(friction)
+	, restitution(restitution)
+	, linearDamping(linearDamping)
+	, angularDamping(angularDamping)
+	, kinematic(kinematic)
+	, anisotropicFriction(anisotropicFriction)
+	, linearFactor(linearFactor)
+	, angularFactor(angularFactor)
+	{
+	}
+
 	PhysicsRigidBody::PhysicsRigidBody(Node * node, const PhysicsCollisionShape::Definition& shape, const Parameters& parameters, int group, int mask)
 	: PhysicsCollisionObject(node, group, mask)
 	, body_(NULL)

@@ -152,11 +152,23 @@ namespace scythe {
 			virtual bool Hit(const HitResult& result);
 		};
 
-		PhysicsController();
-		~PhysicsController();
-
+		/**
+		 * Initializes controller
+		 *
+		 * @return true if initialization was successful and false otherwise
+		 */
 		bool Initialize();
+
+		/**
+		 * Deinitializes controller
+		 */
 		void Deinitialize();
+
+		/**
+		 * Update routine
+		 *
+		 * @param elapsed_time Time since last update in seconds
+		 */
 		void Update(float elapsed_time);
 
 		/**
@@ -380,6 +392,16 @@ namespace scythe {
 			std::vector<PhysicsCollisionObject::CollisionListener*> listeners;
 			int status;
 		};
+
+		/**
+		 * Constructor
+		 */
+		PhysicsController();
+
+		/**
+		 * Destructor
+		 */
+		~PhysicsController();
 
 		// Adds the given collision listener for the two given collision objects.
 		void AddCollisionListener(PhysicsCollisionObject::CollisionListener * listener, PhysicsCollisionObject * objectA, PhysicsCollisionObject * objectB);

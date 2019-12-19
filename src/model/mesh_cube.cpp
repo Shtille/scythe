@@ -107,6 +107,13 @@ namespace scythe {
 		};
 
 		meshes_.push_back(mesh_part);
+
+		// Set bounds
+		Vector3 min = -Vector3::One();
+		Vector3 max = Vector3::One();
+		bounding_box_.Set(min, max);
+		bounding_sphere_.Set(bounding_box_);
+		has_bounds_ = true;
 	}
 
 } // namespace scythe {

@@ -42,7 +42,7 @@ namespace scythe {
 			indices_array_ = nullptr;
 		}
 	}
-	void MeshPart::TransformVertices(VertexFormat * vertex_format, const std::vector<VertexAttribute>& attribs, BoundingBox& bounding_box)
+	void MeshPart::TransformVertices(VertexFormat * vertex_format, const std::vector<VertexAttribute>& attribs, BoundingBox * bounding_box)
 	{
 		num_vertices_ = (U32)vertices_.size();
 		vertices_array_ = new U8[num_vertices_ * vertex_format->vertex_size()];
@@ -55,8 +55,11 @@ namespace scythe {
 				{
 				case VertexAttribute::kVertex:
 					memcpy(ptr, v.position, sizeof(v.position));
-					bounding_box.min.MakeFloor(v.position);
-					bounding_box.max.MakeCeil(v.position);
+					if (bounding_box)
+					{
+						bounding_box->min.MakeFloor(v.position);
+						bounding_box->max.MakeCeil(v.position);
+					}
 					break;
 				case VertexAttribute::kNormal:
 					memcpy(ptr, v.normal, sizeof(v.normal));
@@ -108,7 +111,7 @@ namespace scythe {
 			indices_.shrink_to_fit();
 		}
 	}
-	bool MeshPart::MakeRenderable(VertexFormat * vertex_format, const std::vector<VertexAttribute>& attribs, BoundingBox& bounding_box)
+	bool MeshPart::MakeRenderable(VertexFormat * vertex_format, const std::vector<VertexAttribute>& attribs, BoundingBox * bounding_box)
 	{
 		const bool have_indices = !indices_.empty();
 
