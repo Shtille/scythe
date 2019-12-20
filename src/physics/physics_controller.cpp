@@ -746,7 +746,11 @@ namespace scythe {
 				// Automatically compute bounding box from mesh's bounding box.
 				BoundingBox box;
 				GetBoundingBox(node, &box);
-				collision_shape = CreateBox(Vector3(std::fabs(box.max.x - box.min.x), std::fabs(box.max.y - box.min.y), std::fabs(box.max.z - box.min.z)), scale);
+				Vector3 extents(
+					0.5f * std::fabs(box.max.x - box.min.x),
+					0.5f * std::fabs(box.max.y - box.min.y),
+					0.5f * std::fabs(box.max.z - box.min.z));
+				collision_shape = CreateBox(extents, scale);
 
 				ComputeCenterOfMass(box.GetCenter(), scale, center_of_mass_offset);
 			}
@@ -842,7 +846,9 @@ namespace scythe {
 	}
 	PhysicsCollisionShape* PhysicsController::CreateBox(const Vector3& extents, const Vector3& scale)
 	{
-		btVector3 halfExtents(scale.x * 0.5f * extents.x, scale.y * 0.5f * extents.y, scale.z * 0.5f * extents.z);
+		// Extents originally is always half of bounding box size
+		// But Bullet uses half extents as regular extents.
+		btVector3 halfExtents(scale.x * extents.x, scale.y * extents.y, scale.z * extents.z);
 
 		PhysicsCollisionShape* shape;
 
