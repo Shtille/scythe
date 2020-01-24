@@ -21,7 +21,7 @@ namespace scythe {
 	};
 	
 	//! Colored button class
-	class ButtonColored : public Button, public Drawable {
+	class ButtonColored : public Button, public UiDrawable {
 	public:
 		ButtonColored(Renderer * renderer, Shader * shader,
 			const Vector4& normal_color, const Vector4& touch_color,
@@ -40,7 +40,7 @@ namespace scythe {
 	};
 
 	//! Colored button class
-	class ButtonTextured : public Button, public Drawable {
+	class ButtonTextured : public Button, public UiDrawable {
 	public:
 		ButtonTextured(Renderer * renderer, Shader * shader,
 			Texture * normal_texture, Texture * touch_texture,

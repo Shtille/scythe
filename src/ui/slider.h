@@ -40,7 +40,7 @@ namespace scythe {
 	};
 
 	//! Colored slider class
-	class SliderColored : public Slider, public Drawable {
+	class SliderColored : public Slider, public UiDrawable {
 	public:
 		enum Form
 		{
@@ -70,7 +70,7 @@ namespace scythe {
 	};
 
 	//! Textured slider class
-	class SliderTextured : public Slider, public Drawable {
+	class SliderTextured : public Slider, public UiDrawable {
 	public:
 		enum Form
 		{

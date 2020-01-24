@@ -39,7 +39,7 @@ namespace scythe {
 	RectColored::RectColored(Renderer * renderer, Shader * shader,
 							 const Vector4& color, F32 x, F32 y, F32 width, F32 height, U32 flags)
 	: Rect(x, y, width, height, flags)
-	, Drawable(renderer, shader, nullptr)
+	, UiDrawable(renderer, shader, nullptr)
 	, color_(color)
 	{
 		FillVertexAttribs();
@@ -54,7 +54,7 @@ namespace scythe {
 		shader_->Bind();
 		shader_->Uniform2fv("u_position", position);
 		shader_->Uniform4fv("u_color", color_);
-		Drawable::Render();
+		UiDrawable::Render();
 		shader_->Unbind();
 	}
 	void RectColored::BindConstUniforms()
@@ -93,7 +93,7 @@ namespace scythe {
 	RectTextured::RectTextured(Renderer * renderer, Shader * shader,
 			Texture * texture, F32 x, F32 y, F32 width, F32 height, U32 flags)
 	: Rect(x, y, width, height, flags)
-	, Drawable(renderer, shader, texture)
+	, UiDrawable(renderer, shader, texture)
 	{
 		FillVertexAttribs();
 		FillVertices();
@@ -106,7 +106,7 @@ namespace scythe {
 		ObtainGlobalPosition(&position);
 		shader_->Bind();
 		shader_->Uniform2fv("u_position", position);
-		Drawable::Render();
+		UiDrawable::Render();
 		shader_->Unbind();
 	}
 	void RectTextured::BindConstUniforms()

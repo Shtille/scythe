@@ -40,7 +40,7 @@ namespace scythe {
 		const Vector4& normal_color, const Vector4& touch_color,
 		F32 x, F32 y, F32 width, F32 height, U32 flags)
 	: Button(x, y, width, height, flags)
-	, Drawable(renderer, shader, nullptr)
+	, UiDrawable(renderer, shader, nullptr)
 	, normal_color_(normal_color)
 	, touch_color_(touch_color)
 	{
@@ -56,7 +56,7 @@ namespace scythe {
 		shader_->Bind();
 		shader_->Uniform2fv("u_position", position);
 		shader_->Uniform4fv("u_color", (is_touched_) ? touch_color_ : normal_color_);
-		Drawable::Render();
+		UiDrawable::Render();
 		shader_->Unbind();
 	}
 	void ButtonColored::BindConstUniforms()
@@ -96,7 +96,7 @@ namespace scythe {
 			Texture * normal_texture, Texture * touch_texture,
 			F32 x, F32 y, F32 width, F32 height, U32 flags)
 	: Button(x, y, width, height, flags)
-	, Drawable(renderer, shader, normal_texture)
+	, UiDrawable(renderer, shader, normal_texture)
 	, touch_texture_(touch_texture)
 	{
 		FillVertexAttribs();

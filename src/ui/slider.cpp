@@ -107,7 +107,7 @@ namespace scythe {
 		 F32 x, F32 y, F32 width, F32 height, F32 bar_radius, U32 flags,
 		 Form bar_form, Form pin_form)
 	: Slider(x, y, width, height, bar_radius, flags)
-	, Drawable(renderer, shader, nullptr)
+	, UiDrawable(renderer, shader, nullptr)
 	, bar_color_(bar_color)
 	, pin_color_normal_(pin_color_normal)
 	, pin_color_touch_(pin_color_touch)
@@ -405,7 +405,7 @@ namespace scythe {
 		const Vector4& bar_color, F32 x, F32 y, F32 width, F32 height, F32 bar_radius, U32 flags,
 		Form bar_form)
 	: Slider(x, y, width, height, bar_radius, flags)
-	, Drawable(renderer, color_shader, texture_normal)
+	, UiDrawable(renderer, color_shader, texture_normal)
 	, texture_shader_(texture_shader)
 	, texture_touch_(texture_touch)
 	, bar_color_(bar_color)

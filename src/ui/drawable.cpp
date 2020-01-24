@@ -2,7 +2,7 @@
 
 namespace scythe {
 
-	Drawable::Drawable(Renderer * renderer, Shader * shader, Texture * texture)
+	UiDrawable::UiDrawable(Renderer * renderer, Shader * shader, Texture * texture)
 	: renderer_(renderer)
 	, shader_(shader)
 	, texture_(texture)
@@ -15,7 +15,7 @@ namespace scythe {
 	{
 
 	}
-	Drawable::~Drawable()
+	UiDrawable::~UiDrawable()
 	{
 		if (vertex_format_)
 			renderer_->DeleteVertexFormat(vertex_format_);
@@ -25,7 +25,7 @@ namespace scythe {
 			renderer_->context()->DeleteVertexArrayObject(vertex_array_object_);
 		FreeArrays();
 	}
-	void Drawable::FreeArrays()
+	void UiDrawable::FreeArrays()
 	{
 		if (vertices_array_)
 		{
@@ -33,7 +33,7 @@ namespace scythe {
 			vertices_array_ = nullptr;
 		}
 	}
-	void Drawable::MakeRenderable()
+	void UiDrawable::MakeRenderable()
 	{
 		assert(!attribs_.empty());
 		renderer_->AddVertexFormat(vertex_format_, &attribs_[0], (U32)attribs_.size());
@@ -73,7 +73,7 @@ namespace scythe {
 		
 		can_render_ = true;
 	}
-	void Drawable::Render()
+	void UiDrawable::Render()
 	{
 		if (!can_render_)
 			return;
@@ -83,7 +83,7 @@ namespace scythe {
 		renderer_->context()->DrawArrays(PrimitiveType::kTriangleStrip, 0, num_vertices_);
 		renderer_->context()->BindVertexArrayObject(0);
 	}
-	Renderer * Drawable::renderer()
+	Renderer * UiDrawable::renderer()
 	{
 		return renderer_;
 	}

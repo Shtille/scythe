@@ -1,5 +1,5 @@
-#ifndef __SCYTHE_DRAWABLE_H__
-#define __SCYTHE_DRAWABLE_H__
+#ifndef __SCYTHE_UI_DRAWABLE_H__
+#define __SCYTHE_UI_DRAWABLE_H__
 
 #include "renderable.h"
 
@@ -13,15 +13,15 @@ namespace scythe {
 	class Widget;
 
 	//! Drawable class
-	class Drawable : public virtual IRenderable {
+	class UiDrawable : public virtual IRenderable {
 	public:
 		Renderer * renderer();
 		
 		virtual void Render() override;
 
 	protected:
-		Drawable(Renderer * renderer, Shader * shader, Texture * texture);
-		virtual ~Drawable();
+		UiDrawable(Renderer * renderer, Shader * shader, Texture * texture);
+		virtual ~UiDrawable();
 		
 		void MakeRenderable();
 		

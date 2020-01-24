@@ -26,7 +26,7 @@ namespace scythe {
 	};
 	
 	//! Colored rectangle class
-	class RectColored : public Rect, public Drawable {
+	class RectColored : public Rect, public UiDrawable {
 	public:
 		RectColored(Renderer * renderer, Shader * shader, const Vector4& color,
 			 F32 x, F32 y, F32 width, F32 height, U32 flags);
@@ -43,7 +43,7 @@ namespace scythe {
 	};
 	
 	//! Textured rectangle class
-	class RectTextured : public Rect, public Drawable {
+	class RectTextured : public Rect, public UiDrawable {
 	public:
 		RectTextured(Renderer * renderer, Shader * shader,
 			Texture * texture, F32 x, F32 y, F32 width, F32 height, U32 flags);
