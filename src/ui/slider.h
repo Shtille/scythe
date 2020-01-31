@@ -2,7 +2,7 @@
 #define __SCYTHE_SLIDER_H__
 
 #include "widget.h"
-#include "drawable.h"
+#include "ui_drawable.h"
 
 namespace scythe {
 
