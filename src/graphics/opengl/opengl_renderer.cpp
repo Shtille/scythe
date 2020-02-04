@@ -692,25 +692,20 @@ namespace scythe {
 	}
 	void OpenGlRenderer::AddVertexFormat(VertexFormat* &vf, VertexAttribute *attribs, U32 nAttribs)
 	{
-		vf = new VertexFormat();
-
-		vf->Fill(attribs, nAttribs);
-		
 		// Try to find same format
-		for (auto &p : vertex_formats_)
+		for (auto& existing_vertex_format : vertex_formats_)
 		{
-			auto ptr = p.pointer();
-			if (*ptr == *vf)
+			if (existing_vertex_format->IsSame(attribs, nAttribs))
 			{
-				// format exists and a new one is not need
-				delete vf;
-				p.IncreaseCount();
-				vf = ptr;
+				// The format already exists, increment reference count
+				existing_vertex_format->AddRef();
+				vf = existing_vertex_format;
 				return;
 			}
 		}
-
-		// format doesn't exist
+		// Format doesn't exist
+		vf = new VertexFormat();
+		vf->Fill(attribs, nAttribs);
 		vertex_formats_.push_back(vf);
 	}
 	void OpenGlRenderer::ChangeVertexFormat(VertexFormat* vf)
@@ -734,19 +729,15 @@ namespace scythe {
 	}
 	void OpenGlRenderer::DeleteVertexFormat(VertexFormat* vf)
 	{
-		auto it = std::find_if(vertex_formats_.begin(), vertex_formats_.end(), [vf]
-							   (const CountingPointer<VertexFormat>& format)
-		{
-			return format.pointer() == vf;
-		});
+		auto it = std::find(vertex_formats_.begin(), vertex_formats_.end(), vf);
 		if (it != vertex_formats_.end())
 		{
-			it->DecreaseCount();
-			if (it->count() == 0)
+			VertexFormat * vertex_format = *it;
+			if (vertex_format->GetRefCount() == 1)
 			{
-				delete it->pointer();
 				vertex_formats_.erase(it);
 			}
+			vertex_format->Release();
 		}
 	}
 	void OpenGlRenderer::AddVertexBuffer(VertexBuffer* &vb, U32 size, void *data, BufferUsage usage)

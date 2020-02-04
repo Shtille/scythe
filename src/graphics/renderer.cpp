@@ -84,7 +84,7 @@ namespace scythe {
 		// Clean up vertex formats
 		for (auto &obj : vertex_formats_)
 		{
-			delete obj.pointer();
+			obj->Release();
 		}
 		vertex_formats_.clear();
 

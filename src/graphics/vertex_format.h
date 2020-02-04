@@ -2,15 +2,16 @@
 #define __SCYTHE_VERTEX_FORMAT_H__
 
 #include "common/types.h"
+#include "common/ref.h"
 
 namespace scythe {
 
-	const int kMaxGeneric = 16;
-	const int kMaxTexcoord = 8;
+	const int kMaxGeneric = 8;
 
 	//! Vertex attribute struct
-	struct VertexAttribute {
-
+	class VertexAttribute {
+		friend class VertexFormat;
+	public:
 		//! Vertex attrib types
 		enum Type {
 			kGeneric,
@@ -22,18 +23,23 @@ namespace scythe {
 			kBinormal
 		};
 		
-		VertexAttribute(Type type, U32 size)
-		: type(type)
-		, size(size)
-		{
-		}
+		VertexAttribute(Type type, U32 size);
+
+		bool operator ==(const VertexAttribute& other);
+		bool operator !=(const VertexAttribute& other);
 
 		Type type;			//!< Specifies the vertex type.
 		U32 size;			//!< Specifies the vertex format size.
+
+	private:
+		VertexAttribute() = default;
 	};
 
-	//! Vertex format class
-	class VertexFormat {
+	/**
+	 * Vertex format class
+	 */
+	class VertexFormat final : public Ref {
+		friend class Ref;
 		friend class Renderer;
 		friend class OpenGlRenderer;
 
@@ -47,16 +53,22 @@ namespace scythe {
 		
 		U32 vertex_size() const;
 		const Attrib& generic(U32 index) const;
+		const VertexAttribute * attributes() const;
+		U32 num_attributes() const;
 
 	protected:
 		VertexFormat();
-		virtual ~VertexFormat();
+		~VertexFormat();
 		VertexFormat(const VertexFormat&) = delete;
 		void operator = (const VertexFormat&) = delete;
 
+		bool IsSame(VertexAttribute *attribs, U32 num_attribs);
 		void Fill(VertexAttribute *attribs, U32 num_attribs);
-
+		
 	private:
+		VertexAttribute * attributes_;
+		U32 num_attributes_;
+
 		Attrib generic_[kMaxGeneric];
 
 		U32 vertex_size_;
