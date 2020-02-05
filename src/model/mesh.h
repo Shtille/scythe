@@ -1,17 +1,18 @@
 #ifndef __SCYTHE_MESH_H__
 #define __SCYTHE_MESH_H__
 
+#include "common/types.h"
 #include "common/ref.h"
 #include "resource.h"
 #include "math/bounding_box.h"
 #include "math/bounding_sphere.h"
-#include "graphics/vertex_format.h"
 
 #include <vector>
 
 namespace scythe {
 
 	class Renderer;
+	class VertexFormat;
 	class MeshPart;
 	struct Material;
 	class MaterialBinderInterface;
@@ -45,8 +46,7 @@ namespace scythe {
 		void CreateBox(const Vector3& extents);
 		void CreatePhysicalBox(float size_x, float size_y, float size_z, float size_u, float size_v);
 
-		void AddFormat(const VertexAttribute& attrib);
-		bool MakeRenderable();
+		bool MakeRenderable(const VertexFormat * vertex_format);
 		
 		void Render();
 
@@ -71,12 +71,10 @@ namespace scythe {
 
 		Renderer * renderer_;
 		MaterialBinderInterface * material_binder_;
-		VertexFormat * vertex_format_;
 		BoundingBox bounding_box_;
 		BoundingSphere bounding_sphere_;
 		bool has_bounds_; // if bounds have been set
 
-		std::vector<VertexAttribute> attribs_;
 		std::vector<MeshPart *> meshes_;
 		std::vector<Material> materials_;
 	};

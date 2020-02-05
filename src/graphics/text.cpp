@@ -151,7 +151,9 @@ namespace scythe {
 	}
 	bool Text::MakeRenderable()
 	{
-		VertexAttribute attribs[] = { {VertexAttribute::kVertex, 4} };
+		VertexAttribute attribs[] = {
+			VertexAttribute(VertexAttribute::kVertex, 4)
+		};
 		renderer_->AddVertexFormat(vertex_format_, &attribs[0], _countof(attribs));
 		
 		renderer_->context()->GenVertexArrayObject(vertex_array_object_);

@@ -42,16 +42,17 @@ namespace scythe {
 			indices_array_ = nullptr;
 		}
 	}
-	void MeshPart::TransformVertices(VertexFormat * vertex_format, const std::vector<VertexAttribute>& attribs, BoundingBox * bounding_box)
+	void MeshPart::TransformVertices(const VertexFormat * vertex_format, BoundingBox * bounding_box)
 	{
 		num_vertices_ = (U32)vertices_.size();
 		vertices_array_ = new U8[num_vertices_ * vertex_format->vertex_size()];
 		U8 *ptr = vertices_array_;
 		for (auto &v : vertices_)
 		{
-			for (auto &a : attribs)
+			for (U32 i = 0; i < vertex_format->num_attributes(); ++i)
 			{
-				switch (a.type)
+				const VertexAttribute& attribute = vertex_format->attributes()[i];
+				switch (attribute.type)
 				{
 				case VertexAttribute::kVertex:
 					memcpy(ptr, v.position, sizeof(v.position));
@@ -76,7 +77,7 @@ namespace scythe {
 				default:
 					assert(!"Unknown vertex attribute");
 				}
-				ptr += a.size * sizeof(float);
+				ptr += attribute.GetSize();
 			}
 		}
 		vertices_.clear();
@@ -111,11 +112,11 @@ namespace scythe {
 			indices_.shrink_to_fit();
 		}
 	}
-	bool MeshPart::MakeRenderable(VertexFormat * vertex_format, const std::vector<VertexAttribute>& attribs, BoundingBox * bounding_box)
+	bool MeshPart::MakeRenderable(const VertexFormat * vertex_format, BoundingBox * bounding_box)
 	{
 		const bool have_indices = !indices_.empty();
 
-		TransformVertices(vertex_format, attribs, bounding_box);
+		TransformVertices(vertex_format, bounding_box);
 		
 		renderer_->context()->GenVertexArrayObject(vertex_array_object_);
 		renderer_->context()->BindVertexArrayObject(vertex_array_object_);
@@ -130,7 +131,7 @@ namespace scythe {
 		}
 		
 		const char* base = (char*)0;
-		for (U32 i = 0; i < attribs.size(); ++i)
+		for (U32 i = 0; i < vertex_format->num_attributes(); ++i)
 		{
 			const VertexFormat::Attrib& generic = vertex_format->generic(i);
 			renderer_->context()->VertexAttribPointer(i, generic.size, DataType::kFloat, vertex_format->vertex_size(), base + generic.offset);

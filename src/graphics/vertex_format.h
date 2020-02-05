@@ -28,6 +28,9 @@ namespace scythe {
 		bool operator ==(const VertexAttribute& other);
 		bool operator !=(const VertexAttribute& other);
 
+		// Returns size in bytes
+		U32 GetSize() const;
+
 		Type type;			//!< Specifies the vertex type.
 		U32 size;			//!< Specifies the vertex format size.
 

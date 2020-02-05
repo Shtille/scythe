@@ -22,7 +22,7 @@ namespace scythe {
 		MeshPart(Renderer * renderer);
 		virtual ~MeshPart();
 
-		bool MakeRenderable(VertexFormat * vertex_format, const std::vector<VertexAttribute>& attribs, BoundingBox * bounding_box);
+		bool MakeRenderable(const VertexFormat * vertex_format, BoundingBox * bounding_box);
 		
 		void Render();
 
@@ -37,7 +37,7 @@ namespace scythe {
 		
 	private:
 		void FreeArrays();
-		void TransformVertices(VertexFormat * vertex_format, const std::vector<VertexAttribute>& attribs, BoundingBox * bounding_box);
+		void TransformVertices(const VertexFormat * vertex_format, BoundingBox * bounding_box);
 		
 		Renderer * renderer_;
 		Material * material_;

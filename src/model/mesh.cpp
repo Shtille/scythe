@@ -24,7 +24,6 @@ namespace scythe {
 	Mesh::Mesh(Renderer * renderer, MaterialBinderInterface * material_binder)
 	: renderer_(renderer)
 	, material_binder_(material_binder)
-	, vertex_format_(nullptr)
 	, has_bounds_(false)
 	{
 
@@ -35,8 +34,6 @@ namespace scythe {
 		{
 			delete mesh;
 		}
-		if (vertex_format_)
-			renderer_->DeleteVertexFormat(vertex_format_);
 	}
 	bool Mesh::SaveToFile(const char* filename)
 	{
@@ -66,19 +63,8 @@ namespace scythe {
 			return false;
 		}
 	}
-	void Mesh::AddFormat(const VertexAttribute& attrib)
+	bool Mesh::MakeRenderable(const VertexFormat * vertex_format)
 	{
-		attribs_.push_back(attrib);
-	}
-	bool Mesh::MakeRenderable()
-	{
-		if (attribs_.empty())
-		{
-			SC_ASSERT(!"Vertex format hasn't been set.");
-			return false;
-		}
-		renderer_->AddVertexFormat(vertex_format_, &attribs_[0], (U32)attribs_.size());
-
 		BoundingBox * bounding_box_ptr = nullptr;
 		if (!has_bounds_)
 		{
@@ -89,7 +75,7 @@ namespace scythe {
 
 		for (auto mesh : meshes_)
 		{
-			if (!mesh->MakeRenderable(vertex_format_, attribs_, bounding_box_ptr))
+			if (!mesh->MakeRenderable(vertex_format, bounding_box_ptr))
 				return false;
 		}
 

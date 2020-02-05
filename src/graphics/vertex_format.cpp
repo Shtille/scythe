@@ -18,6 +18,10 @@ namespace scythe {
 	{
 		return !operator==(other);
 	}
+	U32 VertexAttribute::GetSize() const
+	{
+		return size * sizeof(float);
+	}
 
 	VertexFormat::VertexFormat()
 	: attributes_(nullptr)
