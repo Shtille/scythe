@@ -16,6 +16,16 @@
 
 #include "model/model.h"
 #include "model/mesh.h"
+#include "model/mesh_parts_enumerator.h"
+
+#ifdef SC_USE_MEM_LEAK_DETECTION
+# undef new
+#endif
+#include "BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h"
+#include "BulletCollision/CollisionShapes/btShapeHull.h"
+#ifdef SC_USE_MEM_LEAK_DETECTION
+# define new DEBUG_NEW
+#endif
 
 #include <cmath>
 
@@ -942,193 +952,114 @@ namespace scythe {
 
 		return shape;
 	}
-	PhysicsCollisionShape* PhysicsController::CreateMesh(Mesh* mesh, const Vector3& scale, bool dynamic)
+	PhysicsCollisionShape* PhysicsController::CreateMesh(Mesh * mesh, const Vector3& scale, bool dynamic)
 	{
 		SC_ASSERT(mesh);
-
-		// TODO:
-		return nullptr;
-		/*
-		// The mesh must have a valid URL (i.e. it must have been loaded from a Bundle)
-		// in order to fetch mesh data for computing mesh rigid body.
-		if (strlen(mesh->getUrl()) == 0)
-		{
-			SC_ERROR("Cannot create mesh rigid body for mesh without valid URL.");
-			return NULL;
-		}
 
 		if (!dynamic)
 		{
 			// Static meshes use btBvhTriangleMeshShape and therefore only support triangle mesh shapes.
 			// Dynamic meshes are approximated with a btConvexHullShape (convex wrapper on cloud of vertices)
 			// and therefore can support any primitive type.
-			bool triMesh = true;
-			if (mesh->getPartCount() > 0)
-			{
-				for (unsigned int i = 0; i < mesh->getPartCount(); ++i)
-				{
-					if (mesh->getPart(i)->getPrimitiveType() != Mesh::TRIANGLES)
-					{
-						triMesh = false;
-						break;
-					}
-				}
-			}
-			else
-			{
-				triMesh = mesh->getPrimitiveType() == Mesh::TRIANGLES;
-			}
-
-			if (!triMesh)
+			if (!mesh->IsTriangleMesh())
 			{
 				SC_ERROR("Mesh rigid bodies are currently only supported on meshes with TRIANGLES primitive type.");
-				return NULL;
+				return nullptr;
 			}
 		}
 
-		// Read mesh data from URL
-		Bundle::MeshData* data = Bundle::readMeshData(mesh->getUrl());
-		if (data == NULL)
+		unsigned int vertex_count = mesh->GetNumberOfVertices();
+		if (vertex_count == 0)
 		{
-			SC_ERROR("Failed to load mesh data from url '%s'.", mesh->getUrl());
-			return NULL;
+			SC_ERROR("Invalid mesh");
+			return nullptr;
 		}
 
 		// Create mesh data to be populated and store in returned collision shape.
-		PhysicsCollisionShape::MeshData* shapeMeshData = new PhysicsCollisionShape::MeshData();
-		shapeMeshData->vertexData = NULL;
+		PhysicsCollisionShape::MeshData * shape_mesh_data = new PhysicsCollisionShape::MeshData();
+
+		// Use enumerator to go through the mesh
+		MeshPartsEnumerator mesh_enumerator(mesh);
+		MeshPartsEnumerator::PartInfo mesh_part_info;
 
 		// Copy the scaled vertex position data to the rigid body's local buffer.
-		Matrix4 m;
-		Matrix4::CreateScale(scale, &m);
-		unsigned int vertexCount = data->vertexCount;
-		shapeMeshData->vertexData = new float[vertexCount * 3];
-		Vector3 v;
-		int vertexStride = data->vertexFormat.getVertexSize();
-		for (unsigned int i = 0; i < data->vertexCount; i++)
+		Matrix4 scale_matrix;
+		Matrix4::CreateScale(scale, &scale_matrix);
+		shape_mesh_data->vertex_data = new float[vertex_count * 3];
+		Vector3 vertex;
+		while (mesh_enumerator.GetNextObject(&mesh_part_info))
 		{
-			v.set(*((float*)&data->vertexData[i * vertexStride + 0 * sizeof(float)]),
-					*((float*)&data->vertexData[i * vertexStride + 1 * sizeof(float)]),
-					*((float*)&data->vertexData[i * vertexStride + 2 * sizeof(float)]));
-			v *= m;
-			memcpy(&(shapeMeshData->vertexData[i * 3]), &v, sizeof(float) * 3);
+			for (unsigned int i = 0; i < mesh_part_info.num_vertices; ++i)
+			{
+				vertex.Set(mesh_part_info.vertices[i].position);
+				vertex *= scale_matrix;
+				memcpy(&(shape_mesh_data->vertex_data[i * 3]), &vertex, sizeof(float) * 3);
+			}
 		}
 
-		btCollisionShape* collisionShape = NULL;
-		btTriangleIndexVertexArray* meshInterface = NULL;
+		btCollisionShape* collision_shape = nullptr;
+		btTriangleIndexVertexArray* mesh_interface = nullptr;
 
 		if (dynamic)
 		{
 			// For dynamic meshes, use a btConvexHullShape approximation
-			btConvexHullShape* originalConvexShape = bullet_new<btConvexHullShape>(shapeMeshData->vertexData, data->vertexCount, sizeof(float)*3);
+			btConvexHullShape* original_convex_shape = new btConvexHullShape(shape_mesh_data->vertex_data, vertex_count, sizeof(float)*3);
 
 			// Create a hull approximation for better performance
-			btShapeHull* hull = bullet_new<btShapeHull>(originalConvexShape);
-			hull->buildHull(originalConvexShape->getMargin());
-			collisionShape = bullet_new<btConvexHullShape>((btScalar*)hull->getVertexPointer(), hull->numVertices());
+			btShapeHull* hull = new btShapeHull(original_convex_shape);
+			hull->buildHull(original_convex_shape->getMargin());
+			collision_shape = new btConvexHullShape((btScalar*)hull->getVertexPointer(), hull->numVertices());
 
-			SAFE_DELETE(hull);
-			SAFE_DELETE(originalConvexShape);
+			SC_SAFE_DELETE(hull);
+			SC_SAFE_DELETE(original_convex_shape);
 		}
 		else
 		{
 			// For static meshes, use btBvhTriangleMeshShape
-			meshInterface = bullet_new<btTriangleIndexVertexArray>();
+			mesh_interface = new btTriangleIndexVertexArray();
 
-			size_t partCount = data->parts.size();
-			if (partCount > 0)
+			const PHY_ScalarType index_type = PHY_INTEGER;
+			const int index_stride = sizeof(unsigned int);
+
+			mesh_enumerator.Reset();
+			while (mesh_enumerator.GetNextObject(&mesh_part_info))
 			{
-				PHY_ScalarType indexType = PHY_UCHAR;
-				int indexStride = 0;
-				Bundle::MeshPartData* meshPart = NULL;
-				for (size_t i = 0; i < partCount; i++)
-				{
-					meshPart = data->parts[i];
-					SC_ASSERT(meshPart);
+				unsigned int part_index = mesh_part_info.current_index;
 
-					switch (meshPart->indexFormat)
-					{
-					case Mesh::INDEX8:
-						indexType = PHY_UCHAR;
-						indexStride = 1;
-						break;
-					case Mesh::INDEX16:
-						indexType = PHY_SHORT;
-						indexStride = 2;
-						break;
-					case Mesh::INDEX32:
-						indexType = PHY_INTEGER;
-						indexStride = 4;
-						break;
-					default:
-						SC_ERROR("Unsupported index format (%d).", meshPart->indexFormat);
-						SAFE_DELETE(meshInterface);
-						SAFE_DELETE_ARRAY(shapeMeshData->vertexData);
-						SAFE_DELETE(shapeMeshData);
-						SAFE_DELETE(data);
-						return NULL;
-					}
+				// Move the index data into the rigid body's local buffer.
+				unsigned int * index_data = new unsigned int[mesh_part_info.num_indices];
+				memcpy(index_data, mesh_part_info.indices, sizeof(unsigned int) * mesh_part_info.num_indices);
+				
+				shape_mesh_data->index_data.push_back(index_data);
 
-					// Move the index data into the rigid body's local buffer.
-					// Set it to NULL in the MeshPartData so it is not released when the data is freed.
-					shapeMeshData->indexData.push_back(meshPart->indexData);
-					meshPart->indexData = NULL;
+				// Create a btIndexedMesh object for the current mesh part.
+				btIndexedMesh indexed_mesh;
+				indexed_mesh.m_indexType = index_type;
+				indexed_mesh.m_numTriangles = mesh_part_info.num_indices / 3; // assume TRIANGLES primitive type
+				indexed_mesh.m_numVertices = mesh_part_info.num_indices;
+				indexed_mesh.m_triangleIndexBase = reinterpret_cast<const unsigned char*>(shape_mesh_data->index_data[part_index]);
+				indexed_mesh.m_triangleIndexStride = index_stride * 3;
+				indexed_mesh.m_vertexBase = (const unsigned char*)shape_mesh_data->vertex_data;
+				indexed_mesh.m_vertexStride = sizeof(float)*3;
+				indexed_mesh.m_vertexType = PHY_FLOAT;
 
-					// Create a btIndexedMesh object for the current mesh part.
-					btIndexedMesh indexedMesh;
-					indexedMesh.m_indexType = indexType;
-					indexedMesh.m_numTriangles = meshPart->indexCount / 3; // assume TRIANGLES primitive type
-					indexedMesh.m_numVertices = meshPart->indexCount;
-					indexedMesh.m_triangleIndexBase = (const unsigned char*)shapeMeshData->indexData[i];
-					indexedMesh.m_triangleIndexStride = indexStride*3;
-					indexedMesh.m_vertexBase = (const unsigned char*)shapeMeshData->vertexData;
-					indexedMesh.m_vertexStride = sizeof(float)*3;
-					indexedMesh.m_vertexType = PHY_FLOAT;
-
-					// Add the indexed mesh data to the mesh interface.
-					meshInterface->addIndexedMesh(indexedMesh, indexType);
-				}
-			}
-			else
-			{
-				// Generate index data for the mesh locally in the rigid body.
-				unsigned int* indexData = new unsigned int[data->vertexCount];
-				for (unsigned int i = 0; i < data->vertexCount; i++)
-				{
-					indexData[i] = i;
-				}
-				shapeMeshData->indexData.push_back((unsigned char*)indexData);
-
-				// Create a single btIndexedMesh object for the mesh interface.
-				btIndexedMesh indexedMesh;
-				indexedMesh.m_indexType = PHY_INTEGER;
-				indexedMesh.m_numTriangles = data->vertexCount / 3; // assume TRIANGLES primitive type
-				indexedMesh.m_numVertices = data->vertexCount;
-				indexedMesh.m_triangleIndexBase = shapeMeshData->indexData[0];
-				indexedMesh.m_triangleIndexStride = sizeof(unsigned int);
-				indexedMesh.m_vertexBase = (const unsigned char*)shapeMeshData->vertexData;
-				indexedMesh.m_vertexStride = sizeof(float)*3;
-				indexedMesh.m_vertexType = PHY_FLOAT;
-
-				// Set the data in the mesh interface.
-				meshInterface->addIndexedMesh(indexedMesh, indexedMesh.m_indexType);
+				// Add the indexed mesh data to the mesh interface.
+				mesh_interface->addIndexedMesh(indexed_mesh, index_type);
 			}
 
-			// Create our collision shape object and store shapeMeshData in it.
-			collisionShape = bullet_new<btBvhTriangleMeshShape>(meshInterface, true);
+			// Create our collision shape object and store shape_mesh_data in it.
+			collision_shape = new btBvhTriangleMeshShape(mesh_interface, true);
 		}
 
-		// Create our collision shape object and store shapeMeshData in it.
-		PhysicsCollisionShape* shape = new PhysicsCollisionShape(PhysicsCollisionShape::kMesh, collisionShape, meshInterface);
-		shape->_shapeData.meshData = shapeMeshData;
+		// Create our collision shape object and store shape_mesh_data in it.
+		PhysicsCollisionShape * shape = new PhysicsCollisionShape(PhysicsCollisionShape::kMesh, collision_shape, mesh_interface);
+		shape->shape_data_.mesh_data = shape_mesh_data;
 
 		shapes_.push_back(shape);
 
-		// Free the temporary mesh data now that it's stored in physics system.
-		SAFE_DELETE(data);
+		// We could free the mesh data, but it might be used by another mesh based shape.
 
 		return shape;
-		*/
 	}
 	void PhysicsController::DestroyShape(PhysicsCollisionShape* shape)
 	{

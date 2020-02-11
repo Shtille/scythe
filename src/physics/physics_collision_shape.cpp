@@ -16,7 +16,7 @@ namespace scythe {
 	, shape_(shape)
 	, mesh_interface_(mesh_interface)
 	{
-
+		memset(&shape_data_, 0, sizeof(shape_data_));
 	}
 	PhysicsCollisionShape::~PhysicsCollisionShape()
 	{
@@ -24,6 +24,15 @@ namespace scythe {
 		{
 			if (type_ == kMesh)
 			{
+				if (shape_data_.mesh_data)
+				{
+					SC_SAFE_DELETE_ARRAY(shape_data_.mesh_data->vertex_data);
+					for (unsigned int i = 0; i < shape_data_.mesh_data->index_data.size(); i++)
+					{
+						SC_SAFE_DELETE_ARRAY(shape_data_.mesh_data->index_data[i]);
+					}
+					SC_SAFE_DELETE(shape_data_.mesh_data);
+				}
 				// Also need to delete the btTriangleIndexVertexArray, if it exists.
 				SC_SAFE_DELETE(mesh_interface_);
 			}

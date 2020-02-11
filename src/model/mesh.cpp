@@ -63,7 +63,7 @@ namespace scythe {
 			return false;
 		}
 	}
-	bool Mesh::MakeRenderable(const VertexFormat * vertex_format)
+	bool Mesh::MakeRenderable(const VertexFormat * vertex_format, bool keep_data)
 	{
 		BoundingBox * bounding_box_ptr = nullptr;
 		if (!has_bounds_)
@@ -75,7 +75,7 @@ namespace scythe {
 
 		for (auto mesh : meshes_)
 		{
-			if (!mesh->MakeRenderable(vertex_format, bounding_box_ptr))
+			if (!mesh->MakeRenderable(vertex_format, bounding_box_ptr, keep_data))
 				return false;
 		}
 
@@ -86,6 +86,13 @@ namespace scythe {
 		}
 
 		return true;
+	}
+	void Mesh::CleanUp()
+	{
+		for (auto mesh_part : meshes_)
+		{
+			mesh_part->CleanUp();
+		}
 	}
 	void Mesh::Render()
 	{
@@ -119,6 +126,24 @@ namespace scythe {
 	unsigned int Mesh::GetNumberOfParts() const
 	{
 		return static_cast<unsigned int>(meshes_.size());
+	}
+	unsigned int Mesh::GetNumberOfVertices() const
+	{
+		unsigned int num_vertices = 0;
+		for (auto mesh_part : meshes_)
+		{
+			num_vertices += mesh_part->num_vertices_;
+		}
+		return num_vertices;
+	}
+	bool Mesh::IsTriangleMesh() const
+	{
+		for (auto mesh_part : meshes_)
+		{
+			if (mesh_part->primitive_mode_ != PrimitiveType::kTriangles)
+				return false;
+		}
+		return true;
 	}
 
 } // namespace scythe

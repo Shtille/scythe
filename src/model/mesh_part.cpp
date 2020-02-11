@@ -42,7 +42,7 @@ namespace scythe {
 			indices_array_ = nullptr;
 		}
 	}
-	void MeshPart::TransformVertices(const VertexFormat * vertex_format, BoundingBox * bounding_box)
+	void MeshPart::TransformVertices(const VertexFormat * vertex_format, BoundingBox * bounding_box, bool keep_data)
 	{
 		num_vertices_ = (U32)vertices_.size();
 		vertices_array_ = new U8[num_vertices_ * vertex_format->vertex_size()];
@@ -80,8 +80,11 @@ namespace scythe {
 				ptr += attribute.GetSize();
 			}
 		}
-		vertices_.clear();
-		vertices_.shrink_to_fit();
+		if (!keep_data)
+		{
+			vertices_.clear();
+			vertices_.shrink_to_fit();
+		}
 		
 		if (!indices_.empty())
 		{
@@ -108,15 +111,18 @@ namespace scythe {
 					indices[i] = static_cast<U16>(indices_[i]);
 				}
 			}
-			indices_.clear();
-			indices_.shrink_to_fit();
+			if (!keep_data)
+			{
+				indices_.clear();
+				indices_.shrink_to_fit();
+			}
 		}
 	}
-	bool MeshPart::MakeRenderable(const VertexFormat * vertex_format, BoundingBox * bounding_box)
+	bool MeshPart::MakeRenderable(const VertexFormat * vertex_format, BoundingBox * bounding_box, bool keep_data)
 	{
 		const bool have_indices = !indices_.empty();
 
-		TransformVertices(vertex_format, bounding_box);
+		TransformVertices(vertex_format, bounding_box, keep_data);
 		
 		renderer_->context()->GenVertexArrayObject(vertex_array_object_);
 		renderer_->context()->BindVertexArrayObject(vertex_array_object_);
@@ -143,6 +149,13 @@ namespace scythe {
 		FreeArrays();
 		
 		return true;
+	}
+	void MeshPart::CleanUp()
+	{
+		vertices_.clear();
+		vertices_.shrink_to_fit();
+		indices_.clear();
+		indices_.shrink_to_fit();
 	}
 	void MeshPart::Render()
 	{

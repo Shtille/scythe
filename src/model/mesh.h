@@ -23,7 +23,7 @@ namespace scythe {
 	 */
 	class Mesh : public Ref, public Resource {
 		friend class Model;
-		friend class MeshVerticesEnumerator;
+		friend class MeshPartsEnumerator;
 	public:
 
 		enum class FileFormat {
@@ -46,7 +46,18 @@ namespace scythe {
 		void CreateBox(const Vector3& extents);
 		void CreatePhysicalBox(float size_x, float size_y, float size_z, float size_u, float size_v);
 
-		bool MakeRenderable(const VertexFormat * vertex_format);
+		/**
+		 * Translates data to video memory.
+		 *
+		 * @param[in] vertex_format The vertex format.
+		 * @param[in] keep_data True if need to keep data in RAM and false otherwise.
+		 */
+		bool MakeRenderable(const VertexFormat * vertex_format, bool keep_data = false);
+
+		/**
+		 * Cleans all the data that might has been used by physics
+		 */
+		void CleanUp();
 		
 		void Render();
 
@@ -59,6 +70,12 @@ namespace scythe {
 		const BoundingSphere& GetBoundingSphere() const;
 
 		unsigned int GetNumberOfParts() const;
+		unsigned int GetNumberOfVertices() const;
+
+		/**
+		 * Whether mesh primitive type is triangles
+		 */
+		bool IsTriangleMesh() const;
 		
 	private:
 		// Save routines

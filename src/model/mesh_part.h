@@ -17,12 +17,17 @@ namespace scythe {
 	 */
 	class MeshPart {
 		friend class Mesh;
-		friend class MeshVerticesEnumerator;
+		friend class MeshPartsEnumerator;
 	public:
 		MeshPart(Renderer * renderer);
 		virtual ~MeshPart();
 
-		bool MakeRenderable(const VertexFormat * vertex_format, BoundingBox * bounding_box);
+		bool MakeRenderable(const VertexFormat * vertex_format, BoundingBox * bounding_box, bool keep_data);
+
+		/**
+		 * Cleans all the data that might has been used by physics
+		 */
+		void CleanUp();
 		
 		void Render();
 
@@ -30,6 +35,7 @@ namespace scythe {
 		void ScaleTexcoord(const Vector2& scale);
 		
 	protected:
+		// This data is gonna be used on mesh shapes creation by physics
 		std::vector<Vertex> vertices_;
 		std::vector<U32> indices_;
 		
@@ -37,7 +43,7 @@ namespace scythe {
 		
 	private:
 		void FreeArrays();
-		void TransformVertices(const VertexFormat * vertex_format, BoundingBox * bounding_box);
+		void TransformVertices(const VertexFormat * vertex_format, BoundingBox * bounding_box, bool keep_data);
 		
 		Renderer * renderer_;
 		Material * material_;

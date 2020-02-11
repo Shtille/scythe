@@ -198,8 +198,8 @@ namespace scythe {
 
 		struct MeshData
 		{
-			float* vertexData;
-			std::vector<unsigned char*> indexData;
+			float * vertex_data;
+			std::vector<unsigned int*> index_data;
 		};
 
 		// struct HeightfieldData
@@ -234,6 +234,14 @@ namespace scythe {
 
 		//! Bullet mesh interface for mesh types (NULL otherwise)
 		btStridingMeshInterface * mesh_interface_;
+
+		// Shape specific cached data
+		union ShapeData
+		{
+			MeshData * mesh_data;
+			//HeightfieldData * heightfield_data;
+		};
+		ShapeData shape_data_;
 	};
 
 } // namespace scythe
