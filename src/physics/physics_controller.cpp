@@ -987,13 +987,14 @@ namespace scythe {
 		Matrix4::CreateScale(scale, &scale_matrix);
 		shape_mesh_data->vertex_data = new float[vertex_count * 3];
 		Vector3 vertex;
+		unsigned int index = 0;
 		while (mesh_enumerator.GetNextObject(&mesh_part_info))
 		{
-			for (unsigned int i = 0; i < mesh_part_info.num_vertices; ++i)
+			for (unsigned int i = 0; i < mesh_part_info.num_vertices; ++i, ++index)
 			{
 				vertex.Set(mesh_part_info.vertices[i].position);
 				vertex *= scale_matrix;
-				memcpy(&(shape_mesh_data->vertex_data[i * 3]), &vertex, sizeof(float) * 3);
+				memcpy(&(shape_mesh_data->vertex_data[index * 3]), &vertex, sizeof(float) * 3);
 			}
 		}
 
@@ -1021,11 +1022,11 @@ namespace scythe {
 			const PHY_ScalarType index_type = PHY_INTEGER;
 			const int index_stride = sizeof(unsigned int);
 
+			const unsigned char * vertex_base = reinterpret_cast<const unsigned char*>(shape_mesh_data->vertex_data);
+
 			mesh_enumerator.Reset();
 			while (mesh_enumerator.GetNextObject(&mesh_part_info))
 			{
-				unsigned int part_index = mesh_part_info.current_index;
-
 				// Move the index data into the rigid body's local buffer.
 				unsigned int * index_data = new unsigned int[mesh_part_info.num_indices];
 				memcpy(index_data, mesh_part_info.indices, sizeof(unsigned int) * mesh_part_info.num_indices);
@@ -1036,15 +1037,18 @@ namespace scythe {
 				btIndexedMesh indexed_mesh;
 				indexed_mesh.m_indexType = index_type;
 				indexed_mesh.m_numTriangles = mesh_part_info.num_indices / 3; // assume TRIANGLES primitive type
-				indexed_mesh.m_triangleIndexBase = reinterpret_cast<const unsigned char*>(shape_mesh_data->index_data[part_index]);
+				indexed_mesh.m_triangleIndexBase = reinterpret_cast<const unsigned char*>(index_data);
 				indexed_mesh.m_triangleIndexStride = index_stride * 3;
-				indexed_mesh.m_numVertices = vertex_count;
-				indexed_mesh.m_vertexBase = (const unsigned char*)shape_mesh_data->vertex_data;
-				indexed_mesh.m_vertexStride = sizeof(float)*3;
+				indexed_mesh.m_numVertices = mesh_part_info.num_vertices;
+				indexed_mesh.m_vertexBase = vertex_base;
+				indexed_mesh.m_vertexStride = sizeof(float) * 3;
 				indexed_mesh.m_vertexType = PHY_FLOAT;
 
 				// Add the indexed mesh data to the mesh interface.
 				mesh_interface->addIndexedMesh(indexed_mesh, index_type);
+
+				// Finally move vertex base
+				vertex_base += (mesh_part_info.num_vertices * sizeof(float) * 3);
 			}
 
 			// Create our collision shape object and store shape_mesh_data in it.
