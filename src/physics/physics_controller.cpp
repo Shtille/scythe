@@ -1036,9 +1036,9 @@ namespace scythe {
 				btIndexedMesh indexed_mesh;
 				indexed_mesh.m_indexType = index_type;
 				indexed_mesh.m_numTriangles = mesh_part_info.num_indices / 3; // assume TRIANGLES primitive type
-				indexed_mesh.m_numVertices = mesh_part_info.num_indices;
 				indexed_mesh.m_triangleIndexBase = reinterpret_cast<const unsigned char*>(shape_mesh_data->index_data[part_index]);
 				indexed_mesh.m_triangleIndexStride = index_stride * 3;
+				indexed_mesh.m_numVertices = vertex_count;
 				indexed_mesh.m_vertexBase = (const unsigned char*)shape_mesh_data->vertex_data;
 				indexed_mesh.m_vertexStride = sizeof(float)*3;
 				indexed_mesh.m_vertexType = PHY_FLOAT;

@@ -4,7 +4,7 @@
 
 namespace scythe {
 
-	void Mesh::CreateCube()
+	void Mesh::CreateCube(const Vector3 * position)
 	{
 		MeshPart * mesh_part = new MeshPart(renderer_);
 		auto& vertices = mesh_part->vertices_;
@@ -95,25 +95,62 @@ namespace scythe {
 		vertices[23].position.Set(-1.0f, -1.0f,  1.0f);
 		vertices[23].normal.Set(0.0f, -1.0f,  0.0f);
 		vertices[23].texcoord.Set(0.0f,  0.0f);
-		
-		indices.resize(34);
-		indices = {
-			0,1,2,3, 3,4,
-			4,5,6,7, 7,8,
-			8,9,10,11, 11,12,
-			12,13,14,15, 15,16,
-			16,17,18,19, 19,20,
-			20,21,22,23
-		};
+
+		// Move cube center to desired position
+		if (position)
+			mesh_part->TranslateVertices(*position);
+
+		if (force_triangles_)
+		{
+			// Use triangles as primitive for rendering
+			mesh_part->primitive_mode_ = PrimitiveType::kTriangles;
+
+			indices.resize(36);
+			indices = {
+				0,1,2, 2,1,3,
+				4,5,6, 6,5,7,
+				8,9,10, 10,9,11,
+				12,13,14, 14,13,15,
+				16,17,18, 18,17,19,
+				20,21,22, 22,21,23
+			};
+		}
+		else
+		{
+			// Use triangle strip as primitive for rendering
+			indices.resize(34);
+			indices = {
+				0,1,2,3, 3,4,
+				4,5,6,7, 7,8,
+				8,9,10,11, 11,12,
+				12,13,14,15, 15,16,
+				16,17,18,19, 19,20,
+				20,21,22,23
+			};
+		}
 
 		meshes_.push_back(mesh_part);
 
 		// Set bounds
-		Vector3 min = -Vector3::One();
 		Vector3 max = Vector3::One();
-		bounding_box_.Set(min, max);
-		bounding_sphere_.Set(bounding_box_);
-		has_bounds_ = true;
+		Vector3 min = -max;
+		if (!has_bounds_)
+		{
+			bounding_box_.Set(min, max);
+			bounding_sphere_.Set(bounding_box_);
+			has_bounds_ = true;
+		}
+		else
+		{
+			BoundingBox bounding_box;
+			BoundingSphere bounding_sphere;
+
+			bounding_box.Set(min, max);
+			bounding_sphere.Set(bounding_box);
+
+			bounding_box_.Merge(bounding_box);
+			bounding_sphere_.Merge(bounding_sphere);
+		}
 	}
 
 } // namespace scythe {

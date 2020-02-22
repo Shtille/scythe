@@ -42,9 +42,10 @@ namespace scythe {
 		void CreateQuadFullscreen();
 		void CreateSphere(float radius = 1.0f, U32 slices = 20, U32 loops = 10);
 		void CreateTetrahedron();
-		void CreateCube();
-		void CreateBox(const Vector3& extents);
-		void CreatePhysicalBox(float size_x, float size_y, float size_z, float size_u, float size_v);
+		void CreateCube(const Vector3 * position = nullptr);
+		void CreateBox(const Vector3& extents, const Vector3 * position = nullptr);
+		void CreatePhysicalBox(float size_x, float size_y, float size_z, float size_u, float size_v,
+			const Vector3 * position = nullptr);
 
 		/**
 		 * Translates data to video memory.
@@ -76,6 +77,8 @@ namespace scythe {
 		 * Whether mesh primitive type is triangles
 		 */
 		bool IsTriangleMesh() const;
+
+		void ForceTriangles();
 		
 	private:
 		// Save routines
@@ -91,6 +94,7 @@ namespace scythe {
 		BoundingBox bounding_box_;
 		BoundingSphere bounding_sphere_;
 		bool has_bounds_; // if bounds have been set
+		bool force_triangles_; // may be needed triangles for physics
 
 		std::vector<MeshPart *> meshes_;
 		std::vector<Material> materials_;

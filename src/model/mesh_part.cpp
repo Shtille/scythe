@@ -176,5 +176,10 @@ namespace scythe {
 		for (auto& v : vertices_)
 			v.texcoord *= scale;
 	}
+	void MeshPart::TranslateVertices(const Vector3& offset)
+	{
+		for (auto& v : vertices_)
+			v.position += offset;
+	}
 
 } // namespace scythe

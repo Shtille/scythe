@@ -25,6 +25,7 @@ namespace scythe {
 	: renderer_(renderer)
 	, material_binder_(material_binder)
 	, has_bounds_(false)
+	, force_triangles_(false)
 	{
 
 	}
@@ -144,6 +145,10 @@ namespace scythe {
 				return false;
 		}
 		return true;
+	}
+	void Mesh::ForceTriangles()
+	{
+		force_triangles_ = true;
 	}
 
 } // namespace scythe

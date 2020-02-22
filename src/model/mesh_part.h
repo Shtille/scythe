@@ -33,6 +33,7 @@ namespace scythe {
 
 		void ScaleVertices(const Vector3& scale);
 		void ScaleTexcoord(const Vector2& scale);
+		void TranslateVertices(const Vector3& offset);
 		
 	protected:
 		// This data is gonna be used on mesh shapes creation by physics
