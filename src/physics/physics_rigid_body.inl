@@ -21,6 +21,18 @@ namespace scythe {
 		body_->setFriction(friction);
 	}
 
+	inline void PhysicsRigidBody::SetRollingFriction(float friction)
+	{
+		SC_ASSERT(body_);
+		body_->setRollingFriction(friction);
+	}
+
+	inline void PhysicsRigidBody::SetSpinningFriction(float friction)
+	{
+		SC_ASSERT(body_);
+		body_->setSpinningFriction(friction);
+	}
+
 	inline float PhysicsRigidBody::GetRestitution() const
 	{
 		SC_ASSERT(body_);
@@ -49,6 +61,36 @@ namespace scythe {
 	{
 		SC_ASSERT(body_);
 		body_->setDamping(linearDamping, angularDamping);
+	}
+
+	inline float PhysicsRigidBody::GetContactProcessingThreshold() const
+	{
+		SC_ASSERT(body_);
+		return body_->getContactProcessingThreshold();
+	}
+
+	inline void PhysicsRigidBody::SetContactProcessingThreshold(float threshold)
+	{
+		SC_ASSERT(body_);
+		body_->setContactProcessingThreshold(threshold);
+	}
+
+	inline float PhysicsRigidBody::GetContactStiffness() const
+	{
+		SC_ASSERT(body_);
+		return body_->getContactStiffness();
+	}
+
+	inline float PhysicsRigidBody::GetContactDamping() const
+	{
+		SC_ASSERT(body_);
+		return body_->getContactDamping();
+	}
+
+	inline void PhysicsRigidBody::SetContactStiffnessAndDamping(float stiffness, float damping)
+	{
+		SC_ASSERT(body_);
+		body_->setContactStiffnessAndDamping(stiffness, damping);
 	}
 
 	inline Vector3 PhysicsRigidBody::GetLinearVelocity() const
@@ -163,6 +205,12 @@ namespace scythe {
 	{
 		SC_ASSERT(body_);
 		body_->setLinearFactor(btVector3(x, y, z));
+	}
+
+	inline void PhysicsRigidBody::DisableDeactivation()
+	{
+		SC_ASSERT(body_);
+		return body_->setActivationState(DISABLE_DEACTIVATION);
 	}
 
 	inline bool PhysicsRigidBody::IsStatic() const

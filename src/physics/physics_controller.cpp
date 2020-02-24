@@ -43,6 +43,7 @@ namespace scythe {
 	, listeners_(nullptr)
 	, gravity_(0.0f, -9.81f, 0.0f)
 	, collision_callback_(nullptr)
+	, speed_limit_action_(nullptr)
 	, is_updating_(false)
 	{
 		collision_callback_ = new CollisionCallback(this);
@@ -75,6 +76,7 @@ namespace scythe {
 	void PhysicsController::Deinitialize()
 	{
 		// Clean up the world and its various components.
+		RemoveSpeedLimitAction();
 		SC_SAFE_DELETE(world_);
 		SC_SAFE_DELETE(ghost_pair_callback_);
 		SC_SAFE_DELETE(solver_);
@@ -298,6 +300,15 @@ namespace scythe {
 		PhysicsSpringConstraint* constraint = new PhysicsSpringConstraint(a, rotationOffsetA, translationOffsetA, b, rotationOffsetB, translationOffsetB);
 		AddConstraint(a, b, constraint);
 		return constraint;
+	}
+	void PhysicsController::SetGravity(const Vector3& gravity)
+	{
+		gravity_ = gravity;
+		world_->setGravity(BV(gravity));
+	}
+	const Vector3& PhysicsController::GetGravity() const
+	{
+		return gravity_;
 	}
 	bool PhysicsController::RayTest(const Ray& ray, float distance, HitResult * result, HitFilter * filter)
 	{
@@ -1131,6 +1142,32 @@ namespace scythe {
 			}
 		}
 	}
+	void PhysicsController::AddSpeedLimitAction()
+	{
+		SC_ASSERT(!speed_limit_action_);
+		speed_limit_action_ = new SpeedLimitAction();
+		world_->addAction(speed_limit_action_);
+	}
+	void PhysicsController::RemoveSpeedLimitAction()
+	{
+		if (speed_limit_action_)
+		{
+			world_->removeAction(speed_limit_action_);
+			delete speed_limit_action_;
+			speed_limit_action_ = nullptr;
+		}
+	}
+	void PhysicsController::AddSpeedLimit(PhysicsCollisionObject * object, const PhysicsCollisionObject::SpeedLimitInfo & info)
+	{
+		if (!speed_limit_action_)
+			AddSpeedLimitAction();
+		speed_limit_action_->AddSpeedLimit(object, info);
+	}
+	void PhysicsController::RemoveSpeedLimit(PhysicsCollisionObject * object)
+	{
+		SC_ASSERT(speed_limit_action_);
+		speed_limit_action_->RemoveSpeedLimit(object);
+	}
 
 	PhysicsController::HitFilter::HitFilter()
 	{
@@ -1145,6 +1182,33 @@ namespace scythe {
 	bool PhysicsController::HitFilter::Hit(const PhysicsController::HitResult& result)
 	{
 		return true;
+	}
+
+	PhysicsController::SpeedLimitAction::SpeedLimitAction()
+	{
+	}
+	void PhysicsController::SpeedLimitAction::AddSpeedLimit(PhysicsCollisionObject * object, const PhysicsCollisionObject::SpeedLimitInfo & info)
+	{
+		map_.insert(std::make_pair(object, info));
+	}
+	void PhysicsController::SpeedLimitAction::RemoveSpeedLimit(PhysicsCollisionObject * object)
+	{
+		map_.erase(object);
+	}
+	void PhysicsController::SpeedLimitAction::updateAction(btCollisionWorld * collisionWorld, btScalar deltaTimeStep)
+	{
+		for (auto& pair : map_)
+		{
+			PhysicsCollisionObject * object = pair.first;
+			PhysicsCollisionObject::SpeedLimitInfo & info = pair.second;
+			if (info.clamp_linear_velocity)
+				object->ClampLinearVelocity(info.max_linear_velocity);
+			if (info.clamp_angular_velocity)
+				object->ClampAngularVelocity(info.max_angular_velocity);
+		}
+	}
+	void PhysicsController::SpeedLimitAction::debugDraw(btIDebugDraw * debugDrawer)
+	{
 	}
 
 } // namespace scythe

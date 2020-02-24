@@ -114,6 +114,32 @@ namespace scythe {
 		};
 
 		/**
+		* Structure that holds speed limit information.
+		*/
+		struct SpeedLimitInfo
+		{
+			/**
+			* Maximum linear velocity.
+			*/
+			float max_linear_velocity;
+
+			/**
+			* Maximum angular velocity.
+			*/
+			float max_angular_velocity;
+
+			/**
+			* Whether clamp linear velocity.
+			*/
+			bool clamp_linear_velocity;
+
+			/**
+			* Whether clamp angular velocity.
+			*/
+			bool clamp_angular_velocity;
+		};
+
+		/**
 		 * Virtual destructor.
 		 */
 		virtual ~PhysicsCollisionObject();
@@ -241,6 +267,20 @@ namespace scythe {
 		 * @return The Bullet collision object.
 		 */
 		virtual btCollisionObject * GetCollisionObject() const = 0;
+
+		/**
+		 * Clamps linear velocity.
+		 *
+		 * @param max_speed The maximum linear velocity magnitude.
+		 */
+		virtual void ClampLinearVelocity(float max_speed);
+
+		/**
+		 * Clamps angular velocity.
+		 *
+		 * @param max_speed The maximum angular velocity magnitude.
+		 */
+		virtual void ClampAngularVelocity(float max_speed);
 
 		/**
 		 * Pointer to Node contained by this collision object.

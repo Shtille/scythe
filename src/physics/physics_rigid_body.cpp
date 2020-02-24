@@ -130,6 +130,18 @@ namespace scythe {
 	{
 		return body_;
 	}
+	void PhysicsRigidBody::AddSpeedLimit(const SpeedLimitInfo & info)
+	{
+		PhysicsController * controller = PhysicsController::GetInstance();
+		SC_ASSERT(controller);
+		controller->AddSpeedLimit(this, info);
+	}
+	void PhysicsRigidBody::RemoveSpeedLimit()
+	{
+		PhysicsController * controller = PhysicsController::GetInstance();
+		SC_ASSERT(controller);
+		controller->RemoveSpeedLimit(this);
+	}
 	void PhysicsRigidBody::ApplyForce(const Vector3& force, const Vector3* relativePosition)
 	{
 		// If the force is significant enough, activate the rigid body 
@@ -236,6 +248,26 @@ namespace scythe {
 	void PhysicsRigidBody::TransformChanged(Transform * transform, long cookie)
 	{
 		// Needed for heightfield only
+	}
+	void PhysicsRigidBody::ClampLinearVelocity(float max_speed)
+	{
+		btVector3 velocity = body_->getLinearVelocity();
+		btScalar speed = velocity.length();
+		if (speed > max_speed)
+		{
+			velocity *= max_speed / speed;
+			body_->setLinearVelocity(velocity);
+		}
+	}
+	void PhysicsRigidBody::ClampAngularVelocity(float max_speed)
+	{
+		btVector3 velocity = body_->getAngularVelocity();
+		btScalar speed = velocity.length();
+		if (speed > max_speed)
+		{
+			velocity *= max_speed / speed;
+			body_->setAngularVelocity(velocity);
+		}
 	}
 
 } // namespace scythe

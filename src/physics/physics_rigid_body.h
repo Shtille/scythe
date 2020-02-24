@@ -130,6 +130,20 @@ namespace scythe {
 		inline void SetFriction(float friction);
 
 		/**
+		 * Sets the rigid body's rolling friction.
+		 * 
+		 * @param friction The friction.
+		 */
+		inline void SetRollingFriction(float friction);
+
+		/**
+		 * Sets the rigid body's spinning friction.
+		 * 
+		 * @param friction The friction.
+		 */
+		inline void SetSpinningFriction(float friction);
+
+		/**
 		 * Gets the rigid body's restitution.
 		 *
 		 * @return The restitution.
@@ -164,6 +178,42 @@ namespace scythe {
 		 * @param angularDamping The angular damping; between 0.0 (minimum) and 1.0 (maximum).
 		 */
 		inline void SetDamping(float linearDamping, float angularDamping);
+
+		/**
+		 * Gets the rigid body's contact processing threshold.
+		 * 
+		 * @return The contact processing threshold.
+		 */
+		inline float GetContactProcessingThreshold() const;
+
+		/**
+		 * Sets the rigid body's contact processing threshold.
+		 * 
+		 * @param threshold The contact processing threshold.
+		 */
+		inline void SetContactProcessingThreshold(float threshold);
+
+		/**
+		 * Gets the rigid body's contact stiffness.
+		 * 
+		 * @return The contact stiffness.
+		 */
+		inline float GetContactStiffness() const;
+
+		/**
+		 * Gets the rigid body's contact damping.
+		 * 
+		 * @return The contact damping.
+		 */
+		inline float GetContactDamping() const;
+
+		/**
+		 * Sets the rigid body's contact stiffness and damping.
+		 * 
+		 * @param stiffness The contact stiffness.
+		 * @param damping The contact damping.
+		 */
+		inline void SetContactStiffnessAndDamping(float stiffness, float damping);
 
 		/**
 		 * Gets the rigid body's linear velocity.
@@ -210,6 +260,18 @@ namespace scythe {
 		 * @param z The z coordinate of the angular velocity vector.
 		 */
 		inline void SetAngularVelocity(float x, float y, float z);
+
+		/**
+		* Adds speed limit.
+		*
+		* @param info The speed limit information.
+		*/
+		void AddSpeedLimit(const SpeedLimitInfo& info);
+
+		/**
+		* Removes speed limit.
+		*/
+		void RemoveSpeedLimit();
 
 		/**
 		 * Gets the rigid body's anisotropic friction.
@@ -313,6 +375,11 @@ namespace scythe {
 		inline void SetLinearFactor(float x, float y, float z);
 
 		/**
+		 * Disables rigid body deactivation.
+		 */
+		inline void DisableDeactivation();
+
+		/**
 		 * Sets whether the rigid body is a kinematic rigid body or not.
 		 * 
 		 * @param kinematic Whether the rigid body is kinematic or not.
@@ -331,7 +398,7 @@ namespace scythe {
 		 *
 		 * @return Whether the rigid body is static.
 		 */
-		bool IsStatic() const;
+		inline bool IsStatic() const;
 
 		/**
 		 * Applies the given force to the rigid body (optionally, from the given relative position).
@@ -406,6 +473,12 @@ namespace scythe {
 
 		// Used for implementing getHeight() when the heightfield has a transform that can change.
 		void TransformChanged(Transform * transform, long cookie) override;
+
+		// Clamps linear velocity.
+		void ClampLinearVelocity(float max_speed) override;
+
+		// Clamps angular velocity.
+		void ClampAngularVelocity(float max_speed) override;
 
 		btRigidBody * body_;
 		float mass_;

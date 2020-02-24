@@ -394,6 +394,51 @@ namespace scythe {
 		};
 
 		/**
+		* Internal class used to clamp objects velocity.
+		*/
+		class SpeedLimitAction final : public btActionInterface {
+		public:
+			/**
+			 * Constructor.
+			 *
+			 * @param physics_controller The owner instance.
+			 */
+			SpeedLimitAction();
+
+			/**
+			* Adds speed limit to the given object.
+			*
+			* @param object The object.
+			* @param info The speed limit information.
+			*/
+			void AddSpeedLimit(PhysicsCollisionObject * object, const PhysicsCollisionObject::SpeedLimitInfo & info);
+
+			/**
+			* Removes speed limit from the given object.
+			*
+			* @param object The object.
+			* @param info The speed limit information.
+			*/
+			void RemoveSpeedLimit(PhysicsCollisionObject * object);
+
+		protected:
+
+			/**
+			 * Is being called by Bullet every substep after all the collisions and integrating the transforms.
+			 */
+			void updateAction(btCollisionWorld* collisionWorld, btScalar deltaTimeStep) final;
+
+			/**
+			 * Just omit it.
+			 */
+			void debugDraw(btIDebugDraw* debugDrawer) final;
+
+		private:
+			typedef std::map<PhysicsCollisionObject*, PhysicsCollisionObject::SpeedLimitInfo> Map;
+			Map map_;
+		};
+
+		/**
 		 * Constructor
 		 */
 		PhysicsController();
@@ -446,6 +491,18 @@ namespace scythe {
 		//! Removes the given constraint from the simulated physics world.
 		void RemoveConstraint(PhysicsConstraint * constraint);
 
+		// Adds speed limit action.
+		void AddSpeedLimitAction();
+
+		// Removes speed limit action.
+		void RemoveSpeedLimitAction();
+
+		// Adds speed limit to the given object.
+		void AddSpeedLimit(PhysicsCollisionObject * object, const PhysicsCollisionObject::SpeedLimitInfo & info);
+
+		// Removes speed limit from the given object.
+		void RemoveSpeedLimit(PhysicsCollisionObject * object);
+
 	private:
 		btDefaultCollisionConfiguration * collision_configuration_;
 		btCollisionDispatcher * dispatcher_;
@@ -462,6 +519,8 @@ namespace scythe {
 
 		std::map<PhysicsCollisionObject::CollisionPair, CollisionInfo> collision_status_;
 		CollisionCallback * collision_callback_;
+
+		SpeedLimitAction * speed_limit_action_;
 
 		bool is_updating_;
 	};

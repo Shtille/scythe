@@ -56,6 +56,12 @@ namespace scythe {
 		SC_ASSERT(controller);
 		controller->DestroyShape(collision_shape_);
 	}
+	void PhysicsCollisionObject::ClampLinearVelocity(float max_speed)
+	{
+	}
+	void PhysicsCollisionObject::ClampAngularVelocity(float max_speed)
+	{
+	}
 	PhysicsCollisionShape::Type PhysicsCollisionObject::GetShapeType() const
 	{
 		SC_ASSERT(collision_shape_);
