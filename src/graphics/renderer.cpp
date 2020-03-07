@@ -15,7 +15,13 @@ namespace scythe {
 		view_matrix_.SetIdentity();
 		model_matrix_.SetIdentity();
 		
-		Defaults();
+		for (int i = 0; i < kMaxImageUnit; ++i)
+			current_textures_[i] = nullptr;
+		current_vertex_format_ = nullptr;
+
+		for (int i = 0; i < kMaxMrt; ++i)
+			current_color_rt_[i] = nullptr;
+		current_depth_rt_ = nullptr;
 	}
 	Renderer::~Renderer()
 	{
@@ -45,17 +51,6 @@ namespace scythe {
 	}
 	void Renderer::Defaults(void)
 	{
-		for (int i = 0; i < kMaxImageUnit; ++i)
-			current_textures_[i] = nullptr;
-		current_shader_ = nullptr;
-		current_vertex_format_ = nullptr;
-		active_vertex_format_ = nullptr;
-		current_vertex_buffer_ = nullptr;
-		current_index_buffer_ = nullptr;
-
-		for (int i = 0; i < kMaxMrt; ++i)
-			current_color_rt_[i] = nullptr;
-		current_depth_rt_ = nullptr;
 	}
 	void Renderer::CleanUp(void)
 	{
@@ -104,7 +99,6 @@ namespace scythe {
 	}
 	void Renderer::CheckForUsing(void)
 	{
-		assert(current_shader_ == nullptr);
 		for (int i = 0; i < kMaxImageUnit; ++i)
 			assert(current_textures_[i] == nullptr);
 	}

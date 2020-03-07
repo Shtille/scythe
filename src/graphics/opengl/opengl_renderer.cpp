@@ -579,28 +579,50 @@ namespace scythe {
 
 			if (colorLess)
 			{
+				// Detach all the color attachments
+				for (int i = 0; i < kMaxMrt; ++i)
+				{
+					if (current_color_rt_[i])
+					{
+						glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, 0, 0);
+						current_color_rt_[i] = nullptr;
+					}
+					else
+						break;
+				}
 				glDrawBuffer(GL_NONE);
 				glReadBuffer(GL_NONE);
 			}
 			else
 			{
 				GLuint drawBuffers[kMaxMrt];
-				for (U8 i = 0; i < nTargets; i++)
+				for (int i = 0; i < kMaxMrt; ++i)
 				{
-					if (colorRTs[i] != current_color_rt_[i])
+					if (i < nTargets)
 					{
-						glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i,
-							GL_TEXTURE_2D, colorRTs[i]->texture_id_, 0);
+						if (colorRTs[i] != current_color_rt_[i])
+						{
+							glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i,
+								GL_TEXTURE_2D, colorRTs[i]->texture_id_, 0);
 
-						current_color_rt_[i] = colorRTs[i];
+							current_color_rt_[i] = colorRTs[i];
+						}
+						drawBuffers[i] = GL_COLOR_ATTACHMENT0 + i;
 					}
-
-					drawBuffers[i] = GL_COLOR_ATTACHMENT0 + i;
+					else if (current_color_rt_[i])
+					{
+						// Detach color attachment
+						glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, 0, 0);
+						current_color_rt_[i] = nullptr;
+					}
+					else
+						break;
 				}
 
 				if (nTargets != current_render_targets_)
 				{
-					glDrawBuffers(current_render_targets_ = nTargets, drawBuffers);
+					glDrawBuffers(nTargets, drawBuffers);
+					current_render_targets_ = nTargets;
 				}
 				//glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
 			}
@@ -644,25 +666,48 @@ namespace scythe {
 
 			if (colorLess)
 			{
+				// Detach all the color attachments
+				for (int i = 0; i < kMaxMrt; ++i)
+				{
+					if (current_color_rt_[i])
+					{
+						glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, 0, 0);
+						current_color_rt_[i] = nullptr;
+					}
+					else
+						break;
+				}
 				glDrawBuffer(GL_NONE);
 				glReadBuffer(GL_NONE);
 			}
 			else
 			{
 				GLuint drawBuffers[kMaxMrt];
-				for (U8 i = 0; i < nTargets; i++)
+				for (int i = 0; i < kMaxMrt; ++i)
 				{
-					glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i,
-						GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, colorRTs[i]->texture_id_, level);
+					if (i < nTargets)
+					{
+						glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i,
+							GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, colorRTs[i]->texture_id_, level);
 
-					current_color_rt_[i] = colorRTs[i];
+						current_color_rt_[i] = colorRTs[i];
 
-					drawBuffers[i] = GL_COLOR_ATTACHMENT0 + i;
+						drawBuffers[i] = GL_COLOR_ATTACHMENT0 + i;
+					}
+					else if (current_color_rt_[i])
+					{
+						// Detach color attachment
+						glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, 0, 0);
+						current_color_rt_[i] = nullptr;
+					}
+					else
+						break;
 				}
 
 				if (nTargets != current_render_targets_)
 				{
-					glDrawBuffers(current_render_targets_ = nTargets, drawBuffers);
+					glDrawBuffers(nTargets, drawBuffers);
+					current_render_targets_ = nTargets;
 				}
 				//glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
 			}

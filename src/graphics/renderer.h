@@ -175,11 +175,7 @@ namespace scythe {
 
 		// Current identifiers
 		Texture* current_textures_[kMaxImageUnit];
-		Shader* current_shader_;                //!< obsolete
 		VertexFormat* current_vertex_format_;   //!< obsolete
-		VertexFormat* active_vertex_format_;    //!< obsolete
-		VertexBuffer* current_vertex_buffer_;   //!< obsolete
-		IndexBuffer* current_index_buffer_;     //!< obsolete
 		Texture* current_color_rt_[kMaxMrt];
 		Texture* current_depth_rt_;
 	};
