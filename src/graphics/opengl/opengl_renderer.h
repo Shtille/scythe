@@ -15,7 +15,8 @@ namespace scythe {
 		void CreateTextureDepth(Texture* &texture, int w, int h, U32 depthSize);
 		void CreateTexture(Texture* &texture, int w, int h, Image::Format fmt);
 		void CreateTextureFromData(Texture* &texture, int w, int h, Image::Format fmt, unsigned char *data);
-		void AddRenderTarget(Texture* &texture, int w, int h, Image::Format fmt, Texture::Filter filt = Texture::Filter::kLinear);
+		void AddRenderTarget(Texture* &texture, int w, int h, Image::Format fmt,
+			Texture::Filter filt = Texture::Filter::kLinear, Texture::Wrap wrap = Texture::Wrap::kClampToEdge);
 		void AddRenderDepthStencil(Texture* &texture, int w, int h, U32 depthSize, U32 stencilSize);
 		void DeleteTexture(Texture* texture);
 		void ChangeTexture(Texture* texture, U32 layer = 0);

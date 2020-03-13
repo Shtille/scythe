@@ -119,6 +119,61 @@ namespace scythe {
 		default: return GL_RGBA8;
 		}
 	}
+	void OpenGlTexture::SetFilter(Filter filter)
+	{
+		float aniso_max;
+		glTexParameterf(target_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		switch (filter)
+		{
+		case Filter::kPoint:
+			glTexParameterf(target_, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			break;
+		case Filter::kLinear:
+			glTexParameterf(target_, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			break;
+		case Filter::kBilinear:
+			glTexParameterf(target_, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+			break;
+		case Filter::kTrilinear:
+			glTexParameterf(target_, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			break;
+		case Filter::kBilinearAniso:
+			glTexParameterf(target_, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+			glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &aniso_max);
+			glTexParameterf(target_, GL_TEXTURE_MAX_ANISOTROPY_EXT, aniso_max);
+			break;
+		case Filter::kTrilinearAniso:
+			glTexParameterf(target_, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &aniso_max);
+			glTexParameterf(target_, GL_TEXTURE_MAX_ANISOTROPY_EXT, aniso_max);
+			break;
+		}
+	}
+	void OpenGlTexture::SetWrap(Wrap wrap)
+	{
+		bool is_3d = (target_ == GL_TEXTURE_3D || target_ == GL_TEXTURE_CUBE_MAP);
+		switch (wrap)
+		{
+		case Wrap::kRepeat:
+			glTexParameteri(target_, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(target_, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			if (is_3d)
+				glTexParameteri(target_, GL_TEXTURE_WRAP_R, GL_REPEAT);
+			break;
+		case Wrap::kClamp:
+			glTexParameteri(target_, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+			glTexParameteri(target_, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+			if (is_3d)
+				glTexParameteri(target_, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+			break;
+		case Wrap::kClampToEdge:
+			glTexParameteri(target_, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(target_, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			if (is_3d)
+				glTexParameteri(target_, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+			break;
+		}
+	}
 	void OpenGlTexture::ChooseTarget()
 	{
 		target_ = GL_TEXTURE_2D;

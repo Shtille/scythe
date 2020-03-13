@@ -12,6 +12,9 @@ namespace scythe {
 		U32 GetSrcType();
 		int GetInternalFormat();
 
+		void SetFilter(Filter filter);
+		void SetWrap(Wrap wrap);
+
 	private:
 		void ChooseTarget();
 	};

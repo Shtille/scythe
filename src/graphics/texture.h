@@ -36,6 +36,9 @@ namespace scythe {
 		virtual U32 GetSrcType() = 0;
 		virtual int GetInternalFormat() = 0;
 
+		virtual void SetFilter(Filter filter) = 0;
+		virtual void SetWrap(Wrap wrap) = 0;
+
 		int width() const;
 		int height() const;
 

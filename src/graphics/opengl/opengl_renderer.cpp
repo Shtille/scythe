@@ -404,7 +404,7 @@ namespace scythe {
 
 		textures_.push_back(texture);
 	}
-	void OpenGlRenderer::AddRenderTarget(Texture* &texture, int w, int h, Image::Format fmt, Texture::Filter filt)
+	void OpenGlRenderer::AddRenderTarget(Texture* &texture, int w, int h, Image::Format fmt, Texture::Filter filt, Texture::Wrap wrap)
 	{
 		assert(w > 0 && h > 0 && w <= GL_MAX_RENDERBUFFER_SIZE && h <= GL_MAX_RENDERBUFFER_SIZE);
 
@@ -430,8 +430,7 @@ namespace scythe {
 			break;
 		}
 
-		glTexParameteri(texture->target_, GL_TEXTURE_WRAP_S, GL_CLAMP);
-		glTexParameteri(texture->target_, GL_TEXTURE_WRAP_T, GL_CLAMP);
+		texture->SetWrap(wrap);
 
 		// create texture
 		glTexImage2D(texture->target_, // target
@@ -562,8 +561,10 @@ namespace scythe {
 			{
 				if (depthRT == nullptr)
 				{
-					// detach depth renderbuffer
-					glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0);
+					if (current_depth_rt_->texture_id_)
+						glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, current_depth_rt_->target_, 0, 0);
+					else // detach depth renderbuffer
+						glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0);
 				}
 				else
 				{
@@ -649,8 +650,10 @@ namespace scythe {
 			{
 				if (depthRT == nullptr)
 				{
-					// detach depth renderbuffer
-					glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0);
+					if (current_depth_rt_->texture_id_)
+						glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, current_depth_rt_->target_, 0, 0);
+					else // detach depth renderbuffer
+						glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0);
 				}
 				else
 				{
