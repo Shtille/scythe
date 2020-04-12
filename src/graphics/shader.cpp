@@ -2,6 +2,7 @@
 
 #include "opengl/opengl_include.h"
 #include "stream/file_stream.h"
+#include "common/sc_assert.h"
 
 #include <string>
 
@@ -84,7 +85,7 @@ namespace scythe {
 	{
 		context_->UniformMatrix4fv(program_, name, v, trans, n);
 	}
-	Shader * Shader::Create(Context * context, const char *filename, const char **attribs, U32 n_attribs)
+	Shader * Shader::Create(Context * context, const ShaderInfo& info)
 	{
 		Shader * shader = new Shader(context);
 		
@@ -94,10 +95,25 @@ namespace scythe {
 		std::string shader_filename;
 		
 		U32 vertex_shader, fragment_shader;
+
+		// Defines source
+		std::string defines_source;
+		for (U32 i = 0; i < info.num_defines_; ++i)
+		{
+			defines_source += info.defines_[i];
+		}
 		
 		// Vertex program
-		shader_filename = filename;
-		shader_filename += ".vs";
+		if (info.base_filename_)
+		{
+			shader_filename = info.base_filename_;
+			shader_filename += ".vs";
+		}
+		else
+		{
+			SC_ASSERT(info.vertex_program_);
+			shader_filename = info.vertex_program_;
+		}
 		if (stream.Open(shader_filename.c_str(), StreamAccess::kReadBinary))
 		{
 			shader_source.resize(stream.Length());
@@ -108,6 +124,9 @@ namespace scythe {
 				return nullptr;
 			}
 			stream.Close();
+
+			if (info.defines_)
+				shader_source = defines_source + shader_source;
 			
 			vertex_shader = glCreateShader(GL_VERTEX_SHADER);
 			const char * source = shader_source.c_str();
@@ -119,7 +138,7 @@ namespace scythe {
 				char infoLog[2048];
 				glGetShaderInfoLog(vertex_shader, 2048, NULL, infoLog);
 				char temp[100];
-				sprintf(temp, "%s %s", "Error in vertex shader compilation in", filename);
+				sprintf(temp, "%s %s", "Error in vertex shader compilation in", shader_filename.c_str());
 				context->ErrorHandler(temp);
 				context->ErrorHandler(infoLog);
 				glDeleteShader(vertex_shader);
@@ -136,8 +155,16 @@ namespace scythe {
 		}
 		
 		// Fragment program
-		shader_filename = filename;
-		shader_filename += ".fs";
+		if (info.base_filename_)
+		{
+			shader_filename = info.base_filename_;
+			shader_filename += ".fs";
+		}
+		else
+		{
+			SC_ASSERT(info.fragment_program_);
+			shader_filename = info.fragment_program_;
+		}
 		if (stream.Open(shader_filename.c_str(), StreamAccess::kReadBinary))
 		{
 			shader_source.resize(stream.Length());
@@ -148,6 +175,9 @@ namespace scythe {
 				return nullptr;
 			}
 			stream.Close();
+
+			if (info.defines_)
+				shader_source = defines_source + shader_source;
 			
 			fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
 			const char * source = shader_source.c_str();
@@ -159,7 +189,7 @@ namespace scythe {
 				char infoLog[2048];
 				glGetShaderInfoLog(fragment_shader, 2048, NULL, infoLog);
 				char temp[100];
-				sprintf(temp, "%s %s", "Error in fragment shader compilation in", filename);
+				sprintf(temp, "%s %s", "Error in fragment shader compilation in", shader_filename.c_str());
 				context->ErrorHandler(temp);
 				context->ErrorHandler(infoLog);
 				glDeleteShader(fragment_shader);
@@ -180,11 +210,11 @@ namespace scythe {
 		shader->program_ = glCreateProgram();
 		glAttachShader(shader->program_, vertex_shader);
 		glAttachShader(shader->program_, fragment_shader);
-		for (U32 i = 0; i < n_attribs; ++i)
+		for (U32 i = 0; i < info.num_attributes_; ++i)
 		{
-			if (attribs[i])
+			if (info.attributes_[i])
 			{
-				glBindAttribLocation(shader->program_, i, attribs[i]);
+				glBindAttribLocation(shader->program_, i, info.attributes_[i]);
 				context->CheckForErrors();
 			}
 		}
@@ -195,7 +225,7 @@ namespace scythe {
 			char infoLog[2048];
 			glGetProgramInfoLog(shader->program_, 2048, NULL, infoLog);
 			char temp[100];
-			sprintf(temp, "%s %s", "Error in shader linkage in", filename);
+			sprintf(temp, "%s %s", "Error in shader linkage in", shader_filename.c_str());
 			context->ErrorHandler(temp);
 			context->ErrorHandler(infoLog);
 			glDeleteProgram(shader->program_);

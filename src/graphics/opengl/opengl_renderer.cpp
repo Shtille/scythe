@@ -836,9 +836,9 @@ namespace scythe {
 			delete ib;
 		}
 	}
-	bool OpenGlRenderer::AddShader(Shader* &shader, const char* filename, const char **attribs, U32 n_attribs)
+	bool OpenGlRenderer::AddShader(Shader* &shader, const ShaderInfo& info)
 	{
-		shader = Shader::Create(context_, filename, attribs, n_attribs);
+		shader = Shader::Create(context_, info);
 		if (shader == nullptr)
 			return false;
 

@@ -1,7 +1,7 @@
 #ifndef __SCYTHE_SHADER_H__
 #define __SCYTHE_SHADER_H__
 
-#include "common/types.h"
+#include "shader_info.h"
 #include "resource.h"
 #include "context.h"
 
@@ -41,7 +41,7 @@ namespace scythe {
 		Context * context_;
 		
 	private:
-		static Shader * Create(Context * context, const char *filename, const char **attribs, U32 n_attribs);
+		static Shader * Create(Context * context, const ShaderInfo& info);
 		
 		U32 program_;
 	};

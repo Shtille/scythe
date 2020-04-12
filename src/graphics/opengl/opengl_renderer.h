@@ -35,7 +35,7 @@ namespace scythe {
 		void AddIndexBuffer(IndexBuffer* &ib, U32 nIndices, U32 indexSize, void *data, BufferUsage usage);
 		void DeleteIndexBuffer(IndexBuffer* ib);
 
-		bool AddShader(Shader* &shader, const char* filename, const char **attribs = NULL, U32 n_attribs = 0);
+		bool AddShader(Shader* &shader, const ShaderInfo& info);
 		void DeleteShader(Shader* shader);
 
 		void AddFont(Font* &font, const char* fontname);

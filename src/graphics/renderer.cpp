@@ -242,6 +242,10 @@ namespace scythe {
 	{
 		ChangeRenderTargets(1, &colorRT, depthRT);
 	}
+	bool Renderer::AddShader(Shader* &shader, const char* filename)
+	{
+		return AddShader(shader, ShaderInfo(filename));
+	}
 	void Renderer::SetViewport(int w, int h)
 	{
 		viewport_.Set(0.0f, 0.0f, (float)w, (float)h);

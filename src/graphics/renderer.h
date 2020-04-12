@@ -92,8 +92,9 @@ namespace scythe {
 		virtual void DeleteIndexBuffer(IndexBuffer* ib) = 0;
 
 		// Shader functions
-		virtual bool AddShader(Shader* &shd, const char* filename, const char **attribs = NULL, U32 n_attribs = 0) = 0;
-		virtual void DeleteShader(Shader* shd) = 0;
+		bool AddShader(Shader* &shader, const char* filename);
+		virtual bool AddShader(Shader* &shader, const ShaderInfo& info) = 0;
+		virtual void DeleteShader(Shader* shader) = 0;
 
 		// Font functions
 		virtual void AddFont(Font* &font, const char* fontname) = 0;
