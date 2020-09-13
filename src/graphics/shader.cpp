@@ -3,6 +3,7 @@
 #include "opengl/opengl_include.h"
 #include "stream/file_stream.h"
 #include "common/sc_assert.h"
+#include "common/string_format.h"
 
 #include <string>
 
@@ -85,6 +86,23 @@ namespace scythe {
 	{
 		context_->UniformMatrix4fv(program_, name, v, trans, n);
 	}
+	static void InsertAfterVersion(std::string& str, const std::string& str_to_insert)
+	{
+		size_t pos = str.find("#version", 0);
+		if (pos != std::string::npos)
+		{
+			size_t len = str.length();
+			pos = str.find("\n", pos);
+			while (pos < len && (str[pos] == '\n' || str[pos] == '\r'))
+				++pos;
+		}
+		else
+		{
+			// No #version declared in shader, insert in the beginning
+			pos = 0;
+		}
+		str.insert(pos, str_to_insert);
+	}
 	Shader * Shader::Create(Context * context, const ShaderInfo& info)
 	{
 		Shader * shader = new Shader(context);
@@ -100,7 +118,23 @@ namespace scythe {
 		std::string defines_source;
 		for (U32 i = 0; i < info.num_defines_; ++i)
 		{
-			defines_source += info.defines_[i];
+			const char* define_str = info.defines_[i];
+			size_t len = strlen(define_str);
+			if (define_str == nullptr || len == 0)
+				continue;
+			// Check if define was included
+			if (strstr(define_str, "#define"))
+			{
+				// Nothing to worry about
+				defines_source.append(define_str);
+			}
+			else
+			{
+				defines_source.append(scythe::string_format("#define %s", define_str));
+			}
+			// Check if define string has end line symbol
+			if (define_str[len-1] != '\n' && define_str[len-1] != '\r')
+				defines_source.append("\n");
 		}
 		
 		// Vertex program
@@ -126,7 +160,7 @@ namespace scythe {
 			stream.Close();
 
 			if (info.defines_)
-				shader_source = defines_source + shader_source;
+				InsertAfterVersion(shader_source, defines_source);
 			
 			vertex_shader = glCreateShader(GL_VERTEX_SHADER);
 			const char * source = shader_source.c_str();
@@ -177,7 +211,7 @@ namespace scythe {
 			stream.Close();
 
 			if (info.defines_)
-				shader_source = defines_source + shader_source;
+				InsertAfterVersion(shader_source, defines_source);
 			
 			fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
 			const char * source = shader_source.c_str();
