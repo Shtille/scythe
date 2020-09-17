@@ -289,12 +289,8 @@ namespace scythe {
 			up = -Vector3::UnitX();
 			side = Vector3::UnitZ();
 		}
-		// Matrix constructor takes "natural" order
-		Matrix4 matrix(
-			dir.x, up.x, side.x, 0.0f,
-			dir.y, up.y, side.y, 0.0f,
-			dir.z, up.z, side.z, 0.0f,
-			0.0f,  0.0f, 0.0f,   1.0f);
+		Matrix4 matrix;
+		Matrix4::CreateRotation(dir, up, side, &matrix);
 		Quaternion::CreateFromRotationMatrix(matrix, this);
 	}
 
@@ -332,19 +328,42 @@ namespace scythe {
 	{
 		SC_ASSERT(dst);
 
-		float y2, z2, yy, zz, xy, xz, wy, wz;
-		y2 = y + y;
-		z2 = z + z;
-		xy = x * y2;
-		xz = x * z2;
-		yy = y * y2;
-		zz = z * z2;
-		wy = w * y2;
-		wz = w * z2;
+		// Should coincide with Matrix4.GetForwardVector()
+		float x2 = x + x;
+		float y2 = y + y;
+		float z2 = z + z;
 
-		dst->x = 1.0f - (yy + zz);
-		dst->y = xy + wz;
-		dst->z = xz - wy;
+#ifdef SCYTHE_ORIENTATION_Z
+		// We use -Z as forward direction.
+		float xx2 = x * x2;
+		float yy2 = y * y2;
+		// float zz2 = z * z2;
+		// float xy2 = x * y2;
+		float xz2 = x * z2;
+		float yz2 = y * z2;
+		float wx2 = w * x2;
+		float wy2 = w * y2;
+		// float wz2 = w * z2;
+
+		dst->x = -(xz2 + wy2);
+		dst->y = -(yz2 - wx2);
+		dst->z = -(1.0f - xx2 - yy2);
+#else
+		// We use +X as forward direction.
+		// float xx2 = x * x2;
+		float yy2 = y * y2;
+		float zz2 = z * z2;
+		float xy2 = x * y2;
+		float xz2 = x * z2;
+		// float yz2 = y * z2;
+		// float wx2 = w * x2;
+		float wy2 = w * y2;
+		float wz2 = w * z2;
+
+		dst->x = 1.0f - yy2 - zz2;
+		dst->y = xy2 + wz2;
+		dst->z = xz2 - wy2;
+#endif
 		dst->Normalize();
 	}
 

@@ -365,6 +365,7 @@ namespace scythe {
 	{
 		SC_ASSERT(dst);
 
+		// Use +Y as up
 		dst->x = m[3];
 		dst->y = m[4];
 		dst->z = m[5];
@@ -374,6 +375,7 @@ namespace scythe {
 	{
 		SC_ASSERT(dst);
 		
+		// Use -Y as down
 		dst->x = -m[3];
 		dst->y = -m[4];
 		dst->z = -m[5];
@@ -383,36 +385,68 @@ namespace scythe {
 	{
 		SC_ASSERT(dst);
 
+#ifdef SCYTHE_ORIENTATION_Z
+		// Use -X as left
 		dst->x = -m[0];
 		dst->y = -m[1];
 		dst->z = -m[2];
+#else
+		// Use -Z as left
+		dst->x = -m[6];
+		dst->y = -m[7];
+		dst->z = -m[8];
+#endif
 	}
 
 	void Matrix3::GetRightVector(Vector3* dst) const
 	{
 		SC_ASSERT(dst);
 
+#ifdef SCYTHE_ORIENTATION_Z
+		// Use +X as right
 		dst->x = m[0];
 		dst->y = m[1];
 		dst->z = m[2];
+#else
+		// Use +Z as right
+		dst->x = m[6];
+		dst->y = m[7];
+		dst->z = m[8];
+#endif
 	}
 
 	void Matrix3::GetForwardVector(Vector3* dst) const
 	{
 		SC_ASSERT(dst);
 
+#ifdef SCYTHE_ORIENTATION_Z
+		// Use -Z as forward
 		dst->x = -m[6];
 		dst->y = -m[7];
 		dst->z = -m[8];
+#else
+		// Use +X as forward
+		dst->x = m[0];
+		dst->y = m[1];
+		dst->z = m[2];
+#endif
 	}
 
 	void Matrix3::GetBackVector(Vector3* dst) const
 	{
 		SC_ASSERT(dst);
 
+#ifdef SCYTHE_ORIENTATION_Z
+		// Use +Z as backward
 		dst->x = m[6];
 		dst->y = m[7];
 		dst->z = m[8];
+#else
+		// Use -X as backward
+		dst->x = -m[0];
+		dst->y = -m[1];
+		dst->z = -m[2];
+#endif
 	}
 
 	bool Matrix3::Invert()

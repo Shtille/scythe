@@ -201,46 +201,24 @@ namespace scythe {
 
 	void Matrix4::CreateView(const Matrix3& rotation, const Vector3& eye, Matrix4* dst)
 	{
-		//      | f[0] u[0] s[0] |
-		//  R = | f[1] u[1] s[1] |
-		//      | f[2] u[2] s[2] |
-
 		SC_ASSERT(dst);
 
-		Vector3 forward(&rotation.m[0]);
-		Vector3 up(&rotation.m[3]);
-		Vector3 side(&rotation.m[6]);
+		Vector3 forward, up, side;
+		rotation.GetForwardVector(&forward);
+		rotation.GetUpVector(&up);
+		rotation.GetRightVector(&side);
 
 		CreateView(forward, up, side, eye, dst);
 	}
 
 	void Matrix4::CreateView(const Quaternion& q, const Vector3& eye, Matrix4* dst)
 	{
-		//      | f[0] u[0] s[0] |
-		//  R = | f[1] u[1] s[1] |
-		//      | f[2] u[2] s[2] |
-
 		SC_ASSERT(dst);
 
-		float x2 = q.x + q.x;
-		float y2 = q.y + q.y;
-		float z2 = q.z + q.z;
+		Matrix3 rotation;
+		Matrix3::CreateRotation(q, &rotation);
 
-		float xx2 = q.x * x2;
-		float yy2 = q.y * y2;
-		float zz2 = q.z * z2;
-		float xy2 = q.x * y2;
-		float xz2 = q.x * z2;
-		float yz2 = q.y * z2;
-		float wx2 = q.w * x2;
-		float wy2 = q.w * y2;
-		float wz2 = q.w * z2;
-
-		Vector3 forward(1.0f - yy2 - zz2, xy2 + wz2, xz2 - wy2);
-		Vector3 up(xy2 - wz2, 1.0f - xx2 - zz2, yz2 + wx2);
-		Vector3 side(xz2 + wy2, yz2 - wx2, 1.0f - xx2 - yy2);
-
-		CreateView(forward, up, side, eye, dst);
+		CreateView(rotation, eye, dst);
 	}
 
 	void Matrix4::CreatePerspective(float fieldOfView, float aspectRatio,
@@ -491,9 +469,15 @@ namespace scythe {
 
 		SC_ASSERT(dst);
 
+#ifdef SCYTHE_ORIENTATION_Z
+		dst->m[0] = side.x;
+		dst->m[1] = side.y;
+		dst->m[2] = side.z;
+#else
 		dst->m[0] = forward.x;
 		dst->m[1] = forward.y;
 		dst->m[2] = forward.z;
+#endif
 		dst->m[3] = 0.0f;
 
 		dst->m[4] = up.x;
@@ -501,9 +485,15 @@ namespace scythe {
 		dst->m[6] = up.z;
 		dst->m[7] = 0.0f;
 
+#ifdef SCYTHE_ORIENTATION_Z
+		dst->m[8] = -forward.x;
+		dst->m[9] = -forward.y;
+		dst->m[10] = -forward.z;
+#else
 		dst->m[8] = side.x;
 		dst->m[9] = side.y;
 		dst->m[10] = side.z;
+#endif
 		dst->m[11] = 0.0f;
 
 		dst->m[12] = 0.0f;
@@ -821,6 +811,7 @@ namespace scythe {
 	{
 		SC_ASSERT(dst);
 
+		// Use +Y as up
 		dst->x = m[4];
 		dst->y = m[5];
 		dst->z = m[6];
@@ -830,6 +821,7 @@ namespace scythe {
 	{
 		SC_ASSERT(dst);
 		
+		// Use -Y as down
 		dst->x = -m[4];
 		dst->y = -m[5];
 		dst->z = -m[6];
@@ -839,36 +831,68 @@ namespace scythe {
 	{
 		SC_ASSERT(dst);
 
+#ifdef SCYTHE_ORIENTATION_Z
+		// Use -X as left
 		dst->x = -m[0];
 		dst->y = -m[1];
 		dst->z = -m[2];
+#else
+		// Use -Z as left
+		dst->x = -m[8];
+		dst->y = -m[9];
+		dst->z = -m[10];
+#endif
 	}
 
 	void Matrix4::GetRightVector(Vector3* dst) const
 	{
 		SC_ASSERT(dst);
 
+#ifdef SCYTHE_ORIENTATION_Z
+		// Use +X as right
 		dst->x = m[0];
 		dst->y = m[1];
 		dst->z = m[2];
+#else
+		// Use +Z as right
+		dst->x = m[8];
+		dst->y = m[9];
+		dst->z = m[10];
+#endif
 	}
 
 	void Matrix4::GetForwardVector(Vector3* dst) const
 	{
 		SC_ASSERT(dst);
 
+#ifdef SCYTHE_ORIENTATION_Z
+		// Use -Z as forward
 		dst->x = -m[8];
 		dst->y = -m[9];
 		dst->z = -m[10];
+#else
+		// Use +X as forward
+		dst->x = m[0];
+		dst->y = m[1];
+		dst->z = m[2];
+#endif
 	}
 
 	void Matrix4::GetBackVector(Vector3* dst) const
 	{
 		SC_ASSERT(dst);
 
+#ifdef SCYTHE_ORIENTATION_Z
+		// Use +Z as backward
 		dst->x = m[8];
 		dst->y = m[9];
 		dst->z = m[10];
+#else
+		// Use -X as backward
+		dst->x = -m[0];
+		dst->y = -m[1];
+		dst->z = -m[2];
+#endif
 	}
 
 	bool Matrix4::Invert()
