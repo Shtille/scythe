@@ -375,4 +375,15 @@ namespace scythe {
 		this->max.z = newMax.z;
 	}
 
+	void BoundingBox::Prepare()
+	{
+		Set(Vector3(GetFloatInfinity()), Vector3(-GetFloatInfinity()));
+	}
+
+	void BoundingBox::AddPoint(const Vector3& point)
+	{
+		min.MakeMinimum(point);
+		max.MakeMaximum(point);
+	}
+
 } // namespace scythe

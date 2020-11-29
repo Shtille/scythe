@@ -62,6 +62,44 @@ namespace scythe {
 		return m;
 	}
 
+	void Matrix3::CreateBasis(const Vector3& x_axis, const Vector3& y_axis, Matrix3* dst)
+	{
+		//      |	f[0]   u[0]   s[0]   |
+		//  M = |	f[1]   u[1]   s[1]   |
+		//      |   f[2]   u[2]   s[2]   |
+		SC_ASSERT(dst);
+		Vector3 forward, up, side;
+		x_axis.Normalize(&forward);
+		Vector3::Cross(x_axis, y_axis, &side);
+		side.Normalize();
+		Vector3::Cross(side, forward, &up);
+		up.Normalize();
+
+#ifdef SCYTHE_ORIENTATION_Z
+		dst->m[0] = side.x;
+		dst->m[1] = side.y;
+		dst->m[2] = side.z;
+#else
+		dst->m[0] = forward.x;
+		dst->m[1] = forward.y;
+		dst->m[2] = forward.z;
+#endif
+
+		dst->m[3] = up.x;
+		dst->m[4] = up.y;
+		dst->m[5] = up.z;
+
+#ifdef SCYTHE_ORIENTATION_Z
+		dst->m[6] = -forward.x;
+		dst->m[7] = -forward.y;
+		dst->m[8] = -forward.z;
+#else
+		dst->m[6] = side.x;
+		dst->m[7] = side.y;
+		dst->m[8] = side.z;
+#endif
+	}
+
 	void Matrix3::CreateRotation(const Quaternion& q, Matrix3* dst)
 	{
 		SC_ASSERT(dst);

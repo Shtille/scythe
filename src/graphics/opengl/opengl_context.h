@@ -77,6 +77,7 @@ namespace scythe {
 		void Uniform2i(U32 program, const char *name, int x, int y);
 		void Uniform3i(U32 program, const char *name, int x, int y, int z);
 		void Uniform4i(U32 program, const char *name, int x, int y, int z, int w);
+		void Uniform1iv(U32 program, const char *name, const int *v, int n);
 		void Uniform1f(U32 program, const char *name, float x);
 		void Uniform2f(U32 program, const char *name, float x, float y);
 		void Uniform3f(U32 program, const char *name, float x, float y, float z);

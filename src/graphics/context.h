@@ -124,6 +124,7 @@ namespace scythe {
 		virtual void Uniform2i(U32 program, const char *name, int x, int y) = 0;
 		virtual void Uniform3i(U32 program, const char *name, int x, int y, int z) = 0;
 		virtual void Uniform4i(U32 program, const char *name, int x, int y, int z, int w) = 0;
+		virtual void Uniform1iv(U32 program, const char *name, const int *v, int n) = 0;
 		virtual void Uniform1f(U32 program, const char *name, float x) = 0;
 		virtual void Uniform2f(U32 program, const char *name, float x, float y) = 0;
 		virtual void Uniform3f(U32 program, const char *name, float x, float y, float z) = 0;

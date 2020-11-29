@@ -20,6 +20,7 @@ namespace scythe {
 		void Uniform2i(const char *name, int x, int y);
 		void Uniform3i(const char *name, int x, int y, int z);
 		void Uniform4i(const char *name, int x, int y, int z, int w);
+		void Uniform1iv(const char *name, const int *v, int n);
 		void Uniform1f(const char *name, float x);
 		void Uniform2f(const char *name, float x, float y);
 		void Uniform3f(const char *name, float x, float y, float z);

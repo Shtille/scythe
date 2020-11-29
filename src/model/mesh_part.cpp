@@ -58,8 +58,8 @@ namespace scythe {
 					memcpy(ptr, v.position, sizeof(v.position));
 					if (bounding_box)
 					{
-						bounding_box->min.MakeFloor(v.position);
-						bounding_box->max.MakeCeil(v.position);
+						bounding_box->min.MakeMinimum(v.position);
+						bounding_box->max.MakeMaximum(v.position);
 					}
 					break;
 				case VertexAttribute::kNormal:

@@ -1,6 +1,7 @@
 #include "mesh.h"
 
 #include "common/log.h"
+#include "math/constants.h"
 
 #include "mesh_part.h"
 #include "material.h"
@@ -64,7 +65,7 @@ namespace scythe {
 			material.dissolve = obj_material.dissolve;
 		}
 
-		Vector3 min = Vector3(1e8), max = Vector3(-1e8);
+		Vector3 min(GetFloatInfinity()), max(-GetFloatInfinity());
 
 		// Make unique mesh per material per shape
 		typedef std::map<int, std::unique_ptr<MeshPart> > MaterialMap;
@@ -120,8 +121,8 @@ namespace scythe {
 					if (idx.texcoord_index != -1)
 						memcpy(&vertex.texcoord, &attrib.texcoords[2*idx.texcoord_index], 2 * sizeof(float));
 
-					min.MakeFloor(vertex.position);
-					max.MakeCeil(vertex.position);
+					min.MakeMinimum(vertex.position);
+					max.MakeMaximum(vertex.position);
 
 					mesh->vertices_.push_back(vertex);
 					// Indices isn't necessary

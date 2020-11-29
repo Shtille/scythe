@@ -24,6 +24,15 @@ namespace scythe {
 	static const float kFloatEpsilon = 1e-7f;
 	static const double kDoubleEpsilon = 1e-15;
 
+	/**
+	 * Returns float infinity. Can be positive and negative.
+	 */
+	const float GetFloatInfinity();
+	/**
+	 * Returns double infinity. Can be positive and negative.
+	 */
+	const double GetDoubleInfinity();
+
 } // namespace scythe
 
 #endif

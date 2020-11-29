@@ -375,14 +375,14 @@ public:
 	 *
 	 * @param other The vector to compare to.
 	 */
-	void MakeFloor(const Vector3& other);
+	void MakeMinimum(const Vector3& other);
 
 	/**
 	 * Takes component-wise maximum (ceil) value from original and given one.
 	 *
 	 * @param other The vector to compare to.
 	 */
-	void MakeCeil(const Vector3& other);
+	void MakeMaximum(const Vector3& other);
 
 	/**
 	 * Calculates the sum of this vector with the given vector.

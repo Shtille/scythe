@@ -4,6 +4,7 @@
 #include "material.h"
 #include "graphics/renderer.h"
 #include "filesystem/filename.h"
+#include "math/constants.h"
 
 #include "common/sc_assert.h"
 
@@ -70,7 +71,7 @@ namespace scythe {
 		if (!has_bounds_)
 		{
 			// Set initial values for bounding box
-			bounding_box_.Set(Vector3(1e8), Vector3(-1e8));
+			bounding_box_.Set(Vector3(GetFloatInfinity()), Vector3(-GetFloatInfinity()));
 			bounding_box_ptr = &bounding_box_;
 		}
 

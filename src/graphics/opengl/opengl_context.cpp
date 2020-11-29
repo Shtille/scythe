@@ -301,6 +301,12 @@ namespace scythe {
 		assert(location != -1);
 		glUniform1i(location, x);
 	}
+	void OpenGlContext::Uniform1iv(U32 program, const char *name, const int *v, int n)
+	{
+		GLint location = glGetUniformLocation(program, name);
+		assert(location != -1);
+		glUniform1iv(location, n, v);
+	}
 	void OpenGlContext::Uniform2i(U32 program, const char *name, int x, int y)
 	{
 		GLint location = glGetUniformLocation(program, name);

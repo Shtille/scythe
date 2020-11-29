@@ -342,14 +342,14 @@ namespace scythe {
 		}
 	}
 
-	void Vector3::MakeFloor(const Vector3& other)
+	void Vector3::MakeMinimum(const Vector3& other)
 	{
 		if (other.x < x) x = other.x;
 		if (other.y < y) y = other.y;
 		if (other.z < z) z = other.z;
 	}
 
-	void Vector3::MakeCeil(const Vector3& other)
+	void Vector3::MakeMaximum(const Vector3& other)
 	{
 		if (other.x > x) x = other.x;
 		if (other.y > y) y = other.y;

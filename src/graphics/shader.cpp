@@ -42,6 +42,10 @@ namespace scythe {
 	{
 		context_->Uniform4i(program_, name, x, y, z, w);
 	}
+	void Shader::Uniform1iv(const char *name, const int *v, int n)
+	{
+		context_->Uniform1iv(program_, name, v, n);
+	}
 	void Shader::Uniform1f(const char *name, float x)
 	{
 		context_->Uniform1f(program_, name, x);

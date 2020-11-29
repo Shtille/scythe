@@ -227,6 +227,19 @@ public:
 	 */
 	void Transform(const Matrix4& matrix);
 
+
+	/**
+	 * Prepares for calculation (sets min and max to infinite values).
+	 */
+	void Prepare();
+
+	/**
+	 * Adds point to bounding box for calculation.
+	 *
+	 * @param point The point to be added.
+	 */
+	void AddPoint(const Vector3& point);
+
 	/**
 	 * Transforms this bounding box by the given matrix.
 	 * 

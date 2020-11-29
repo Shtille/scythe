@@ -102,6 +102,15 @@ public:
 	static const Matrix3& Zero();
 
 	/**
+	 * Creates a matrix basis from the axis.
+	 *
+	 * @param x_axis A X-direction axis. May not have unit length.
+	 * @param y_axis A Y-direction axis. Could be not orthonormal to x-axis. May not have unit length.
+	 * @param dst A matrix to store the result in.
+	 */
+	static void CreateBasis(const Vector3& x_axis, const Vector3& y_axis, Matrix3* dst);
+
+	/**
 	 * Creates a rotation matrix from the specified quaternion.
 	 *
 	 * @param quat A quaternion describing a 3D orientation.
