@@ -495,7 +495,7 @@ namespace scythe {
 	bool Matrix3::Invert(Matrix3* dst) const
 	{
 		float p0 = m[4] * m[8] - m[7] * m[5];
-		float p1 = m[5] * m[6] - m[3] * m[7];
+		float p1 = m[5] * m[6] - m[3] * m[8];
 		float p2 = m[3] * m[7] - m[4] * m[6];
 
 		float det = m[0] * p0 + m[1] * p1 + m[2] * p2;
