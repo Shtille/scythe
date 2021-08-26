@@ -77,6 +77,7 @@ namespace scythe {
 		void ChangeRenderTarget(Texture* colorRT, Texture* depthRT);
 		virtual void GenerateMipmap(Texture* texture) = 0;
 		virtual void CopyToTexture(Texture* texture, U32 layer = 0) = 0;
+		virtual void SetTextureData(Texture* texture, int x, int y, int width, int height, const void* pixels) = 0;
 
 		// Vertex format functions
 		virtual void AddVertexFormat(VertexFormat* &vf, VertexAttribute *attribs, U32 nAttribs) = 0;

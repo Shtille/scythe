@@ -738,6 +738,19 @@ namespace scythe {
 		ChangeTexture(texture, layer);
 		glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, texture->width_, texture->height_);
 	}
+	void OpenGlRenderer::SetTextureData(Texture* texture, int x, int y, int width, int height, const void* pixels)
+	{
+		SC_ASSERT(texture->target_ == GL_TEXTURE_2D);
+
+		glBindTexture(texture->target_, texture->texture_id_);
+		glTexSubImage2D(texture->target_, 0, x, y, width, height, texture->GetSrcFormat(), texture->GetSrcType(), pixels);
+
+		Texture * curtex = current_textures_[current_image_unit_];
+		if (curtex != nullptr)
+			glBindTexture(curtex->target_, curtex->texture_id_);
+		
+		context_->CheckForErrors();
+	}
 	void OpenGlRenderer::AddVertexFormat(VertexFormat* &vf, VertexAttribute *attribs, U32 nAttribs)
 	{
 		// Try to find same format

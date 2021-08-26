@@ -35,11 +35,6 @@ int DesktopMainWrapper(int, const char**)
 
 			while (!PlatformNeedQuit())
 			{
-				// Render a frame
-				app->BeginFrame();
-				app->Render();
-				app->EndFrame();
-
 				// Update physics
 				time_physics_curr = clock.GetTime();
 				app->UpdatePhysics(time_physics_curr - time_physics_prev);
@@ -59,6 +54,11 @@ int DesktopMainWrapper(int, const char**)
 
 					app->Update();
 				}
+
+				// Render a frame
+				app->BeginFrame();
+				app->Render();
+				app->EndFrame();
 			}
 		}
 		app->Unload(); // delete allocated objects (may be allocated partially)

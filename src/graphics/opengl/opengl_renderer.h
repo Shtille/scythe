@@ -24,6 +24,7 @@ namespace scythe {
 		void ChangeRenderTargetsToCube(U8 nTargets, Texture* *colorRTs, Texture* depthRT, int face, int level);
 		void GenerateMipmap(Texture* texture);
 		void CopyToTexture(Texture* texture, U32 layer = 0);
+		void SetTextureData(Texture* texture, int x, int y, int width, int height, const void* pixels);
 
 		void AddVertexFormat(VertexFormat* &vf, VertexAttribute *attribs, U32 nAttribs);
 		void ChangeVertexFormat(VertexFormat* vf);
