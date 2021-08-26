@@ -743,12 +743,9 @@ namespace scythe {
 	{
 		SC_ASSERT(texture->target_ == GL_TEXTURE_2D);
 
-		glBindTexture(texture->target_, texture->texture_id_);
+		ChangeTexture(texture, 0U);
 		glTexSubImage2D(texture->target_, 0, x, y, width, height, texture->GetSrcFormat(), texture->GetSrcType(), pixels);
-
-		Texture * curtex = current_textures_[current_image_unit_];
-		if (curtex != nullptr)
-			glBindTexture(curtex->target_, curtex->texture_id_);
+		glGenerateMipmap(texture->target_);
 		
 		context_->CheckForErrors();
 	}
