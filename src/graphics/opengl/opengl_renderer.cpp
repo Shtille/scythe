@@ -4,6 +4,7 @@
 #include "opengl_include.h"
 
 #include "stream/file_stream.h"
+#include "common/sc_assert.h"
 
 #include <string>
 #include <algorithm>
@@ -406,7 +407,7 @@ namespace scythe {
 	}
 	void OpenGlRenderer::AddRenderTarget(Texture* &texture, int w, int h, Image::Format fmt, Texture::Filter filt, Texture::Wrap wrap)
 	{
-		assert(w > 0 && h > 0 && w <= GL_MAX_RENDERBUFFER_SIZE && h <= GL_MAX_RENDERBUFFER_SIZE);
+		SC_ASSERT(w > 0 && h > 0 && w <= GL_MAX_RENDERBUFFER_SIZE && h <= GL_MAX_RENDERBUFFER_SIZE);
 
 		texture = new OpenGlTexture();
 		texture->width_ = w;
@@ -449,7 +450,7 @@ namespace scythe {
 	}
 	void OpenGlRenderer::AddRenderDepthStencil(Texture* &texture, int w, int h, U32 depthSize, U32 stencilSize)
 	{
-		assert(w > 0 && h > 0 && w <= GL_MAX_RENDERBUFFER_SIZE && h <= GL_MAX_RENDERBUFFER_SIZE && (depthSize > 0 || stencilSize > 0));
+		SC_ASSERT(w > 0 && h > 0 && w <= GL_MAX_RENDERBUFFER_SIZE && h <= GL_MAX_RENDERBUFFER_SIZE && (depthSize > 0 || stencilSize > 0));
 
 		texture = new OpenGlTexture();
 		texture->width_ = w;
@@ -492,7 +493,7 @@ namespace scythe {
 	}
 	void OpenGlRenderer::DeleteTexture(Texture* texture)
 	{
-		assert(texture);
+		SC_ASSERT(texture);
 		ApiDeleteTexture(texture);
 		auto it = std::find(textures_.begin(), textures_.end(), texture);
 		if (it != textures_.end())
@@ -816,7 +817,7 @@ namespace scythe {
 	}
 	void OpenGlRenderer::DeleteVertexBuffer(VertexBuffer* vb)
 	{
-		assert(vb);
+		SC_ASSERT(vb);
 		auto it = std::find(vertex_buffers_.begin(), vertex_buffers_.end(), vb);
 		if (it != vertex_buffers_.end())
 		{
@@ -841,7 +842,7 @@ namespace scythe {
 	}
 	void OpenGlRenderer::DeleteIndexBuffer(IndexBuffer* ib)
 	{
-		assert(ib);
+		SC_ASSERT(ib);
 		auto it = std::find(index_buffers_.begin(), index_buffers_.end(), ib);
 		if (it != index_buffers_.end())
 		{
@@ -862,7 +863,7 @@ namespace scythe {
 	}
 	void OpenGlRenderer::DeleteShader(Shader* shader)
 	{
-		assert(shader);
+		SC_ASSERT(shader);
 		auto it = std::find(shaders_.begin(), shaders_.end(), shader);
 		if (it != shaders_.end())
 		{
@@ -912,7 +913,7 @@ namespace scythe {
 	}
 	void OpenGlRenderer::DeleteFont(Font* font)
 	{
-		assert(font);
+		SC_ASSERT(font);
 		auto it = std::find(fonts_.begin(), fonts_.end(), font);
 		if (it != fonts_.end())
 		{
