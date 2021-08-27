@@ -7,6 +7,9 @@
 
 namespace scythe {
 
+	// Forward declarations
+	class Allocator;
+
 	//! Image class
 	class Image {
 	public:
@@ -34,6 +37,7 @@ namespace scythe {
 		};
 
 		Image();
+		Image(Allocator * allocator);
 		Image(const Image& other);
 		~Image();
 
@@ -97,6 +101,11 @@ namespace scythe {
 
 	private:
 
+		void AllocatePixels(const size_t allocation_size);
+		void FreePixels();
+		void ReallocatePixels(const size_t allocation_size);
+
+		Allocator * allocator_; //!< pointer to allocator instance
 		U8 *pixels_;		//!< bytes of the source image
 		Format format_;		//!< pixel format of the source image
 		DataType data_type_;//!< type of pixel data of the source image

@@ -1,10 +1,10 @@
 #ifndef __SCYTHE_POOL_ALLOCATOR_H__
 #define __SCYTHE_POOL_ALLOCATOR_H__
 
+#include "allocator.h"
 #include "stack_linked_list.h"
 
 #include <vector>
-#include <cstddef>
 
 namespace scythe {
 
@@ -12,7 +12,7 @@ namespace scythe {
 	 * Pool allocator.
 	 * Allocates memory blocks with constant size.
 	 */
-	class PoolAllocator {
+	class PoolAllocator final : public Allocator {
 
 		typedef StackLinkedList::Node Node;
 
@@ -36,14 +36,14 @@ namespace scythe {
 		 *
 		 * @param[in] allocation_size Size of memory block
 		 */
-		void * Allocate(const size_t allocation_size);
+		void * Allocate(const size_t allocation_size) final;
 
 		/**
 		 * Releases block of memory that was allocated previously
 		 *
 		 * @param[in] ptr Pointer to block of memory
 		 */
-		void Free(void * ptr);
+		void Free(void * ptr) final;
 
 	private:
 

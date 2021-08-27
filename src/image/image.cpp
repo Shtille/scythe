@@ -1,6 +1,8 @@
 #include "image.h"
 
 #include "filesystem/filename.h"
+#include "memory/allocator.h"
+#include "common/sc_assert.h"
 
 #include <assert.h>
 #include <math.h>
@@ -111,12 +113,20 @@ namespace scythe {
 		return Image::FileFormat::kUnknown;
 	}
 	Image::Image()
-	: pixels_(nullptr)
+	: allocator_(nullptr)
+	, pixels_(nullptr)
+	, inverted_row_order_(true)
+	{
+	}
+	Image(Allocator * allocator)
+	: allocator_(allocator)
+	, pixels_(nullptr)
 	, inverted_row_order_(true)
 	{
 	}
 	Image::Image(const Image& other)
-	: pixels_(nullptr)
+	: allocator_(other.allocator_)
+	, pixels_(nullptr)
 	, format_(other.format_)
 	, data_type_(other.data_type_)
 	, width_(other.width_)
@@ -125,13 +135,36 @@ namespace scythe {
 	, bpp_(other.bpp_)
 	, inverted_row_order_(other.inverted_row_order_)
 	{
+		// Copy pixels
 		size_t size = static_cast<size_t>(width_ * height_ * bpp_);
-		pixels_ = new U8[size];
+		AllocatePixels(size);
 		memcpy(pixels_, other.pixels_, size);
 	}
 	Image::~Image()
 	{
-		if (pixels_) delete[] pixels_;
+		FreePixels();
+	}
+	void Image::AllocatePixels(const size_t allocation_size)
+	{
+		if (allocator_ != nullptr)
+			pixels_ = reinterpret_cast<U8*>(allocator_->Allocate(allocation_size));
+		else
+			pixels_ = new U8[allocation_size];
+	}
+	void Image::FreePixels()
+	{
+		if (allocator_ != nullptr)
+			allocator_->Free(reinterpret_cast<void*>(pixels_));
+		else if (pixels_)
+		{
+			delete[] pixels_;
+		}
+		pixels_ = nullptr;
+	}
+	void Image::ReallocatePixels(const size_t allocation_size)
+	{
+		FreePixels();
+		AllocatePixels(allocation_size);
 	}
 	void Image::SetRowOrder(bool inverted)
 	{
@@ -181,8 +214,7 @@ namespace scythe {
 		int bpp = GetBpp(fmt);
 		bpp_ = bpp >> 3; // bits to bytes
 		channels_ = GetChannels(fmt);
-		if (pixels_) delete[] pixels_;
-		pixels_ = new U8[width_ * height_ * bpp_];
+		ReallocatePixels(width_ * height_ * bpp_);
 		return pixels_;
 	}
 	void Image::FillWithZeroes()
@@ -191,9 +223,8 @@ namespace scythe {
 	}
 	void Image::Copy(const Image& other)
 	{
-		if (pixels_) delete[] pixels_;
 		size_t size = static_cast<size_t>(width_ * height_ * bpp_);
-		pixels_ = new U8[size];
+		ReallocatePixels(size);
 		memcpy(pixels_, other.pixels_, size);
 		format_ = other.format_;
 		data_type_ = other.data_type_;
@@ -367,6 +398,8 @@ namespace scythe {
 		if (!LoadFromFile(filename))
 			return false;
 
+		SC_ASSERT(allocator_ == nullptr);
+
 		int new_bpp = 3;
 		U8 * new_pixels = new U8[width_ * height_ * new_bpp];
 
@@ -451,6 +484,8 @@ namespace scythe {
 	{
 		if (!LoadFromFile(filename))
 			return false;
+
+		SC_ASSERT(allocator_ == nullptr);
 
 		int new_bpp = 4;
 		U8 * new_pixels = new U8[width_ * height_ * new_bpp];
