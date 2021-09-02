@@ -1,13 +1,17 @@
 # Makefile
 
-ROOT_PATH = ../..
-LIBRARY_PATH := $(ROOT_PATH)/lib
+TARGET_PATH := bin
+STATIC_LIB_EXT = .a
 # Platform-specific defines
 ifeq ($(OS),Windows_NT)
 	# Windows
+	ROOT_PATH = $(shell cd)\\..\\..
+	LIBRARY_PATH := $(ROOT_PATH)\\lib
 	LDFLAGS = -s -mwindows
 	TARGET_EXT = .exe
 else
+	ROOT_PATH = $(shell pwd)/../..
+	LIBRARY_PATH := $(ROOT_PATH)/lib
 	LDFLAGS =
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Linux)
@@ -22,7 +26,7 @@ endif
 
 TARGET = scythe_test
 TARGET_NAME = scythe_test
-TARGET_FILE = $(TARGET_NAME)$(TARGET_EXT)
+TARGET_FILE = $(TARGET_PATH)/$(TARGET_NAME)$(TARGET_EXT)
 
 INCLUDE = \
 	-I$(ROOT_PATH)/scythe/include \
@@ -51,6 +55,12 @@ $(shell mkdir -p $(dir $(OBJECTS)) >/dev/null)
 $(shell mkdir -p $(dir $(DEPS)) >/dev/null)
 endif
 
+ifeq ($(OS),Windows_NT)
+	CREATE_BIN_DIR = if not exist $(TARGET_PATH) mkdir $(TARGET_PATH)
+else
+	CREATE_BIN_DIR = test -d $(TARGET_PATH) || mkdir -p $(TARGET_PATH)
+endif
+
 # User library dependencies
 DEPENDENT_LIBRARIES = scythe
 DEPENDENT_LIB_FILES = $(foreach name,$(DEPENDENT_LIBRARIES),$(patsubst %,$(LIBRARY_PATH)/lib%$(STATIC_LIB_EXT),$(name)))
@@ -64,7 +74,7 @@ CPPFLAGS += $(INCLUDE)
 CPPFLAGS += $(DEFINES)
 # linker flags
 LDFLAGS += -L$(LIBRARY_PATH)
-LDLIBS = -lscythe -lstdc++ -lfreetype -ljpeg -lpng -lz
+LDLIBS = -lgoogletest -lscythe -lstdc++ -lfreetype -ljpeg -lpng -lz
 # flags required for dependency generation; passed to compilers
 DEPFLAGS = -MT $@ -MD -MP -MF $(DEPDIR)/$*.Td
 
@@ -97,7 +107,10 @@ clean:
 help:
 	@echo available targets: all clean
 
-$(TARGET): $(TARGET_FILE)
+create_bin_dir:
+	@$(CREATE_BIN_DIR)
+
+$(TARGET): create_bin_dir $(TARGET_FILE)
 
 $(TARGET_FILE): $(OBJECTS) $(DEPENDENT_LIB_FILES)
 	@echo linking $(TARGET_NAME)$(TARGET_EXT)

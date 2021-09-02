@@ -118,7 +118,7 @@ namespace scythe {
 	, inverted_row_order_(true)
 	{
 	}
-	Image(Allocator * allocator)
+	Image::Image(Allocator * allocator)
 	: allocator_(allocator)
 	, pixels_(nullptr)
 	, inverted_row_order_(true)
