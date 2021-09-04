@@ -1,17 +1,24 @@
-# Makefile
+# Makefile for scythe tests
+
+ifeq ($(LIBRARY_PATH),)
+	$(error LIBRARY_PATH should be set by parent makefile with absolute path)
+endif
 
 TARGET_PATH := bin
-STATIC_LIB_EXT = .a
+SCYTHE_PATH = ..
+THIRDPARTY_PATH = ../../thirdparty
+
+STATIC_LIB_EXT := .a
 # Platform-specific defines
 ifeq ($(OS),Windows_NT)
 	# Windows
-	ROOT_PATH = $(shell cd)\\..\\..
-	LIBRARY_PATH := $(ROOT_PATH)\\lib
+	#ROOT_PATH = $(shell cd)\\..\\..
+	#LIBRARY_PATH := $(ROOT_PATH)\\lib
 	LDFLAGS = -s -mwindows
 	TARGET_EXT = .exe
 else
-	ROOT_PATH = $(shell pwd)/../..
-	LIBRARY_PATH := $(ROOT_PATH)/lib
+	#ROOT_PATH = $(shell pwd)/../..
+	#LIBRARY_PATH := $(ROOT_PATH)/lib
 	LDFLAGS =
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Linux)
@@ -24,14 +31,15 @@ else
 	endif
 endif
 
-TARGET = scythe_test
-TARGET_NAME = scythe_test
+# 'TARGET' should coinside with directory name
+TARGET = tests
+TARGET_NAME = scythe_tests
 TARGET_FILE = $(TARGET_PATH)/$(TARGET_NAME)$(TARGET_EXT)
 
 INCLUDE = \
-	-I$(ROOT_PATH)/scythe/include \
-	-I$(ROOT_PATH)/scythe/src \
-	-I$(ROOT_PATH)/thirdparty/googletest/include
+	-I$(SCYTHE_PATH)/include \
+	-I$(SCYTHE_PATH)/src \
+	-I$(THIRDPARTY_PATH)/googletest/include
 DEFINES = 
 
 include sources.mk
@@ -110,6 +118,7 @@ help:
 create_bin_dir:
 	@$(CREATE_BIN_DIR)
 
+.PHONY: $(TARGET)
 $(TARGET): create_bin_dir $(TARGET_FILE)
 
 $(TARGET_FILE): $(OBJECTS) $(DEPENDENT_LIB_FILES)

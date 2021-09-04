@@ -111,6 +111,10 @@ uninstall:
 help:
 	@echo available targets: all clean
 
+.PHONY: tests
+tests:
+	@$(MAKE) -C $@ $@
+
 $(TARGET): $(TARGET_FILE)
 
 $(TARGET_FILE): $(OBJECTS)
