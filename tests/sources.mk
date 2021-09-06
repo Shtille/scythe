@@ -1,5 +1,6 @@
 
 SRC_DIRS = \
+	containers \
 	memory
 
 SRC_FILES = $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.cpp))

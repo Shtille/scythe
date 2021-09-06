@@ -18,6 +18,7 @@ namespace scythe {
 	 */
 	template <class T>
 	class StlPoolAllocator {
+		static constexpr std::size_t kDefaultNumChunks = 40;
 	public:
 
 		// Type definitions
@@ -28,6 +29,7 @@ namespace scythe {
 		typedef const T& const_reference;
 		typedef std::size_t    size_type;
 		typedef std::ptrdiff_t difference_type;
+		using propagate_on_container_move_assignment = std::true_type;
 
 		/**
 		 * Structure to rebind allocator to another type
@@ -57,7 +59,7 @@ namespace scythe {
 		 * Default constructor
 		 */
 		StlPoolAllocator() throw()
-		: allocator_(40)
+		: allocator_(kDefaultNumChunks)
 		{
 		}
 
@@ -66,8 +68,33 @@ namespace scythe {
 		 *
 		 * @param[in] num_chunks Number of chunks per buffer
 		 */
-		StlPoolAllocator(std::size_t num_chunks) throw()
+		explicit StlPoolAllocator(std::size_t num_chunks) throw()
 		: allocator_(num_chunks)
+		{
+		}
+
+		/**
+		 * Copy constructor
+		 */
+		StlPoolAllocator(const StlPoolAllocator<T>& other) throw()
+		: allocator_(other.allocator_)
+		{
+		}
+
+		/**
+		 * Move constructor
+		 */
+		StlPoolAllocator(StlPoolAllocator<T>&& other) throw()
+		: allocator_(std::move(other.allocator_))
+		{
+		}
+
+		/**
+		 * Copy constructor from other type
+		 */
+		template <typename U>
+		StlPoolAllocator(const StlPoolAllocator<U>& other) throw()
+		: allocator_(other.get_inner_allocator())
 		{
 		}
 
@@ -122,6 +149,11 @@ namespace scythe {
 		{
 		   allocator_.Free((void*)p);
 		   //::operator delete((void*)p);
+		}
+
+		const PoolAllocator & get_inner_allocator() const
+		{
+			return allocator_;
 		}
 
 	private:

@@ -14,6 +14,7 @@ SRC_DIRS = \
 	src/input \
 	src/math \
 	src/math/geometry \
+	src/memory \
 	src/scene \
 	src/stream \
 	src/tasks \

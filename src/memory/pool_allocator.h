@@ -26,6 +26,20 @@ namespace scythe {
 		PoolAllocator(const size_t num_chunks);
 
 		/**
+		 * Copy constructor
+		 *
+		 * @param[in] other Other allocator.
+		 */
+		PoolAllocator(const PoolAllocator& other);
+
+		/**
+		 * Move constructor
+		 *
+		 * @param[in] other Other allocator.
+		 */
+		PoolAllocator(PoolAllocator&& other);
+
+		/**
 		 * Destructor
 		 */
 		~PoolAllocator();
@@ -45,14 +59,26 @@ namespace scythe {
 		 */
 		void Free(void * ptr) final;
 
+		/**
+		 * Returns number of chunks
+		 */
+		size_t num_chunks() const;
+
 	private:
+
+		/**
+		 * Disallow default constructor
+		 */
+		PoolAllocator() = delete;
 
 		unsigned char* AllocateBuffer();
 		
 		size_t num_chunks_;
-		size_t total_size_;
 		size_t chunk_size_;
+#ifdef SCYTHE_MEMORY_DEBUG
+		size_t total_size_;
 		size_t used_;
+#endif
 		StackLinkedList free_list_;
 		std::vector<unsigned char*> buffers_;
 	};

@@ -26,6 +26,15 @@ namespace scythe {
 		}
 
 		/**
+		 * Move constructor
+		 */
+		StackLinkedList(StackLinkedList&& other)
+		: head_(other.head_)
+		{
+			other.head_ = nullptr;
+		}
+
+		/**
 		 * Pushes new node to top of the list
 		 *
 		 * @param[in] new_node A new node
@@ -54,7 +63,7 @@ namespace scythe {
 		/**
 		 * Disallow copy
 		 */
-		StackLinkedList(StackLinkedList &stackLinkedList) = delete;
+		StackLinkedList(const StackLinkedList& stackLinkedList) = delete;
 
 		Node * head_;
 	};
