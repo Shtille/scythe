@@ -25,6 +25,91 @@ namespace scythe {
 			T data;
 		};
 
+		/**
+		 * Defines predicate for matching data
+		 */
+		struct DataMatchPredicate {
+			DataMatchPredicate(const T& data)
+			: data_(data)
+			{
+			}
+			bool operator()(const T& data)
+			{
+				return data_ == data;
+			}
+			const T& data_; // hold data reference
+		};
+
+	public:
+
+		/**
+		 * Defines iterator class.
+		 */
+		class Iterator {
+			friend class List;
+
+			Iterator()
+			: node_(nullptr)
+			{
+			}
+			Iterator(Node * node)
+			: node_(node)
+			{
+			}
+		public:
+			Iterator(const Iterator& other)
+			: node_(other.node_)
+			{
+			}
+			Iterator& operator =(const Iterator& other)
+			{
+				node_ = other.node_;
+				return *this;
+			}
+			bool operator ==(const Iterator& other)
+			{
+				return node_ == other.node_;
+			}
+			bool operator !=(const Iterator& other)
+			{
+				return node_ != other.node_;
+			}
+			Iterator& operator ++() // prefix increment
+			{
+				SC_ASSERT(node_ != nullptr);
+				node_ = node_->next;
+				return *this;
+			}
+			void operator ++(int) // postfix increment
+			{
+				SC_ASSERT(node_ != nullptr);
+				node_ = node_->next;
+			}
+			Iterator& operator --() // prefix decrement
+			{
+				SC_ASSERT(node_ != nullptr);
+				node_ = node_->prev;
+				return *this;
+			}
+			void operator --(int) // postfix decrement
+			{
+				SC_ASSERT(node_ != nullptr);
+				node_ = node_->prev;
+			}
+			T& operator *()
+			{
+				SC_ASSERT(node_ != nullptr);
+				return node_->data;
+			}
+			T& operator ->()
+			{
+				SC_ASSERT(node_ != nullptr);
+				return node_->data;
+			}
+		private:
+			Node * node_;
+		};
+
 	public:
 
 		/**
@@ -107,19 +192,34 @@ namespace scythe {
 		}
 
 		/**
+		 * Returns iterator to the first element.
+		 * 
+		 * @return Returns iterator to the first element.
+		 */
+		Iterator begin()
+		{
+			return Iterator(head_);
+		}
+
+		/**
+		 * Returns iterator to the end.
+		 * 
+		 * @return Returns iterator to the end.
+		 */
+		static Iterator end()
+		{
+			return Iterator(nullptr);
+		}
+
+		/**
 		 * Returns front element.
 		 * 
 		 * @return Returns front element or nullptr.
 		 */
 		T front() const
 		{
-			if (head_ != nullptr)
-				return head_->data;
-			else
-			{
-				SC_ASSERT("Calling front() on an empty container.");
-				return T();
-			}
+			SC_ASSERT(head_ != nullptr && "Calling front() on an empty container.");
+			return head_->data;
 		}
 
 		/**
@@ -129,13 +229,8 @@ namespace scythe {
 		 */
 		T back() const
 		{
-			if (tail_ != nullptr)
-				return tail_->data;
-			else
-			{
-				SC_ASSERT("Calling back() on an empty container.");
-				return T();
-			}
+			SC_ASSERT(tail_ != nullptr && "Calling back() on an empty container.");
+			return tail_->data;
 		}
 
 		/**
@@ -309,6 +404,114 @@ namespace scythe {
 			std::swap(size_, other.size_);
 			std::swap(allocator_, other.allocator_);
 			std::swap(owns_allocator_, other.owns_allocator_);
+		}
+
+		/**
+		 * Inserts element before the selected position.
+		 * 
+		 * @param[in] pos  The position to insert before.
+		 * @param[in] data The data to insert.
+		 */
+		void insert(Iterator pos, const T& data)
+		{
+			if (pos.node_ == nullptr)
+			{
+				push_back(data);
+				return;
+			}
+
+			Node * node = _allocate_node();
+			node->data = data;
+			node->prev = pos.node_->prev;
+			node->next = pos.node_;
+			if (pos.node_->prev != nullptr)
+				pos.node_->prev->next = node;
+			pos.node_->prev = node;
+			if (pos.node_ == head_)
+				head_ = node;
+			++size_;
+		}
+
+		/**
+		 * Erases element at selected position.
+		 * 
+		 * @param[in] pos  The position to erase.
+		 * 
+		 * @return Returns iterator to the next element.
+		 */
+		Iterator erase(Iterator pos)
+		{
+			Node * node = pos.node_;
+			if (node == nullptr)
+				return Iterator(nullptr);
+
+			Iterator next_iterator(node->next);
+			if (node->prev)
+				node->prev->next = node->next;
+			if (node->next)
+				node->next->prev = node->prev;
+			if (head_ == node)
+				head_ = node->next;
+			if (tail_ == node)
+				tail_ = node->prev;
+			_free_node(node);
+			--size_;
+			return next_iterator;
+		}
+
+		/**
+		 * Removes all elements matching passed one.
+		 * 
+		 * @param[in] data The data to match with.
+		 */
+		void remove(const T& data)
+		{
+			DataMatchPredicate predicate(data);
+			remove_if(predicate);
+		}
+
+		/**
+		 * Removes all elements matching predicate.
+		 * 
+		 * @param[in] predicate The predicate to be matched with.
+		 */
+		template <class UnaryPredicate>
+		void remove_if(UnaryPredicate predicate)
+		{
+			Node * node = head_;
+			while (node != nullptr)
+			{
+				if (predicate(node->data))
+				{
+					// Remove node
+					Iterator it = erase(Iterator(node));
+					node = it.node_;
+				}
+				else
+					node = node->next;
+			}
+		}
+
+		/**
+		 * Finds first element in the list mathing data.
+		 * 
+		 * @param[in] data The data to match with.
+		 * 
+		 * @return Returns iterator to found element or iterator to the end otherwise.
+		 */
+		Iterator find(const T& data)
+		{
+			DataMatchPredicate predicate(data);
+			Node * node = head_;
+			while (node != nullptr)
+			{
+				if (predicate(node->data))
+				{
+					return Iterator(node);
+				}
+				node = node->next;
+			}
+			return Iterator(nullptr);
 		}
 
 	private:

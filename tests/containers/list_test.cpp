@@ -84,6 +84,73 @@ TEST_F(ListWithDefaultAllocatorTest, PopBack)
 	EXPECT_EQ(list->size(), 0U);
 }
 
+TEST_F(ListWithDefaultAllocatorTest, Insert)
+{
+	int value1 = 1;
+	int value2 = 2;
+	int value3 = 3;
+	list->insert(list->end(), value1);
+	EXPECT_EQ(list->size(), 1U);
+	EXPECT_EQ(list->front(), value1);
+
+	list->insert(list->begin(), value2);
+	EXPECT_EQ(list->size(), 2U);
+	EXPECT_EQ(list->front(), value2);
+
+	list->insert(list->end(), value3);
+	EXPECT_EQ(list->size(), 3U);
+	EXPECT_EQ(list->back(), value3);
+}
+
+TEST_F(ListWithDefaultAllocatorTest, Erase)
+{
+	int value1 = 1;
+	int value2 = 2;
+	int value3 = 3;
+	list->push_back(value1);
+	list->push_back(value2);
+	list->push_back(value3);
+
+	auto it = list->erase(list->begin());
+	EXPECT_EQ(list->size(), 2U);
+	EXPECT_EQ(list->front(), value2);
+	EXPECT_EQ(*it, value2);
+
+	it = list->erase(list->begin());
+	EXPECT_EQ(list->size(), 1U);
+	EXPECT_EQ(list->back(), value3);
+	EXPECT_EQ(*it, value3);
+}
+
+TEST_F(ListWithDefaultAllocatorTest, Remove)
+{
+	int value1 = 1;
+	int value2 = 2;
+	int value3 = 3;
+	list->push_back(value1);
+	list->push_back(value2);
+	list->push_back(value3);
+
+	list->remove(value2);
+	EXPECT_EQ(list->size(), 2U);
+	EXPECT_EQ(list->front(), value1);
+	EXPECT_EQ(list->back(), value3);
+}
+
+TEST_F(ListWithDefaultAllocatorTest, Find)
+{
+	int value1 = 1;
+	int value2 = 2;
+	int value3 = 3;
+	list->push_back(value1);
+	list->push_back(value2);
+	list->push_back(value3);
+
+	auto it = list->find(value2);
+	EXPECT_EQ(list->size(), 3U);
+	EXPECT_EQ(*it, value2);
+}
+
 
 /**
  * The same test, but with pool allocator

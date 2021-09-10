@@ -111,13 +111,8 @@ namespace scythe {
 		 */
 		T front() const
 		{
-			if (head_ != nullptr)
-				return head_->data;
-			else
-			{
-				SC_ASSERT("Calling front() on an empty container.");
-				return T();
-			}
+			SC_ASSERT(head_ != nullptr && "Calling front() on an empty container.");
+			return head_->data;
 		}
 
 		/**
