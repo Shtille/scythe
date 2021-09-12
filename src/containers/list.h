@@ -212,22 +212,22 @@ namespace scythe {
 		}
 
 		/**
-		 * Returns front element.
+		 * Gets the first element.
 		 * 
-		 * @return Returns front element or nullptr.
+		 * @return Returns reference to the first element.
 		 */
-		T front() const
+		T& front() const
 		{
 			SC_ASSERT(head_ != nullptr && "Calling front() on an empty container.");
 			return head_->data;
 		}
 
 		/**
-		 * Returns back element.
+		 * Gets the last element.
 		 * 
-		 * @return Returns back element or nullptr.
+		 * @return Returns reference to the last element.
 		 */
-		T back() const
+		T& back() const
 		{
 			SC_ASSERT(tail_ != nullptr && "Calling back() on an empty container.");
 			return tail_->data;

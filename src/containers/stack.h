@@ -1,5 +1,5 @@
-#ifndef __SCYTHE_FORWARD_LIST_H__
-#define __SCYTHE_FORWARD_LIST_H__
+#ifndef __SCYTHE_STACK_H__
+#define __SCYTHE_STACK_H__
 
 #include "common/sc_assert.h"
 #include "memory/default_allocator.h"
@@ -9,13 +9,13 @@
 namespace scythe {
 
 	/**
-	 * Defines forward list container. Implemented as single linked list.
+	 * Defines stack container. Implemented as single linked list.
 	 * Move semantics should be defined for used type.
 	 * If no allocator is provided, default allocator's new/delete allocation/deallocation routine is used.
 	 * Note: copy operations require additional allocations.
 	 */
 	template <typename T, class AllocatorType = DefaultAllocator>
-	class ForwardList {
+	class Stack {
 
 		/**
 		 * Defines single list node that holds data.
@@ -30,7 +30,7 @@ namespace scythe {
 		/**
 		 * Default constructor.
 		 */
-		ForwardList()
+		Stack()
 		: head_(nullptr)
 		, allocator_(new AllocatorType())
 		, size_(0U)
@@ -43,7 +43,7 @@ namespace scythe {
 		 * 
 		 * @param[in] allocator The allocator to be used to allocate nodes.
 		 */
-		ForwardList(AllocatorType * allocator)
+		Stack(AllocatorType * allocator)
 		: head_(nullptr)
 		, allocator_(allocator)
 		, size_(0U)
@@ -55,9 +55,9 @@ namespace scythe {
 		 * Copy constructor.
 		 * If other does not own allocator both will share it.
 		 * 
-		 * @param[in] other The other list.
+		 * @param[in] other The other stack.
 		 */
-		ForwardList(const ForwardList& other)
+		Stack(const Stack& other)
 		{
 			_set_by_copy(other);
 		}
@@ -65,9 +65,9 @@ namespace scythe {
 		/**
 		 * Move constructor.
 		 * 
-		 * @param[in] other The other list.
+		 * @param[in] other The other stack.
 		 */
-		ForwardList(ForwardList && other)
+		Stack(Stack && other)
 		{
 			_set_by_move(std::forward(other));
 		}
@@ -75,7 +75,7 @@ namespace scythe {
 		/**
 		 * Destructor.
 		 */
-		~ForwardList()
+		~Stack()
 		{
 			clear();
 			if (owns_allocator_)
@@ -85,9 +85,9 @@ namespace scythe {
 		/**
 		 * Copy assignment.
 		 * 
-		 * @param[in] other The other list.
+		 * @param[in] other The other stack.
 		 */
-		ForwardList& operator =(const ForwardList& other)
+		Stack& operator =(const Stack& other)
 		{
 			_set_by_copy(other);
 			return *this;
@@ -96,27 +96,27 @@ namespace scythe {
 		/**
 		 * Move assignment.
 		 * 
-		 * @param[in] other The other list.
+		 * @param[in] other The other stack.
 		 */
-		ForwardList& operator =(ForwardList && other)
+		Stack& operator =(Stack && other)
 		{
 			_set_by_move(std::forward(other));
 			return *this;
 		}
 
 		/**
-		 * Gets the first element.
+		 * Gets the top element.
 		 * 
-		 * @return Returns reference to the first element.
+		 * @return Returns reference to the top element.
 		 */
-		T& front() const
+		T& top() const
 		{
-			SC_ASSERT(head_ != nullptr && "Calling front() on an empty container.");
+			SC_ASSERT(head_ != nullptr && "Calling top() on an empty container.");
 			return head_->data;
 		}
 
 		/**
-		 * Checks if list is empty.
+		 * Checks if stack is empty.
 		 * 
 		 * @return Returns true if empty and false otherwise.
 		 */
@@ -126,9 +126,9 @@ namespace scythe {
 		}
 
 		/**
-		 * Returns number of list elements.
+		 * Returns number of stack elements.
 		 * 
-		 * @return Returns list size.
+		 * @return Returns stack size.
 		 */
 		size_t size() const
 		{
@@ -136,35 +136,25 @@ namespace scythe {
 		}
 
 		/**
-		 * Returns number of list elements.
-		 * 
-		 * @return Returns list size.
-		 */
-		size_t length() const
-		{
-			return size_;
-		}
-
-		/**
-		 * Clears list.
+		 * Clears stack.
 		 * Data move constructor is used for data destruction.
 		 */
 		void clear()
 		{
 			while (size_ != 0U)
 			{
-				T data(std::move(front()));
-				pop_front();
+				T data(std::move(top()));
+				pop();
 			}
 		}
 
 		/**
-		 * Pushes data to the beginning of the list.
+		 * Pushes data to the top of the stack.
 		 * Version that copies data.
 		 * 
 		 * @param[in] data The data.
 		 */
-		void push_front(const T& data)
+		void push(const T& data)
 		{
 			Node * node = _allocate_node();
 			node->data = data;
@@ -174,12 +164,12 @@ namespace scythe {
 		}
 
 		/**
-		 * Pushes data to the beginning of the list.
+		 * Pushes data to the top of the stack.
 		 * Version that moves data.
 		 * 
 		 * @param[in] data The data.
 		 */
-		void push_front(T&& data)
+		void push(T&& data)
 		{
 			Node * node = _allocate_node();
 			node->data = std::move(data);
@@ -189,9 +179,9 @@ namespace scythe {
 		}
 
 		/**
-		 * Removes element from the beginning of the list.
+		 * Removes element from the top of the stack.
 		 */
-		void pop_front()
+		void pop()
 		{
 			Node * node = head_;
 			if (node)
@@ -203,11 +193,11 @@ namespace scythe {
 		}
 
 		/**
-		 * Swaps list with other one.
+		 * Swaps stack with other one.
 		 * 
-		 * @param[in] other The other list.
+		 * @param[in] other The other stack.
 		 */
-		void swap(ForwardList & other)
+		void swap(Stack & other)
 		{
 			std::swap(head_, other.head_);
 			std::swap(size_, other.size_);
@@ -225,7 +215,7 @@ namespace scythe {
 		{
 			allocator_->Free(reinterpret_cast<void*>(node));
 		}
-		void _set_by_copy(const ForwardList& other)
+		void _set_by_copy(const Stack& other)
 		{
 			head_ = nullptr;
 			size_ = 0U;
@@ -241,7 +231,7 @@ namespace scythe {
 				// Allocate storage for nodes
 				Node ** nodes = new Node*[other_size];
 
-				// Copy other list nodes
+				// Copy other stack nodes
 				int i = 0;
 				Node * other_node = other.head_;
 				while (other_node != nullptr)
@@ -259,7 +249,7 @@ namespace scythe {
 				delete[] nodes;
 			}
 		}
-		void _set_by_move(ForwardList && other)
+		void _set_by_move(Stack && other)
 		{
 			// Copy other fields
 			head_ = other.head_;
