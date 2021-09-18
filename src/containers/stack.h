@@ -58,6 +58,10 @@ namespace scythe {
 		 * @param[in] other The other stack.
 		 */
 		Stack(const Stack& other)
+		: head_(nullptr)
+		, allocator_(nullptr)
+		, size_(0U)
+		, owns_allocator_(false)
 		{
 			_set_by_copy(other);
 		}
@@ -68,6 +72,10 @@ namespace scythe {
 		 * @param[in] other The other stack.
 		 */
 		Stack(Stack && other)
+		: head_(nullptr)
+		, allocator_(nullptr)
+		, size_(0U)
+		, owns_allocator_(false)
 		{
 			_set_by_move(std::forward(other));
 		}
@@ -77,9 +85,7 @@ namespace scythe {
 		 */
 		~Stack()
 		{
-			clear();
-			if (owns_allocator_)
-				delete allocator_;
+			_clean();
 		}
 
 		/**
@@ -215,8 +221,15 @@ namespace scythe {
 		{
 			allocator_->Free(reinterpret_cast<void*>(node));
 		}
+		void _clean()
+		{
+			clear();
+			if (owns_allocator_)
+				delete allocator_;
+		}
 		void _set_by_copy(const Stack& other)
 		{
+			_clean();
 			head_ = nullptr;
 			size_ = 0U;
 			owns_allocator_ = other.owns_allocator_;
@@ -251,6 +264,7 @@ namespace scythe {
 		}
 		void _set_by_move(Stack && other)
 		{
+			_clean();
 			// Copy other fields
 			head_ = other.head_;
 			allocator_ = other.allocator_;

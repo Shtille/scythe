@@ -68,7 +68,7 @@ namespace scythe {
 				--ptr_;
 				return *this;
 			}
-			void operator --(int) // postfix decrement
+			Iterator operator --(int) // postfix decrement
 			{
 				SC_ASSERT(ptr_ != nullptr);
 				Iterator it(ptr_);
@@ -124,6 +124,11 @@ namespace scythe {
 		 * @param[in] other The other array.
 		 */
 		Array(const Array& other)
+		: buffer_(nullptr)
+		, allocator_(nullptr)
+		, buffer_size_(0U)
+		, size_(0U)
+		, owns_allocator_(false)
 		{
 			_set_by_copy(other);
 		}
@@ -134,6 +139,11 @@ namespace scythe {
 		 * @param[in] other The other array.
 		 */
 		Array(Array && other)
+		: buffer_(nullptr)
+		, allocator_(nullptr)
+		, buffer_size_(0U)
+		, size_(0U)
+		, owns_allocator_(false)
 		{
 			_set_by_move(std::forward(other));
 		}
@@ -143,12 +153,7 @@ namespace scythe {
 		 */
 		~Array()
 		{
-			clear();
-			if (buffer_ != nullptr)
-			{
-				_free_buffer(buffer_);
-				buffer_ = nullptr;
-			}
+			_clean();
 		}
 
 		/**
@@ -410,8 +415,24 @@ namespace scythe {
 		{
 			allocator_->Free(reinterpret_cast<void*>(buffer));
 		}
+		void _clean()
+		{
+			clear();
+			if (buffer_ != nullptr)
+			{
+				_free_buffer(buffer_);
+				buffer_ = nullptr;
+			}
+			buffer_size_ = 0U;
+			if (owns_allocator_)
+			{
+				delete allocator_;
+				allocator_ = nullptr;
+			}
+		}
 		void _set_by_copy(const Array& other)
 		{
+			_clean();
 			owns_allocator_ = other.owns_allocator_;
 			if (other.owns_allocator_)
 				allocator_ = new AllocatorType();
@@ -431,6 +452,7 @@ namespace scythe {
 		}
 		void _set_by_move(Array && other)
 		{
+			_clean();
 			// Copy other fields
 			buffer_ = other.buffer_;
 			allocator_ = other.allocator_;

@@ -145,6 +145,11 @@ namespace scythe {
 		 * @param[in] other The other list.
 		 */
 		List(const List& other)
+		: head_(nullptr)
+		, tail_(nullptr)
+		, allocator_(nullptr)
+		, size_(0U)
+		, owns_allocator_(false)
 		{
 			_set_by_copy(other);
 		}
@@ -155,6 +160,11 @@ namespace scythe {
 		 * @param[in] other The other list.
 		 */
 		List(List && other)
+		: head_(nullptr)
+		, tail_(nullptr)
+		, allocator_(nullptr)
+		, size_(0U)
+		, owns_allocator_(false)
 		{
 			_set_by_move(std::forward(other));
 		}
@@ -164,9 +174,7 @@ namespace scythe {
 		 */
 		~List()
 		{
-			clear();
-			if (owns_allocator_)
-				delete allocator_;
+			_clean();
 		}
 
 		/**
@@ -524,8 +532,15 @@ namespace scythe {
 		{
 			allocator_->Free(reinterpret_cast<void*>(node));
 		}
+		void _clean()
+		{
+			clear();
+			if (owns_allocator_)
+				delete allocator_;
+		}
 		void _set_by_copy(const List& other)
 		{
+			_clean();
 			head_ = nullptr;
 			tail_ = nullptr;
 			size_ = 0U;
@@ -545,6 +560,7 @@ namespace scythe {
 		}
 		void _set_by_move(List && other)
 		{
+			_clean();
 			// Copy other fields
 			head_ = other.head_;
 			tail_ = other.tail_;
