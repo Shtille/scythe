@@ -380,7 +380,11 @@ namespace scythe {
 				kDirty      = 0x01,
 				kCollision  = 0x02,
 				kRegistered = 0x04,
-				kRemove     = 0x08
+				kRemove     = 0x08,
+				/**
+				 * Duplicates events with kCollision status
+				 */
+				kDuplicate  = 0x10
 			};
 		};
 
@@ -449,7 +453,7 @@ namespace scythe {
 		~PhysicsController();
 
 		// Adds the given collision listener for the two given collision objects.
-		void AddCollisionListener(PhysicsCollisionObject::CollisionListener * listener, PhysicsCollisionObject * objectA, PhysicsCollisionObject * objectB);
+		void AddCollisionListener(PhysicsCollisionObject::CollisionListener * listener, PhysicsCollisionObject * objectA, PhysicsCollisionObject * objectB, bool duplicate = false);
 
 		// Removes the given collision listener.
 		void RemoveCollisionListener(PhysicsCollisionObject::CollisionListener * listener, PhysicsCollisionObject * objectA, PhysicsCollisionObject * objectB);

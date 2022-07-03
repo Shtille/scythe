@@ -216,7 +216,7 @@ namespace scythe {
 		 * @param listener The listener to add.
 		 * @param object Optional collision object used to filter the collision event.
 		 */
-		void AddCollisionListener(CollisionListener* listener, PhysicsCollisionObject* object = NULL);
+		void AddCollisionListener(CollisionListener* listener, PhysicsCollisionObject* object = NULL, bool duplicate = false);
 
 		/**
 		 * Removes a collision listener.

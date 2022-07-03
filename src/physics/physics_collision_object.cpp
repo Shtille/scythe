@@ -135,11 +135,11 @@ namespace scythe {
 		}
 	}
 
-	void PhysicsCollisionObject::AddCollisionListener(CollisionListener* listener, PhysicsCollisionObject* object)
+	void PhysicsCollisionObject::AddCollisionListener(CollisionListener* listener, PhysicsCollisionObject* object, bool duplicate)
 	{
 		PhysicsController * controller = PhysicsController::GetInstance();
 		SC_ASSERT(controller);
-		controller->AddCollisionListener(listener, this, object);
+		controller->AddCollisionListener(listener, this, object, duplicate);
 	}
 
 	void PhysicsCollisionObject::RemoveCollisionListener(CollisionListener* listener, PhysicsCollisionObject* object)

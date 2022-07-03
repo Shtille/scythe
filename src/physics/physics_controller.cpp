@@ -553,7 +553,8 @@ namespace scythe {
 		}
 
 		// Fire collision event.
-		if ((collisionInfo->status & CollisionStatus::kCollision) == 0)
+		if ((collisionInfo->status & CollisionStatus::kCollision) == 0 ||
+			(collisionInfo->status & CollisionStatus::kDuplicate) != 0)
 		{
 			std::vector<PhysicsCollisionObject::CollisionListener*>::const_iterator iter = collisionInfo->listeners.begin();
 			for (; iter != collisionInfo->listeners.end(); iter++)
@@ -574,7 +575,7 @@ namespace scythe {
 		collisionInfo->status |= CollisionStatus::kCollision;
 		return 0.0f;
 	}
-	void PhysicsController::AddCollisionListener(PhysicsCollisionObject::CollisionListener* listener, PhysicsCollisionObject* objectA, PhysicsCollisionObject* objectB)
+	void PhysicsController::AddCollisionListener(PhysicsCollisionObject::CollisionListener* listener, PhysicsCollisionObject* objectA, PhysicsCollisionObject* objectB, bool duplicate)
 	{
 		SC_ASSERT(listener);
 		
@@ -586,6 +587,8 @@ namespace scythe {
 		CollisionInfo& info = collision_status_[pair];
 		info.listeners.push_back(listener);
 		info.status |= CollisionStatus::kRegistered;
+		if (duplicate)
+			info.status |= CollisionStatus::kDuplicate;
 	}
 	void PhysicsController::RemoveCollisionListener(PhysicsCollisionObject::CollisionListener* listener, PhysicsCollisionObject* objectA, PhysicsCollisionObject* objectB)
 	{
