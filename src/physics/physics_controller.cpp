@@ -516,11 +516,21 @@ namespace scythe {
 		// during the previous frame. Otherwise, it's a new pair, so add a
 		// new entry to the cache with the appropriate listeners and notify them.
 		PhysicsCollisionObject::CollisionPair pair(objectA, objectB);
+		PhysicsCollisionObject::CollisionPair pair_a_null(objectA, nullptr);
+		PhysicsCollisionObject::CollisionPair pair_b_null(objectB, nullptr);
 
 		CollisionInfo * collisionInfo;
 		if (controller_->collision_status_.count(pair) > 0)
 		{
 			collisionInfo = &controller_->collision_status_[pair];
+		}
+		else if(controller_->collision_status_.count(pair_a_null) > 0)
+		{
+			collisionInfo = &controller_->collision_status_[pair_a_null];
+		}
+		else if(controller_->collision_status_.count(pair_b_null) > 0)
+		{
+			collisionInfo = &controller_->collision_status_[pair_b_null];
 		}
 		else
 		{
