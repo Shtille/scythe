@@ -562,8 +562,10 @@ namespace scythe {
 				SC_ASSERT(*iter);
 				if ((collisionInfo->status & CollisionStatus::kRemove) == 0)
 				{
-					(*iter)->CollisionEvent(PhysicsCollisionObject::CollisionListener::kColliding, pair, Vector3(cp.getPositionWorldOnA().x(), cp.getPositionWorldOnA().y(), cp.getPositionWorldOnA().z()),
-						Vector3(cp.getPositionWorldOnB().x(), cp.getPositionWorldOnB().y(), cp.getPositionWorldOnB().z()));
+					// PositionA == PositionB + ContactNormal * Distance
+					(*iter)->CollisionEvent(PhysicsCollisionObject::CollisionListener::kColliding, pair, 
+						Vector3(cp.m_positionWorldOnB.x(), cp.m_positionWorldOnB.y(), cp.m_positionWorldOnB.z()),
+						Vector3(cp.m_normalWorldOnB.x(), cp.m_normalWorldOnB.y(), cp.m_normalWorldOnB.z()));
 				}
 			}
 		}
