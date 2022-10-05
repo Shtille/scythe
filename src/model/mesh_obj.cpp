@@ -2,6 +2,7 @@
 
 #include "common/log.h"
 #include "math/constants.h"
+#include "containers/array.h"
 
 #include "mesh_part.h"
 #include "material.h"
@@ -69,7 +70,8 @@ namespace scythe {
 
 		// Make unique mesh per material per shape
 		typedef std::map<int, std::unique_ptr<MeshPart> > MaterialMap;
-		std::vector< MaterialMap > shape_meshes;
+		// std::vector usage will produce C2280 error on MSVC 2017+ compiler due to the bug in Standard itself
+		scythe::Array< MaterialMap > shape_meshes;
 
 		// Loop over shapes
 		for (const auto& shape : shapes)
@@ -78,7 +80,7 @@ namespace scythe {
 				continue;
 
 			// Push an empty map at the beginning
-			shape_meshes.push_back(MaterialMap());
+			shape_meshes.push_back(std::move(MaterialMap()));
 
 			// Loop over faces
 			size_t index_offset = 0;

@@ -9,7 +9,7 @@
 namespace scythe {
 
 	/**
-	 * Defines list container. Implemented as double linked list.
+	 * Defines array container (analog of std::vector).
 	 * Move semantics should be defined for used type.
 	 * If no allocator is provided, default new/delete allocation/deallocation routine is used.
 	 */
