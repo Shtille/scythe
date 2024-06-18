@@ -14,7 +14,7 @@ public:
 	typedef std::list<Pair> List;
 	typedef std::unordered_map<Key, std::list<Pair>::iterator> Map;
 
-	explicit LruCache(size_t max_size)
+	explicit LruCache(std::size_t max_size)
 	: max_size_(max_size)
 	{
 	}
@@ -67,7 +67,7 @@ public:
 		return map_.find(key) != map_.end();
 	}
 	
-	size_t size() const
+	std::size_t size() const
 	{
 		return map_.size();
 	}
@@ -75,7 +75,7 @@ public:
 private:
 	List list_;
 	Map map_;
-	size_t max_size_;
+	std::size_t max_size_;
 };
 
 template<typename Value>
@@ -84,7 +84,7 @@ public:
 	typedef std::list<Value> List;
 	typedef std::unordered_set<std::list<Value>::iterator> Set;
 
-	explicit LruCacheSet(size_t max_size)
+	explicit LruCacheSet(std::size_t max_size)
 	: max_size_(max_size)
 	{
 	}
@@ -117,7 +117,7 @@ public:
 		set_.clear();
 	}
 	
-	size_t size() const
+	std::size_t size() const
 	{
 		return set_.size();
 	}
@@ -125,7 +125,7 @@ public:
 private:
 	List list_;
 	Set set_;
-	size_t max_size_;
+	std::size_t max_size_;
 };
 
 } // namespace scythe

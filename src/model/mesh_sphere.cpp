@@ -4,6 +4,8 @@
 
 #include "math/constants.h"
 
+#include <cmath>
+
 namespace scythe {
 
 	void Mesh::CreateSphere(float radius, U32 slices, U32 loops)

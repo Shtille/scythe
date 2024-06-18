@@ -28,6 +28,7 @@
 #endif
 
 #include <cmath>
+#include <algorithm>
 
 namespace scythe {
 

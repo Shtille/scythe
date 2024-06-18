@@ -1,7 +1,7 @@
 #ifndef __SCYTHE_CRYPT_H__
 #define __SCYTHE_CRYPT_H__
 
-#include <cstddef>
+#include "common/types.h"
 
 namespace scythe {
 	

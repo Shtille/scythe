@@ -14,7 +14,7 @@ namespace scythe {
         button_down_table_[MouseButton::kLeft] = false;
         button_down_table_[MouseButton::kMiddle] = false;
         button_down_table_[MouseButton::kRight] = false;
-        SC_ASSERT(button_down_table_.size() == (size_t)MouseButton::kCount);
+        SC_ASSERT(button_down_table_.size() == (std::size_t)MouseButton::kCount);
     }
     Mouse::~Mouse()
     {

@@ -13,7 +13,7 @@ namespace scythe {
 	template <typename ... Args>
 	std::string string_format(const char* format, Args ... args)
 	{
-		size_t size = snprintf(nullptr, 0, format, args ...);
+		std::size_t size = snprintf(nullptr, 0, format, args ...);
 		std::string result(size, '\0');
 		snprintf(&result[0], size + 1, format, args ...); // buffer should hold extra space for '\0'
 		return result;
@@ -25,7 +25,7 @@ namespace scythe {
 	template <typename ... Args>
 	std::string string_format(const std::string& format, Args ... args)
 	{
-		size_t size = snprintf(nullptr, 0, format.c_str(), args ...);
+		std::size_t size = snprintf(nullptr, 0, format.c_str(), args ...);
 		std::string result(size, '\0');
 		snprintf(&result[0], size + 1, format.c_str(), args ...); // buffer should hold extra space for '\0'
 		return result;

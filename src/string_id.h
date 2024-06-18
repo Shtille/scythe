@@ -2,7 +2,7 @@
 #define __SCYTHE_STRING_ID_H__
 
 #include <cstring>
-#include <cstdint>
+#include <stdint.h>
 
 namespace scythe {
 

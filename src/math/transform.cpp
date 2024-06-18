@@ -54,8 +54,8 @@ namespace scythe {
 		if (suspend_transform_changed_ == 1)
 		{
 			// Call TransformChanged() on all transforms in the list
-			size_t transformCount = transforms_changed_.size();
-			for (size_t i = 0; i < transformCount; i++)
+			std::size_t transformCount = transforms_changed_.size();
+			for (std::size_t i = 0; i < transformCount; i++)
 			{
 				Transform* t = transforms_changed_.at(i);
 				SC_ASSERT(t);
@@ -65,7 +65,7 @@ namespace scythe {
 			// Go through list and reset DIRTY_NOTIFY bit. The list could potentially be larger here if the 
 			// transforms we were delaying calls to transformChanged() have any child nodes.
 			transformCount = transforms_changed_.size();
-			for (size_t i = 0; i < transformCount; i++)
+			for (std::size_t i = 0; i < transformCount; i++)
 			{
 				Transform* t = transforms_changed_.at(i);
 				SC_ASSERT(t);
