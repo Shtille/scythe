@@ -1,7 +1,7 @@
 #ifndef __SCYTHE_PLATFORM_H__
 #define __SCYTHE_PLATFORM_H__
 
-#if defined(_WIN32) // Windows
+#if defined(_WIN32) || defined(_WIN64) // Windows
 
 	#define SCYTHE_TARGET_WINDOWS
 

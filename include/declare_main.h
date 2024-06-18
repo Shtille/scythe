@@ -56,7 +56,7 @@ return r;												\
 }
 
 #else
-# error Main function hasn't been declared for this platform.
+# error "Main function has not been declared for this platform."
 #endif
 
 #endif

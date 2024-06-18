@@ -48,7 +48,7 @@ struct PlatformWindow {
 #elif defined(SCYTHE_TARGET_UNIX)
 	// TODO:
 #else
- #error PlatformWindow hasn't been implemented for this platform.
+ #error "PlatformWindow has not been implemented for this platform."
 #endif
 	bool need_quit;
 };
