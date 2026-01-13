@@ -15,6 +15,7 @@ set(PUBLIC_HEADERS
 	./include/scythe/graphics_provider.h
 	./include/scythe/keyboard.h
 	./include/scythe/keyboard_controller.h
+	./include/scythe/log.h
 	./include/scythe/logics_controller.h
 	./include/scythe/main.h
 	./include/scythe/mouse.h
@@ -46,6 +47,7 @@ set(SRC_FILES
 	./src/time/time_manager.cpp
 	./src/time/timer.cpp
 	./src/endianness.cpp
+	./src/log.cpp
 	./src/resource_manager.cpp
 	./src/string_id.cpp
 )
