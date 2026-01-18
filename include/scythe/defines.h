@@ -2,6 +2,7 @@
 #define __SCYTHE_DEFINES_H__
 
 // Attribute defines
+#define SCYTHE_NO_DISCARD [[nodiscard]]
 #define SCYTHE_DEPRECATED [[deprecated]]
 #define SCYTHE_MAYBE_UNUSED [[maybe_unused]]
 #define SCYTHE_UNUSED(x) (void)(x)

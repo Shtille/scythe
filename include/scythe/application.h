@@ -11,6 +11,12 @@
 namespace scythe {
 
 	// Forward declarations
+	class Application;
+	namespace platform {
+		struct Data;
+		Data* GetData(Application*);
+		const Data* GetData(const Application*);
+	}
 	class GraphicsProvider;
 
 	/**
@@ -21,12 +27,25 @@ namespace scythe {
 	, public Expandable<Application>
 	{
 		friend class ManagedSingleton<Application>;
+		friend platform::Data* platform::GetData(Application*);
+		friend const platform::Data* platform::GetData(const Application*);
 
 	public:
 		int Run(int argc, char const** argv);
 		void Terminate(); //!< terminates application
 
+		/**
+		 * @brief      Initializes the object.
+		 * @details    Initializes application and window parameters and necessary controllers.
+		 *
+		 * @return     True on success and false otherwise.
+		 */
 		virtual bool Initialize() = 0;
+
+		/**
+		 * @brief      Deinitializes the object.
+		 * @details    Function is called whenever initialize succeeded.
+		 */
 		virtual void Deinitialize() = 0;
 
 		const float GetFrameTime() const; //!< returns fixed frame time (1 / fps desired)
@@ -39,7 +58,6 @@ namespace scythe {
 		virtual const char* GetTitle() const;
 		virtual const float GetDesiredFrameRate() const; //!< average frame rate for application that we desire
 		virtual const bool IsBenchmark() const;
-		virtual const bool IsMultisample() const;
 
 	public:
 		void Show();
@@ -68,6 +86,9 @@ namespace scythe {
 		LogicsController* logics_controller_;		//!< logics controller (optional)
 		bool need_quit_;
 		uint8_t pad[3];
+
+	private:
+		void* platform_data_;						//!< platform data for inner usage
 	};
 
 } // namespace scythe

@@ -5,13 +5,21 @@
 
 #ifdef SCYTHE_TARGET_WINDOWS
 
-	#ifdef _MSC_VER
-	#include <SDKDDKVer.h>
+	// We don't need all the fancy stuff
+	#ifndef NOMINMAX
+	# define NOMINMAX
 	#endif
 
-	#define WIN32_LEAN_AND_MEAN				// Exclude rarely-used stuff from Windows headers
-	#ifndef NOMINMAX
-	# define NOMINMAX 1						// We don't want these annoying defines
+	#ifndef VC_EXTRALEAN
+	# define VC_EXTRALEAN
+	#endif
+
+	#ifndef WIN32_LEAN_AND_MEAN
+	# define WIN32_LEAN_AND_MEAN
+	#endif
+
+	#ifdef _MSC_VER
+	# include <SDKDDKVer.h>
 	#endif
 
 	#include <Windows.h>

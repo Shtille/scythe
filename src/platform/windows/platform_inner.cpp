@@ -4,8 +4,9 @@
 #include <Windowsx.h> // for GET_X_LPARAM
 
 #include <scythe/desktop_application.h>
+#include <scythe/log.h>
 
-#include "platform_window.h"
+#include "platform_data.h"
 
 #ifndef WM_MOUSEHWHEEL // It isn't defined on MinGW platform
 # define WM_MOUSEHWHEEL 0x020E
@@ -20,7 +21,8 @@
 # undef RemoveDirectory
 #endif // RemoveDirectory
 
-static constexpr char* kApplicationClassName = "scythe";
+static constexpr char* kMainWindowClassName = "scythe-window";
+static constexpr char* kHelperWindowClassName = "scythe-helper-window";
 
 // Translates Windows key modifiers to engine ones
 static scythe::KeyModifiers TranslateKeyboardModifiers(void)
@@ -85,11 +87,13 @@ static scythe::KeyboardKey TranslateKey(WPARAM wParam, LPARAM lParam)
 static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	scythe::DesktopApplication* desktop_app = scythe::DesktopApplication::GetInstance();
-	scythe::PlatformWindow* window = scythe::platform::GetPlatformWindow(desktop_app);
+	scythe::platform::Data* data = scythe::platform::GetData(desktop_app);
+	scythe::platform::Window* window = data->main_window;
 	scythe::KeyboardState& keyboard_state = desktop_app->GetKeyboardState();
 	scythe::MouseState& mouse_state = desktop_app->GetMouseState();
 	scythe::KeyboardController* keyboard_controller = desktop_app->GetKeyboardController();
 	scythe::MouseController* mouse_controller = desktop_app->GetMouseController();
+	scythe::WindowController* window_controller = desktop_app->GetWindowController();
 
 	switch (uMsg)
 	{
@@ -120,9 +124,14 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		return 0;
 
 	case WM_SETFOCUS: // Got focus
+		window->base.active = true;
+		if (window_controller)
+			window_controller->OnGetFocus();
 		return 0;
-	case WM_KILLFOCUS: // Focus is lost, so minimize the window
-		scythe::platform::window::MakeWindowed();
+	case WM_KILLFOCUS: // Focus is lost
+		window->base.active = false;
+		if (window_controller)
+			window_controller->OnLostFocus();
 		return 0;
 
 	case WM_SIZE:	// Size Action Has Taken Place
@@ -130,10 +139,14 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		{
 		case SIZE_MINIMIZED:
 			window->base.visible = false;
+			if (window_controller)
+				window_controller->OnMinimized();
 			return 0;
 
 		case SIZE_MAXIMIZED:
 			window->base.visible = true;
+			if (window_controller)
+				window_controller->OnMaximized();
 			return 0;
 
 		case SIZE_RESTORED:
@@ -144,7 +157,8 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 			window->base.width = width;
 			window->base.height = height;
 			window->base.aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
-			desktop_app->OnSize(width, height);
+			if (window_controller)
+				window_controller->OnResize(width, height);
 			return 0;
 		}
 		}
@@ -287,49 +301,8 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
 	return ::DefWindowProc(hWnd, uMsg, wParam, lParam);	// Pass Unhandled Messages
 }
-
-static inline scythe::PlatformWindow* GetPlatformWindow()
+static void AdjustWindowedAppearance(scythe::platform::Window* window, scythe::DesktopApplication* app, bool windowed)
 {
-	scythe::DesktopApplication* desktop_app = scythe::DesktopApplication::GetInstance();
-	return scythe::platform::GetPlatformWindow(desktop_app);
-}
-static inline void FillWindowParameters(scythe::DesktopApplication* app, scythe::PlatformWindow* window)
-{
-	window->base.width = app->GetInitialWidth();
-	window->base.height = app->GetInitialHeight();
-	window->base.aspect_ratio = static_cast<float>(window->base.width) / static_cast<float>(window->base.height);
-	window->base.visible = false;
-	window->base.fullscreen = app->GetInitialFullscreen();
-	window->old_mouse_position = { 0 };
-}
-static void AdjustVideoSettings()
-{
-	scythe::DesktopApplication* app = scythe::DesktopApplication::GetInstance();
-	scythe::PlatformWindow* window = scythe::platform::GetPlatformWindow(app);
-
-	window->current_state.style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-	window->current_state.ex_style = WS_EX_APPWINDOW;
-
-	window->current_state.rect.left = 0;
-	window->current_state.rect.top = 0;
-	window->current_state.rect.right = window->base.width;
-	window->current_state.rect.bottom = window->base.height;
-
-	bool windowed = true;
-	if (window->base.fullscreen)	// Fullscreen Requested, Try Changing Video Modes
-	{
-		if (!scythe::platform::window::MakeFullscreen())
-		{
-			// Fullscreen Mode Failed.  Run In Windowed Mode Instead
-			::MessageBoxA(HWND_DESKTOP, TEXT("Mode Switch Failed.\nRunning In Windowed Mode."), TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
-		}
-		else // Otherwise (If Fullscreen Mode Was Successful)
-		{
-			windowed = false;
-			window->current_state.style |= WS_POPUP;
-			window->current_state.ex_style |= WS_EX_TOPMOST;
-		}
-	}
 	if (windowed)
 	{
 		if (app->IsDecorated())
@@ -350,32 +323,162 @@ static void AdjustVideoSettings()
 		::AdjustWindowRectEx(&window->current_state.rect, window->current_state.style, 0, window->current_state.ex_style);
 	}
 }
-static void RestoreVideoSettings()
+static void ConfigureWindowSettings(scythe::platform::Window* window, scythe::DesktopApplication* app)
 {
-	scythe::DesktopApplication* desktop_app = scythe::DesktopApplication::GetInstance();
-	scythe::PlatformWindow* window = scythe::platform::GetPlatformWindow(desktop_app);
+	// Base properties
+	window->base.width = app->GetInitialWidth();
+	window->base.height = app->GetInitialHeight();
+	window->base.aspect_ratio = static_cast<float>(window->base.width) / static_cast<float>(window->base.height);
+	window->base.active = true;
+	window->base.visible = false;
+	window->base.fullscreen = app->GetInitialFullscreen();
+	window->old_mouse_position = { 0 };
 
-	if (window->base.fullscreen)
+	// Style
+	window->current_state.style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+	window->current_state.ex_style = WS_EX_APPWINDOW;
+
+	window->current_state.rect.left = 0;
+	window->current_state.rect.top = 0;
+	window->current_state.rect.right = window->base.width;
+	window->current_state.rect.bottom = window->base.height;
+
+	::AdjustWindowedAppearance(window, app, !window->base.fullscreen);
+}
+static void EnterFullscreenMode(scythe::platform::Window* window, scythe::DesktopApplication* app)
+{
+	bool windowed = true;
+	if (window->base.fullscreen)	// Fullscreen Requested, Try Changing Video Modes
 	{
-		::ChangeDisplaySettingsA(NULL, 0);
+		if (!scythe::platform::window::MakeFullscreen(true))
+		{
+			// Fullscreen Mode Failed.  Run In Windowed Mode Instead
+			window->base.fullscreen = false;
+			scythe::Error("Mode Switch Failed. Running In Windowed Mode.");
+		}
+		else // Otherwise (If Fullscreen Mode Was Successful)
+		{
+			windowed = false;
+			window->current_state.style |= WS_POPUP;
+			window->current_state.ex_style |= WS_EX_TOPMOST;
+		}
 	}
+	::AdjustWindowedAppearance(window, app, windowed);
+}
+static void LeaveFullscreenMode()
+{
+	scythe::DesktopApplication* app = scythe::DesktopApplication::GetInstance();
+	scythe::platform::Data* data = scythe::platform::GetData(app);
+	if (data->main_window->base.fullscreen)
+		::ChangeDisplaySettingsA(NULL, 0);
+}
+static LRESULT CALLBACK HelperWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	return ::DefWindowProcA(hWnd, uMsg, wParam, lParam);
+}
+static bool CreateHelperWindow(scythe::platform::Data* data)
+{
+	MSG msg;
+	WNDCLASSEXA wc = { sizeof(wc) };
+
+	wc.style         = CS_OWNDC;
+	wc.lpfnWndProc   = (WNDPROC) HelperWindowProc;
+	wc.hInstance     = data->instance;
+	wc.lpszClassName = kHelperWindowClassName;
+
+	data->helper_window_class_registered = ::RegisterClassExA(&wc) != 0;
+	if (!data->helper_window_class_registered)
+	{
+		scythe::Error("Failed to register helper window class");
+		return false;
+	}
+
+	data->helper_window_handle = ::CreateWindowExA(
+		WS_EX_OVERLAPPEDWINDOW,
+		kHelperWindowClassName,
+		"scythe helper window",
+		WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
+		0, 0, 1, 1,
+		NULL, NULL,
+		data->instance,
+		NULL);
+
+	if (!data->helper_window_handle)
+	{
+		scythe::Error("Failed to create helper window");
+		return false;
+	}
+
+	// HACK: The command to the first ShowWindow call is ignored if the parent
+	//       process passed along a STARTUPINFO, so clear that with a no-op call
+	::ShowWindow(data->helper_window_handle, SW_HIDE);
+
+	while (::PeekMessageA(&msg, data->helper_window_handle, 0, 0, PM_REMOVE))
+	{
+		::TranslateMessage(&msg);
+		::DispatchMessageA(&msg);
+	}
+
+	return true;
+}
+static void DestroyHelperWindow(scythe::platform::Data* data)
+{
+	if (data->helper_window_handle)
+		::DestroyWindow(data->helper_window_handle);
+	if (data->helper_window_class_registered)
+		::UnregisterClassA(kHelperWindowClassName, data->instance);
+}
+static inline scythe::platform::Window* GetMainWindow()
+{
+	scythe::Application* app = scythe::Application::GetInstance();
+	scythe::platform::Data* data = scythe::platform::GetData(app);
+	return data->main_window;
 }
 
 namespace scythe {
+
+	const BaseWindow* GetBaseWindow(const Application* app)
+	{
+		const platform::Window* window = platform::GetWindow(app);
+		return &window->base;
+	}
+
 	namespace platform {
 
-		const Window* GetWindowByPlatformOne(const void* platform_window_ptr)
+		Data* CreateData()
 		{
-			const PlatformWindow* platform_window = reinterpret_cast<const PlatformWindow*>(platform_window_ptr);
-			return &platform_window->base;
+			Data* data = new Data();
+			data->instance = nullptr;
+			data->icon = nullptr;
+			data->helper_window_class_registered = false;
+			data->main_window_class_registered = false;
+			data->helper_window_handle = nullptr;
+			data->main_window = nullptr;
+			return data;
 		}
-		PlatformWindow* GetPlatformWindow(DesktopApplication* desktop_app)
+		void DestroyData(Data* data)
 		{
-			return reinterpret_cast<PlatformWindow*>(desktop_app->platform_window_);
+			delete data;
+		}
+		Data* GetData(Application* app)
+		{
+			return reinterpret_cast<Data*>(app->platform_data_);
+		}
+		const Data* GetData(const Application* app)
+		{
+			return reinterpret_cast<const Data*>(app->platform_data_);
+		}
+		const Window* GetWindow(const Application* app)
+		{
+			const Data* data = GetData(app);
+			return data->main_window;
 		}
 
 		bool Initialize()
 		{
+			Application* app = Application::GetInstance();
+			Data* data = GetData(app);
+
 			// Skip any upcoming error
 			::GetLastError();
 
@@ -385,58 +488,54 @@ namespace scythe {
 			//	the main thread to always run on CPU 0.
 			::SetThreadAffinityMask(::GetCurrentThread(), 1);
 
-			// Create platform window and store its value in application instance
-			DesktopApplication* desktop_app = DesktopApplication::GetInstance();
-			PlatformWindow* window = new PlatformWindow();
-			if (!window) return false;
-			desktop_app->platform_window_ = reinterpret_cast<void*>(window);
-			::FillWindowParameters(desktop_app, window);
-
 			// This is the way to change window icon manually:
-			window->icon = ::LoadIcon(NULL, IDI_APPLICATION);
-			if (window->icon == NULL)
+			data->icon = ::LoadIcon(NULL, IDI_APPLICATION);
+			if (data->icon == NULL)
 			{
-				::MessageBoxA(HWND_DESKTOP, TEXT("Icon loading failed!"), TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
+				Error("Icon loading failed!");
 				return false;
 			}
 
-			window->instance = GetModuleHandle(NULL);
+			data->instance = GetModuleHandle(NULL);
 
 			// Register A Window Class
-			WNDCLASSEXA window_class;
-			::ZeroMemory(&window_class, sizeof(WNDCLASSEX));
-			window_class.cbSize = sizeof(WNDCLASSEX);
-			window_class.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-			window_class.lpfnWndProc = (WNDPROC)(WindowProc);
-			window_class.hInstance = window->instance;
-			window_class.hbrBackground = (HBRUSH)::GetStockObject(BLACK_BRUSH);
-			window_class.hCursor = ::LoadCursor(NULL, IDC_ARROW);
-			window_class.hIcon = window->icon;
-			window_class.hIconSm = window->icon;
-			window_class.lpszClassName = kApplicationClassName;
-			if (::RegisterClassExA(&window_class) == 0)
+			WNDCLASSEXA wc;
+			::ZeroMemory(&wc, sizeof(WNDCLASSEXA));
+			wc.cbSize = sizeof(WNDCLASSEXA);
+			wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+			wc.lpfnWndProc = (WNDPROC)(WindowProc);
+			wc.hInstance = data->instance;
+			wc.hbrBackground = (HBRUSH)::GetStockObject(BLACK_BRUSH);
+			wc.hCursor = ::LoadCursor(NULL, IDC_ARROW);
+			wc.hIcon = data->icon;
+			wc.hIconSm = data->icon;
+			wc.lpszClassName = kMainWindowClassName;
+
+			data->main_window_class_registered = ::RegisterClassExA(&wc) != 0;
+			if (!data->main_window_class_registered)
 			{
-				::DestroyIcon(window->icon);
-				::MessageBox(HWND_DESKTOP, TEXT("RegisterClassEx Failed!"), TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
+				Error("RegisterClassEx Failed!");
 				return false;
 			}
 
-			::AdjustVideoSettings();
+			if (!::CreateHelperWindow(data))
+			{
+				Error("CreateHelperWindow Failed!");
+				return false;
+			}
 			return true;
 		}
 		void Deinitialize()
 		{
-			::RestoreVideoSettings();
+			Application* app = Application::GetInstance();
+			Data* data = GetData(app);
 
-			DesktopApplication* desktop_app = DesktopApplication::GetInstance();
-			PlatformWindow* window = scythe::platform::GetPlatformWindow(desktop_app);
+			::DestroyHelperWindow(data);
 
-			::UnregisterClassA(kApplicationClassName, window->instance);
-			::DestroyIcon(window->icon);
-
-			// Destroy platform window
-			delete window;
-			desktop_app->platform_window_ = nullptr;
+			if (data->main_window_class_registered)
+				::UnregisterClassA(kMainWindowClassName, data->instance);
+			if (data->icon)
+				::DestroyIcon(data->icon);
 		}
 
 		void PollEvents()
@@ -472,11 +571,21 @@ namespace scythe {
 			bool Create()
 			{
 				DesktopApplication* app = DesktopApplication::GetInstance();
-				PlatformWindow* window = scythe::platform::GetPlatformWindow(app);
+				Data* data = GetData(app);
+
+				// Create window instance
+				Window* window = new Window();
+				data->main_window = window;
+				if (!data->main_window)
+					return false;
+
+				// Configure window size
+				::ConfigureWindowSettings(window, app);
 
 				// Create Window
-				window->hwnd = ::CreateWindowExA(window->current_state.ex_style,			// Extended Style
-					kApplicationClassName,													// Class Name
+				window->handle = ::CreateWindowExA(
+					window->current_state.ex_style,											// Extended Style
+					kMainWindowClassName,													// Class Name
 					app->GetTitle(),														// Window Title
 					window->current_state.style,											// Window Style
 					0, 0,																	// Window X,Y Position
@@ -484,25 +593,50 @@ namespace scythe {
 					window->current_state.rect.bottom - window->current_state.rect.top,		// Window Height
 					HWND_DESKTOP,															// Desktop Is Window's Parent
 					0,																		// No Menu
-					window->instance,														// Pass The Window Instance
-					NULL);																	// pointer to window class
+					data->instance,															// Pass The Window Instance
+					nullptr);																// pointer to window class
+				if (!window->handle)
+				{
+					Error("CreateWindowExA Failed!");
+					return false;
+				}
 
-				return window->hwnd != NULL;
+				// Enter fullscreen if necessary and adjust borders
+				::EnterFullscreenMode(window, app);
+
+				return true;
 			}
 			void Destroy()
 			{
-				PlatformWindow* window = ::GetPlatformWindow();
-				::DestroyWindow(window->hwnd);
+				Application* app = Application::GetInstance();
+				Data* data = GetData(app);
+
+				// Leave fullscreen mode (if it hasn't been windowed)
+				::LeaveFullscreenMode();
+
+				// Destroy main window
+				if (data->main_window->handle)
+				{
+					::DestroyWindow(data->main_window->handle);
+					data->main_window->handle = nullptr;
+				}
+
+				// Delete its instance
+				if (data->main_window)
+				{
+					delete data->main_window;
+					data->main_window = nullptr;
+				}
 			}
 			void Terminate()
 			{
-				PlatformWindow* window = ::GetPlatformWindow();
-				::PostMessage(window->hwnd, WM_CLOSE, 0, 0);
+				Window* window = ::GetMainWindow();
+				::PostMessage(window->handle, WM_CLOSE, 0, 0);
 			}
 
 			void ToggleFullscreen(void)
 			{
-				PlatformWindow* window = ::GetPlatformWindow();
+				Window* window = ::GetMainWindow();
 				if (window->base.fullscreen) // fullscreen -> windowed
 				{
 					MakeWindowed();
@@ -513,12 +647,13 @@ namespace scythe {
 					window->base.fullscreen = MakeFullscreen();
 				}
 			}
-			bool MakeFullscreen(void)
+			bool MakeFullscreen(bool force)
 			{
-				DesktopApplication* app = DesktopApplication::GetInstance();
-				PlatformWindow* window = scythe::platform::GetPlatformWindow(app);
+				Application* app = Application::GetInstance();
+				Data* data = GetData(app);
+				Window* window = data->main_window;
 
-				if (window->base.fullscreen)
+				if (window->base.fullscreen && !force)
 					return true;
 
 				int width = window->base.width;
@@ -530,100 +665,100 @@ namespace scythe {
 				window->old_state.style = window->current_state.style;
 				window->old_state.ex_style = window->current_state.ex_style;
 				
-			    DEVMODE dmScreenSettings;
-				ZeroMemory(&dmScreenSettings, sizeof(DEVMODE));
+				DEVMODE dmScreenSettings;
+				::ZeroMemory(&dmScreenSettings, sizeof(DEVMODE));
 				dmScreenSettings.dmSize = sizeof(DEVMODE);
 				dmScreenSettings.dmPelsWidth = width;
 				dmScreenSettings.dmPelsHeight = height;
 				dmScreenSettings.dmBitsPerPel = color_bits;
 				dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
-				if (ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
+				if (::ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
 				{
 					// Still windowed
-					SetWindowLongPtr(window->hwnd, GWL_STYLE, window->old_state.style);
-					SetWindowLongPtr(window->hwnd, GWL_EXSTYLE, window->old_state.ex_style);
-					ShowWindow(window->hwnd, SW_NORMAL);
+					::SetWindowLongPtr(window->handle, GWL_STYLE, window->old_state.style);
+					::SetWindowLongPtr(window->handle, GWL_EXSTYLE, window->old_state.ex_style);
+					::ShowWindow(window->handle, SW_NORMAL);
 					return false;
 				}
 
-				SetWindowLongPtr(window->hwnd, GWL_STYLE, WS_POPUP);
-				SetWindowLongPtr(window->hwnd, GWL_EXSTYLE, WS_EX_APPWINDOW | WS_EX_TOPMOST);
-				MoveWindow(window->hwnd, 0, 0, width, height, FALSE);
-				ShowWindow(window->hwnd, SW_NORMAL);
+				::SetWindowLongPtr(window->handle, GWL_STYLE, WS_POPUP);
+				::SetWindowLongPtr(window->handle, GWL_EXSTYLE, WS_EX_APPWINDOW | WS_EX_TOPMOST);
+				::MoveWindow(window->handle, 0, 0, width, height, FALSE);
+				::ShowWindow(window->handle, SW_NORMAL);
 				return true;
 			}
-			void MakeWindowed(void)
+			void MakeWindowed(bool force)
 			{
-				PlatformWindow* window = ::GetPlatformWindow();
+				Window* window = ::GetMainWindow();
 
-				if (!window->base.fullscreen)
+				if (!window->base.fullscreen && !force)
 					return;
 
 				::ChangeDisplaySettings(NULL, 0); // restore display settings
 
 				// Restore window state
-				::SetWindowLongPtr(window->hwnd, GWL_STYLE, window->old_state.style);
-				::SetWindowLongPtr(window->hwnd, GWL_EXSTYLE, window->old_state.ex_style);
-				::MoveWindow(window->hwnd, window->old_state.rect.left, window->old_state.rect.top,
+				::SetWindowLongPtr(window->handle, GWL_STYLE, window->old_state.style);
+				::SetWindowLongPtr(window->handle, GWL_EXSTYLE, window->old_state.ex_style);
+				::MoveWindow(window->handle, window->old_state.rect.left, window->old_state.rect.top,
 					window->old_state.rect.right - window->old_state.rect.left,
 					window->old_state.rect.bottom - window->old_state.rect.top, FALSE);
-				::ShowWindow(window->hwnd, SW_NORMAL);
+				::ShowWindow(window->handle, SW_NORMAL);
 			}
 			void Center()
 			{
-				PlatformWindow* window = ::GetPlatformWindow();
+				Window* window = ::GetMainWindow();
 				RECT window_rect;
-				::GetWindowRect(window->hwnd, &window_rect);
+				::GetWindowRect(window->handle, &window_rect);
 				int screen_width = ::GetSystemMetrics(SM_CXSCREEN);
 				int screen_height = ::GetSystemMetrics(SM_CYSCREEN);
 				int window_width = window_rect.right - window_rect.left;
 				int window_height = window_rect.bottom - window_rect.top;
 				window_rect.left = (screen_width - window_width)/2;
 				window_rect.top = (screen_height - window_height)/2;
-				::MoveWindow(window->hwnd, window_rect.left, window_rect.top, window_width, window_height, TRUE);
+				::MoveWindow(window->handle, window_rect.left, window_rect.top, window_width, window_height, TRUE);
 			}
 			void Resize(int width, int height)
 			{
-				PlatformWindow* window = ::GetPlatformWindow();
+				Window* window = ::GetMainWindow();
 				RECT rect;
 				POINT pos;
 				pos.x = width;
 				pos.y = height;
-				::GetWindowRect(window->hwnd, &rect);
-				::ClientToScreen(window->hwnd, &pos);
-				::MoveWindow(window->hwnd, rect.left, rect.top, pos.x - rect.left, pos.y - rect.top, TRUE);
+				::GetWindowRect(window->handle, &rect);
+				::ClientToScreen(window->handle, &pos);
+				::MoveWindow(window->handle, rect.left, rect.top, pos.x - rect.left, pos.y - rect.top, TRUE);
 			}
 			void Iconify()
 			{
-				PlatformWindow* window = ::GetPlatformWindow();
-				::ShowWindow(window->hwnd, SW_MINIMIZE);
+				Window* window = ::GetMainWindow();
+				::ShowWindow(window->handle, SW_MINIMIZE);
 			}
 			void Restore()
 			{
-				PlatformWindow* window = ::GetPlatformWindow();
-				::ShowWindow(window->hwnd, SW_NORMAL);
+				Window* window = ::GetMainWindow();
+				::ShowWindow(window->handle, SW_NORMAL);
 			}
 			void Show()
 			{
-				PlatformWindow* window = ::GetPlatformWindow();
-				::ShowWindow(window->hwnd, SW_SHOW);
+				Window* window = ::GetMainWindow();
+				::ShowWindow(window->handle, SW_SHOW);
 				window->base.visible = true;
 			}
 			void Hide()
 			{
-				PlatformWindow* window = ::GetPlatformWindow();
-				::ShowWindow(window->hwnd, SW_HIDE);
+				Window* window = ::GetMainWindow();
+				::ShowWindow(window->handle, SW_HIDE);
 				window->base.visible = false;
 			}
 			bool IsVisible()
 			{
-				PlatformWindow* window = ::GetPlatformWindow();
+				Window* window = ::GetMainWindow();
 				return window->base.visible;
 			}
 			void SetTitle(const char* title)
 			{
-				PlatformWindow* window = ::GetPlatformWindow();
-				::SetWindowTextA(window->hwnd, title);
+				Window* window = ::GetMainWindow();
+				::SetWindowTextA(window->handle, title);
 			}
 
 		} // namespace window
@@ -633,12 +768,12 @@ namespace scythe {
 
 			void GetPos(float* x, float* y)
 			{
-				PlatformWindow* window = ::GetPlatformWindow();
+				Window* window = ::GetMainWindow();
 				RECT winrect;
 				POINT pos;
 				::GetCursorPos(&pos);
-				::GetClientRect(window->hwnd, &winrect);
-				::ScreenToClient(window->hwnd, &pos);
+				::GetClientRect(window->handle, &winrect);
+				::ScreenToClient(window->handle, &pos);
 				if (x)
 					*x = static_cast<float>(pos.x);
 				if (y)
@@ -646,24 +781,24 @@ namespace scythe {
 			}
 			void SetPos(float x, float y)
 			{
-				PlatformWindow* window = ::GetPlatformWindow();
+				Window* window = ::GetMainWindow();
 				RECT winrect;
 				POINT pos;
-				::GetClientRect(window->hwnd, &winrect);
+				::GetClientRect(window->handle, &winrect);
 				pos.x = static_cast<LONG>(x);
 				pos.y = static_cast<LONG>(winrect.bottom - y - 1);
-				::ClientToScreen(window->hwnd, &pos);
+				::ClientToScreen(window->handle, &pos);
 				::SetCursorPos((int)pos.x, (int)pos.y);
 			}
 			void Center()
 			{
-				PlatformWindow* window = ::GetPlatformWindow();
+				Window* window = ::GetMainWindow();
 				RECT winrect;
 				POINT pos;
-				::GetClientRect(window->hwnd, &winrect);
+				::GetClientRect(window->handle, &winrect);
 				pos.x = (winrect.right - winrect.left) / 2;
 				pos.y = (winrect.bottom - winrect.top) / 2;
-				::ClientToScreen(window->hwnd, &pos);
+				::ClientToScreen(window->handle, &pos);
 				::SetCursorPos((int)(pos.x), (int)(pos.y));
 			}
 			void Show()

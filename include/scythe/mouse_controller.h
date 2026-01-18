@@ -11,7 +11,7 @@ namespace scythe {
 	class MouseController
 	{
 	public:
-		virtual ~MouseController();
+		virtual ~MouseController() = default;
 
 		virtual void OnMouseDown(MouseButton button) {}
 		virtual void OnMouseUp(MouseButton button) {}

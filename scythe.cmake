@@ -32,7 +32,7 @@ set(PUBLIC_HEADERS
 	./include/scythe/time_manager.h
 	./include/scythe/timer.h
 	./include/scythe/types.h
-	./include/scythe/window.h
+	./include/scythe/window_controller.h
 )
 
 # Source files
@@ -42,6 +42,7 @@ set(SRC_FILES
 	./src/graphics/graphics_provider.cpp
 	./src/input/keyboard.cpp
 	./src/input/mouse.cpp
+	./src/platform/base_window.h
 	./src/platform/platform_inner.h
 	./src/time/clock.cpp
 	./src/time/time_manager.cpp
@@ -54,8 +55,8 @@ set(SRC_FILES
 # Windows specific sources
 if (WIN32)
 	list(APPEND SRC_FILES
+		./src/platform/windows/platform_data.h
 		./src/platform/windows/platform_inner.cpp
-		./src/platform/windows/platform_window.h
 	)
 endif (WIN32)
 

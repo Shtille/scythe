@@ -17,6 +17,7 @@ namespace scythe {
 	, physics_controller_(nullptr)
 	, logics_controller_(nullptr)
 	, need_quit_(false)
+	, platform_data_(nullptr)
 	{
 	}
 	Application::~Application()
@@ -88,7 +89,13 @@ namespace scythe {
 	}
 	int Application::Run(int argc, char const** argv)
 	{
-		int result = 0;
+		int result = 1;
+
+		// Create platform data and store it
+		platform::Data* data = platform::CreateData();
+		if (!data)
+			return 1;
+		platform_data_ = reinterpret_cast<void*>(data);
 
 		// Set proper text encoding to let use non-english characters
 		std::setlocale(LC_CTYPE, "UTF-8");
@@ -119,50 +126,34 @@ namespace scythe {
 						// Load graphics dependent resources (textures, shaders, etc.)
 						if (graphics_controller_->LoadGraphicsResources())
 						{
+							result = 0;
+
 							// Show window
 							Show();
 
 							// Run main cycle routine
 							RunMainCycle();
-
-							// Unload graphics dependent resources
-							graphics_controller_->UnloadGraphicsResources();
 						}
+						// Unload graphics dependent resources
+						graphics_controller_->UnloadGraphicsResources();
 
 						// Deinitialize all managers
 						DeinitializeManagers();
-
-						// Deinitialize graphics API
-						graphics_provider_->Deinitialize();
 					}
-					else
-					{
-						result = 4;
-					}
-
-					// Destroy surface
-					DestroySurface();
+					// Deinitialize graphics API
+					graphics_provider_->Deinitialize();
 				}
-				else
-				{
-					result = 3;
-				}
-
-				// Deinitialize platform stuff
-				platform::Deinitialize();
+				// Destroy surface
+				DestroySurface();
 			}
-			else
-			{
-				result = 2;
-			}
+			// Deinitialize platform stuff
+			platform::Deinitialize();
+		}
+		// Deinitialize user data
+		Deinitialize();
 
-			// Deinitialize user data
-			Deinitialize();
-		}
-		else
-		{
-			result = 1;
-		}
+		// Destroy platform data
+		platform::DestroyData(data);
 
 		return result;
 	}
@@ -211,10 +202,6 @@ namespace scythe {
 		return 60.0f;
 	}
 	const bool Application::IsBenchmark() const
-	{
-		return false;
-	}
-	const bool Application::IsMultisample() const
 	{
 		return false;
 	}

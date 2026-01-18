@@ -11,7 +11,7 @@ namespace scythe {
 	class KeyboardController
 	{
 	public:
-		virtual ~KeyboardController();
+		virtual ~KeyboardController() = default;
 
 		virtual void OnChar(KeyCode code) {}
 		virtual void OnKeyDown(KeyboardKey key, KeyModifiers modifiers) {}

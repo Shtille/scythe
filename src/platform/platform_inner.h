@@ -4,20 +4,26 @@
 #include <string>
 
 #include <scythe/platform.h>
-#ifdef SCYTHE_TARGET_DESKTOP
-# include <scythe/window.h>
-#endif
 
 namespace scythe {
 
 	// Forward declarations
-	class DesktopApplication;
-	struct PlatformWindow;
+	class Application;
+	struct BaseWindow;
+
+	const BaseWindow* GetBaseWindow(const Application* app);
 
 	namespace platform {
 
-		const Window* GetWindowByPlatformOne(const void* platform_window_ptr);
-		PlatformWindow* GetPlatformWindow(DesktopApplication* desktop_app);
+		// Forward declarations
+		struct Data;
+		struct Window;
+
+		Data* CreateData();
+		void DestroyData(Data* data);
+		Data* GetData(Application* app);
+		const Data* GetData(const Application* app);
+		const Window* GetWindow(const Application* app);
 
 		bool Initialize();
 		void Deinitialize();
@@ -35,8 +41,8 @@ namespace scythe {
 			void Terminate();
 
 			void ToggleFullscreen(void);
-			bool MakeFullscreen(void);
-			void MakeWindowed(void);
+			bool MakeFullscreen(bool force = false);
+			void MakeWindowed(bool force = false);
 			void Center();
 			void Resize(int width, int height);
 			void Iconify();

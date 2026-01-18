@@ -3,6 +3,7 @@
 #include <scythe/graphics_provider.h>
 
 #include "../platform/platform_inner.h"
+#include "../platform/base_window.h"
 
 static constexpr int kApplicationWidth = 800;
 static constexpr int kApplicationHeight = 600;
@@ -16,7 +17,7 @@ namespace scythe {
 	, mouse_state_()
 	, keyboard_controller_(nullptr)
 	, mouse_controller_(nullptr)
-	, platform_window_(nullptr)
+	, window_controller_(nullptr)
 	{
 	}
 	DesktopApplication* DesktopApplication::GetInstance()
@@ -39,6 +40,10 @@ namespace scythe {
 	{
 		return mouse_controller_;
 	}
+	WindowController* DesktopApplication::GetWindowController()
+	{
+		return window_controller_;
+	}
 	bool DesktopApplication::CreateSurface()
 	{
 		if (platform::window::Create())
@@ -53,33 +58,34 @@ namespace scythe {
 	{
 		platform::window::Destroy();
 	}
-	const Window* DesktopApplication::GetWindow() const
-	{
-		return platform::GetWindowByPlatformOne(platform_window_);
-	}
 	const int DesktopApplication::GetWidth() const
 	{
-		const Window* window = GetWindow();
+		const BaseWindow* window = GetBaseWindow(this);
 		return window->width;
 	}
 	const int DesktopApplication::GetHeight() const
 	{
-		const Window* window = GetWindow();
+		const BaseWindow* window = GetBaseWindow(this);
 		return window->height;
 	}
 	const float DesktopApplication::GetAspectRatio() const
 	{
-		const Window* window = GetWindow();
+		const BaseWindow* window = GetBaseWindow(this);
 		return window->aspect_ratio;
+	}
+	const bool DesktopApplication::IsActive() const
+	{
+		const BaseWindow* window = GetBaseWindow(this);
+		return window->active;
 	}
 	const bool DesktopApplication::IsVisible() const
 	{
-		const Window* window = GetWindow();
+		const BaseWindow* window = GetBaseWindow(this);
 		return window->visible;
 	}
 	const bool DesktopApplication::IsFullscreen() const
 	{
-		const Window* window = GetWindow();
+		const BaseWindow* window = GetBaseWindow(this);
 		return window->fullscreen;
 	}
 	const int DesktopApplication::GetInitialWidth() const
@@ -101,9 +107,6 @@ namespace scythe {
 	const bool DesktopApplication::IsResizable() const
 	{
 		return false;
-	}
-	void DesktopApplication::OnSize(int width, int height)
-	{
 	}
 
 }

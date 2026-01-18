@@ -6,18 +6,9 @@
 #include "mouse.h"
 #include "keyboard_controller.h"
 #include "mouse_controller.h"
-#include "window.h"
+#include "window_controller.h"
 
 namespace scythe {
-
-	// Forward declarations
-	class DesktopApplication;
-	struct PlatformWindow;
-	namespace platform {
-		bool Initialize();
-		void Deinitialize();
-		PlatformWindow* GetPlatformWindow(DesktopApplication*);
-	}
 
 	/**
 	 * @brief      This class describes a desktop application.
@@ -25,10 +16,6 @@ namespace scythe {
 	class DesktopApplication
 	: public Application
 	{
-		friend bool platform::Initialize();
-		friend void platform::Deinitialize();
-		friend PlatformWindow* platform::GetPlatformWindow(DesktopApplication*);
-
 	public:
 		DesktopApplication();
 
@@ -39,12 +26,13 @@ namespace scythe {
 
 		KeyboardController* GetKeyboardController();
 		MouseController* GetMouseController();
+		WindowController* GetWindowController();
 
 		// Window properties
-		const Window* GetWindow() const;
 		const int GetWidth() const;
 		const int GetHeight() const;
 		const float GetAspectRatio() const;
+		const bool IsActive() const;
 		const bool IsVisible() const;
 		const bool IsFullscreen() const;
 
@@ -55,8 +43,6 @@ namespace scythe {
 		virtual const bool IsDecorated() const;
 		virtual const bool IsResizable() const;
 
-		virtual void OnSize(int width, int height);
-
 	private:
 		bool CreateSurface() override final;
 		void DestroySurface() override final;
@@ -66,9 +52,7 @@ namespace scythe {
 		MouseState				mouse_state_;			//!< mouse state
 		KeyboardController* 	keyboard_controller_;	//!< keyboard controller
 		MouseController* 		mouse_controller_;		//!< mouse controller
-
-	private:
-		void* 					platform_window_;		//!< platform window
+		WindowController*		window_controller_;		//!< window controller
 	};
 
 } // namespace scythe
