@@ -282,10 +282,6 @@ namespace scythe {
 	{
 		return !IsKeyDown(key);
 	}
-	bool KeyboardState::IsKeyActive(KeyboardKey key) const
-	{
-		return states[static_cast<int>(key)].active;
-	}
 	void KeyboardState::SetKeyDown(KeyboardKey key, bool value)
 	{
 		states[static_cast<int>(key)].down = value;
@@ -294,9 +290,9 @@ namespace scythe {
 	{
 		states[static_cast<int>(key)].down = !value;
 	}
-	void KeyboardState::SetKeyActive(KeyboardKey key, bool value)
+	bool KeyboardState::IsKeyPressed(KeyboardKey down_key, KeyboardKey key)
 	{
-		states[static_cast<int>(key)].active = value;
+		return down_key == key && !IsKeyDown(key);
 	}
 
 	bool IsGoodChar(KeyCode code)

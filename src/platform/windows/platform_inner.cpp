@@ -180,11 +180,11 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 			break;
 		const scythe::KeyModifiers modifiers = ::TranslateKeyboardModifiers();
 
-		keyboard_state.SetKeyDown(translated_key, true);
-		keyboard_state.modifiers = modifiers;
-
 		if (keyboard_controller)
 			keyboard_controller->OnKeyDown(translated_key, modifiers);
+
+		keyboard_state.SetKeyDown(translated_key, true);
+		keyboard_state.modifiers = modifiers;
 		break;
 	}
 
@@ -195,10 +195,6 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		if (translated_key == scythe::KeyboardKey::kUnknown)
 			break;
 		const scythe::KeyModifiers modifiers = ::TranslateKeyboardModifiers();
-
-		keyboard_state.SetKeyDown(translated_key, false);
-		keyboard_state.SetKeyActive(translated_key, false);
-		keyboard_state.modifiers = modifiers;
 
 		if (wParam == VK_SHIFT)
 		{
@@ -224,6 +220,9 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 			if (keyboard_controller)
 				keyboard_controller->OnKeyUp(translated_key, modifiers);
 		}
+
+		keyboard_state.SetKeyDown(translated_key, false);
+		keyboard_state.modifiers = modifiers;
 
 		break;
 	}
@@ -347,6 +346,8 @@ static void ConfigureWindowSettings(scythe::platform::Window* window, scythe::De
 }
 static void EnterFullscreenMode(scythe::platform::Window* window, scythe::DesktopApplication* app)
 {
+#ifdef SCYTHE_USE_EXCLUSIVE_FULLSCREEN
+
 	bool windowed = true;
 	if (window->base.fullscreen)	// Fullscreen Requested, Try Changing Video Modes
 	{
@@ -364,13 +365,32 @@ static void EnterFullscreenMode(scythe::platform::Window* window, scythe::Deskto
 		}
 	}
 	::AdjustWindowedAppearance(window, app, windowed);
+
+#else // windowed fullscreen
+
+	int screen_width = ::GetSystemMetrics(SM_CXSCREEN);
+	int screen_height = ::GetSystemMetrics(SM_CYSCREEN);
+	window->base.width = screen_width;
+	window->base.height = screen_height;
+	window->base.aspect_ratio = static_cast<float>(window->base.width) / static_cast<float>(window->base.height);
+	window->current_state.style |= WS_POPUP;
+	window->current_state.ex_style |= WS_EX_TOPMOST;
+	window->current_state.rect.left = 0;
+	window->current_state.rect.top = 0;
+	window->current_state.rect.right = window->base.width;
+	window->current_state.rect.bottom = window->base.height;
+	::AdjustWindowRectEx(&window->current_state.rect, window->current_state.style, 0, window->current_state.ex_style);
+
+#endif
 }
 static void LeaveFullscreenMode()
 {
+#ifdef SCYTHE_USE_EXCLUSIVE_FULLSCREEN
 	scythe::DesktopApplication* app = scythe::DesktopApplication::GetInstance();
 	scythe::platform::Data* data = scythe::platform::GetData(app);
 	if (data->main_window->base.fullscreen)
 		::ChangeDisplaySettingsA(NULL, 0);
+#endif
 }
 static LRESULT CALLBACK HelperWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {

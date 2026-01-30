@@ -154,10 +154,9 @@ namespace scythe {
 	/**
 	 * @brief      This class describes a keyboard key state.
 	 */
-	struct KeyboardKeyState {
+	struct alignas(1) KeyboardKeyState
+	{
 		bool down;		//!< key down flag (key down if true and key up if false)
-		bool active;	//!< key active flag
-		char pad[2];	//!< a memory pad
 	};
 
 	/**
@@ -175,11 +174,19 @@ namespace scythe {
 
 		bool IsKeyDown(KeyboardKey key) const;
 		bool IsKeyUp(KeyboardKey key) const;
-		bool IsKeyActive(KeyboardKey key) const;
 
 		void SetKeyDown(KeyboardKey key, bool value);
 		void SetKeyUp(KeyboardKey key, bool value);
-		void SetKeyActive(KeyboardKey key, bool value);
+
+		/**
+		 * @brief      Determines if key has been pressed.
+		 *
+		 * @param[in]  down_key  The key that becomes pressed
+		 * @param[in]  key       The key to check
+		 *
+		 * @return     True if key pressed, False otherwise.
+		 */
+		bool IsKeyPressed(KeyboardKey down_key, KeyboardKey key);
 
 		static constexpr KeyCode kTableSize = 
 #if defined(SCYTHE_TARGET_WINDOWS)
