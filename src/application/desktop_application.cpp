@@ -58,6 +58,10 @@ namespace scythe {
 	{
 		platform::window::Destroy();
 	}
+	void DesktopApplication::ToggleFullscreen()
+	{
+		platform::window::ToggleFullscreen();
+	}
 	const int DesktopApplication::GetWidth() const
 	{
 		const BaseWindow* window = GetBaseWindow(this);
@@ -96,7 +100,7 @@ namespace scythe {
 	{
 		return kApplicationHeight;
 	}
-	const bool DesktopApplication::GetInitialFullscreen() const
+	const bool DesktopApplication::IsInitialFullscreen() const
 	{
 		return kApplicationFullscreen;
 	}

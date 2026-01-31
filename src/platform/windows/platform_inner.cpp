@@ -300,96 +300,67 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
 	return ::DefWindowProc(hWnd, uMsg, wParam, lParam);	// Pass Unhandled Messages
 }
-static void AdjustWindowedAppearance(scythe::platform::Window* window, scythe::DesktopApplication* app, bool windowed)
-{
-	if (windowed)
-	{
-		if (app->IsDecorated())
-		{
-			window->current_state.style |= WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
-
-			if (app->IsResizable())
-			{
-				window->current_state.style |= WS_MAXIMIZEBOX | WS_SIZEBOX;
-				window->current_state.ex_style |= WS_EX_WINDOWEDGE;
-			}
-		}
-		else
-		{
-			window->current_state.style |= WS_POPUP;
-		}
-		// Adjust Window, Account For Window Borders
-		::AdjustWindowRectEx(&window->current_state.rect, window->current_state.style, 0, window->current_state.ex_style);
-	}
-}
 static void ConfigureWindowSettings(scythe::platform::Window* window, scythe::DesktopApplication* app)
 {
+	int width = app->GetInitialWidth();
+	int height = app->GetInitialHeight();
+	bool window_decorated = app->IsDecorated();
+	bool window_resizable = app->IsResizable();
+
 	// Base properties
-	window->base.width = app->GetInitialWidth();
-	window->base.height = app->GetInitialHeight();
-	window->base.aspect_ratio = static_cast<float>(window->base.width) / static_cast<float>(window->base.height);
+	window->base.width = width;
+	window->base.height = height;
+	window->base.aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
 	window->base.active = true;
 	window->base.visible = false;
-	window->base.fullscreen = app->GetInitialFullscreen();
+	window->base.fullscreen = false;
 	window->old_mouse_position = { 0 };
 
-	// Style
-	window->current_state.style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-	window->current_state.ex_style = WS_EX_APPWINDOW;
+	// Windowed state
+	window->windowed_state.style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+	window->windowed_state.ex_style = WS_EX_APPWINDOW;
 
-	window->current_state.rect.left = 0;
-	window->current_state.rect.top = 0;
-	window->current_state.rect.right = window->base.width;
-	window->current_state.rect.bottom = window->base.height;
-
-	::AdjustWindowedAppearance(window, app, !window->base.fullscreen);
-}
-static void EnterFullscreenMode(scythe::platform::Window* window, scythe::DesktopApplication* app)
-{
-#ifdef SCYTHE_USE_EXCLUSIVE_FULLSCREEN
-
-	bool windowed = true;
-	if (window->base.fullscreen)	// Fullscreen Requested, Try Changing Video Modes
+	if (window_decorated)
 	{
-		if (!scythe::platform::window::MakeFullscreen(true))
+		window->windowed_state.style |= WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
+
+		if (window_resizable)
 		{
-			// Fullscreen Mode Failed.  Run In Windowed Mode Instead
-			window->base.fullscreen = false;
-			scythe::Error("Mode Switch Failed. Running In Windowed Mode.");
-		}
-		else // Otherwise (If Fullscreen Mode Was Successful)
-		{
-			windowed = false;
-			window->current_state.style |= WS_POPUP;
-			window->current_state.ex_style |= WS_EX_TOPMOST;
+			window->windowed_state.style |= WS_MAXIMIZEBOX | WS_SIZEBOX;
+			window->windowed_state.ex_style |= WS_EX_WINDOWEDGE;
 		}
 	}
-	::AdjustWindowedAppearance(window, app, windowed);
+	else
+	{
+		window->windowed_state.style |= WS_POPUP;
+	}
 
-#else // windowed fullscreen
+	window->windowed_state.pos.x = 0;
+	window->windowed_state.pos.y = 0;
+	window->windowed_state.rect.left = 0;
+	window->windowed_state.rect.top = 0;
+	window->windowed_state.rect.right = width;
+	window->windowed_state.rect.bottom = height;
 
+	// Adjust Window, Account For Window Borders
+	::AdjustWindowRectEx(&window->windowed_state.rect, window->windowed_state.style, 0, window->windowed_state.ex_style);
+
+	// Fullscreen state
+	window->fullscreen_state.style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP;
+	window->fullscreen_state.ex_style = WS_EX_APPWINDOW | WS_EX_TOPMOST;
+
+	window->fullscreen_state.pos.x = 0;
+	window->fullscreen_state.pos.y = 0;
+	window->fullscreen_state.rect.left = 0;
+	window->fullscreen_state.rect.top = 0;
+#ifdef SCYTHE_USE_EXCLUSIVE_FULLSCREEN
+	window->fullscreen_state.rect.right = width;
+	window->fullscreen_state.rect.bottom = height;
+#else
 	int screen_width = ::GetSystemMetrics(SM_CXSCREEN);
 	int screen_height = ::GetSystemMetrics(SM_CYSCREEN);
-	window->base.width = screen_width;
-	window->base.height = screen_height;
-	window->base.aspect_ratio = static_cast<float>(window->base.width) / static_cast<float>(window->base.height);
-	window->current_state.style |= WS_POPUP;
-	window->current_state.ex_style |= WS_EX_TOPMOST;
-	window->current_state.rect.left = 0;
-	window->current_state.rect.top = 0;
-	window->current_state.rect.right = window->base.width;
-	window->current_state.rect.bottom = window->base.height;
-	::AdjustWindowRectEx(&window->current_state.rect, window->current_state.style, 0, window->current_state.ex_style);
-
-#endif
-}
-static void LeaveFullscreenMode()
-{
-#ifdef SCYTHE_USE_EXCLUSIVE_FULLSCREEN
-	scythe::DesktopApplication* app = scythe::DesktopApplication::GetInstance();
-	scythe::platform::Data* data = scythe::platform::GetData(app);
-	if (data->main_window->base.fullscreen)
-		::ChangeDisplaySettingsA(NULL, 0);
+	window->fullscreen_state.rect.right = screen_width;
+	window->fullscreen_state.rect.bottom = screen_height;
 #endif
 }
 static LRESULT CALLBACK HelperWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -602,15 +573,20 @@ namespace scythe {
 				// Configure window size
 				::ConfigureWindowSettings(window, app);
 
+				Window::State current_state = (window->base.fullscreen)
+					? window->fullscreen_state
+					: window->windowed_state;
+
 				// Create Window
 				window->handle = ::CreateWindowExA(
-					window->current_state.ex_style,											// Extended Style
+					current_state.ex_style,													// Extended Style
 					kMainWindowClassName,													// Class Name
 					app->GetTitle(),														// Window Title
-					window->current_state.style,											// Window Style
-					0, 0,																	// Window X,Y Position
-					window->current_state.rect.right - window->current_state.rect.left,		// Window Width
-					window->current_state.rect.bottom - window->current_state.rect.top,		// Window Height
+					current_state.style,													// Window Style
+					current_state.pos.x,	 												// Window X Position
+					current_state.pos.y,													// Window Y Position
+					current_state.rect.right - current_state.rect.left,						// Window Width
+					current_state.rect.bottom - current_state.rect.top,						// Window Height
 					HWND_DESKTOP,															// Desktop Is Window's Parent
 					0,																		// No Menu
 					data->instance,															// Pass The Window Instance
@@ -622,7 +598,8 @@ namespace scythe {
 				}
 
 				// Enter fullscreen if necessary and adjust borders
-				::EnterFullscreenMode(window, app);
+				if (app->IsInitialFullscreen())
+					MakeFullscreen();
 
 				return true;
 			}
@@ -632,7 +609,7 @@ namespace scythe {
 				Data* data = GetData(app);
 
 				// Leave fullscreen mode (if it hasn't been windowed)
-				::LeaveFullscreenMode();
+				MakeWindowed();
 
 				// Destroy main window
 				if (data->main_window->handle)
@@ -660,82 +637,114 @@ namespace scythe {
 				if (window->base.fullscreen) // fullscreen -> windowed
 				{
 					MakeWindowed();
-					window->base.fullscreen = false;
 				}
 				else // windowed -> fullscreen
 				{
-					window->base.fullscreen = MakeFullscreen();
+					MakeFullscreen();
 				}
 			}
-			bool MakeFullscreen(bool force)
+			bool MakeFullscreen()
 			{
-				Application* app = Application::GetInstance();
+				DesktopApplication* app = DesktopApplication::GetInstance();
+				WindowController* window_controller = app->GetWindowController();
 				Data* data = GetData(app);
 				Window* window = data->main_window;
 
-				if (window->base.fullscreen && !force)
+				if (window->base.fullscreen)
 					return true;
 
-				int width = window->base.width;
-				int height = window->base.height;
-				int color_bits = app->GetColorBits();
-
-				// Store current window state:
-				window->old_state.rect = window->current_state.rect;
-				window->old_state.style = window->current_state.style;
-				window->old_state.ex_style = window->current_state.ex_style;
+				// Remember window position
+				window->windowed_state.pos.x = window->windowed_state.rect.left;
+				window->windowed_state.pos.y = window->windowed_state.rect.top;
+				::ClientToScreen(window->handle, &window->windowed_state.pos);
 				
+#ifdef SCYTHE_USE_EXCLUSIVE_FULLSCREEN
 				DEVMODE dmScreenSettings;
 				::ZeroMemory(&dmScreenSettings, sizeof(DEVMODE));
 				dmScreenSettings.dmSize = sizeof(DEVMODE);
-				dmScreenSettings.dmPelsWidth = width;
-				dmScreenSettings.dmPelsHeight = height;
-				dmScreenSettings.dmBitsPerPel = color_bits;
+				dmScreenSettings.dmPelsWidth = window->fullscreen_state.width;
+				dmScreenSettings.dmPelsHeight = window->fullscreen_state.height;
+				dmScreenSettings.dmBitsPerPel = app->GetColorBits();
 				dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 				if (::ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
 				{
 					// Still windowed
-					::SetWindowLongPtr(window->handle, GWL_STYLE, window->old_state.style);
-					::SetWindowLongPtr(window->handle, GWL_EXSTYLE, window->old_state.ex_style);
+					scythe::Error("Mode Switch Failed. Running In Windowed Mode.");
+					int width = window->windowed_state.rect.right - window->windowed_state.rect.left;
+					int height = window->windowed_state.rect.bottom - window->windowed_state.rect.top;
+					::SetWindowLongPtr(window->handle, GWL_STYLE, window->windowed_state.style);
+					::SetWindowLongPtr(window->handle, GWL_EXSTYLE, window->windowed_state.ex_style);
+					::MoveWindow(window->handle, window->windowed_state.pos.x, window->windowed_state.pos.y, width, height, TRUE);
 					::ShowWindow(window->handle, SW_NORMAL);
 					return false;
 				}
+#endif
 
-				::SetWindowLongPtr(window->handle, GWL_STYLE, WS_POPUP);
-				::SetWindowLongPtr(window->handle, GWL_EXSTYLE, WS_EX_APPWINDOW | WS_EX_TOPMOST);
-				::MoveWindow(window->handle, 0, 0, width, height, FALSE);
+				int width = window->fullscreen_state.rect.right - window->fullscreen_state.rect.left;
+				int height = window->fullscreen_state.rect.bottom - window->fullscreen_state.rect.top;
+				::SetWindowLongPtr(window->handle, GWL_STYLE, window->fullscreen_state.style);
+				::SetWindowLongPtr(window->handle, GWL_EXSTYLE, window->fullscreen_state.ex_style);
+				::MoveWindow(window->handle, window->fullscreen_state.pos.x, window->fullscreen_state.pos.y, width, height, TRUE);
 				::ShowWindow(window->handle, SW_NORMAL);
+
+				window->base.width = width;
+				window->base.height = height;
+				window->base.aspect_ratio = static_cast<float>(window->base.width) / static_cast<float>(window->base.height);
+				window->base.fullscreen = true;
+				if (window_controller)
+					window_controller->OnResize(window->base.width, window->base.height);
 				return true;
 			}
-			void MakeWindowed(bool force)
+			void MakeWindowed()
 			{
-				Window* window = ::GetMainWindow();
+				DesktopApplication* app = DesktopApplication::GetInstance();
+				WindowController* window_controller = app->GetWindowController();
+				Data* data = GetData(app);
+				Window* window = data->main_window;
 
-				if (!window->base.fullscreen && !force)
+				if (!window->base.fullscreen)
 					return;
 
+#ifdef SCYTHE_USE_EXCLUSIVE_FULLSCREEN
 				::ChangeDisplaySettings(NULL, 0); // restore display settings
+#endif
+
+				int width = window->windowed_state.rect.right - window->windowed_state.rect.left;
+				int height = window->windowed_state.rect.bottom - window->windowed_state.rect.top;
 
 				// Restore window state
-				::SetWindowLongPtr(window->handle, GWL_STYLE, window->old_state.style);
-				::SetWindowLongPtr(window->handle, GWL_EXSTYLE, window->old_state.ex_style);
-				::MoveWindow(window->handle, window->old_state.rect.left, window->old_state.rect.top,
-					window->old_state.rect.right - window->old_state.rect.left,
-					window->old_state.rect.bottom - window->old_state.rect.top, FALSE);
+				::SetWindowLongPtr(window->handle, GWL_STYLE, window->windowed_state.style);
+				::SetWindowLongPtr(window->handle, GWL_EXSTYLE, window->windowed_state.ex_style);
+				::MoveWindow(window->handle, window->windowed_state.pos.x, window->windowed_state.pos.y, width, height, TRUE);
 				::ShowWindow(window->handle, SW_NORMAL);
+
+				window->base.width = width;
+				window->base.height = height;
+				window->base.aspect_ratio = static_cast<float>(window->base.width) / static_cast<float>(window->base.height);
+				window->base.fullscreen = false;
+				if (window_controller)
+					window_controller->OnResize(window->base.width, window->base.height);
 			}
 			void Center()
 			{
-				Window* window = ::GetMainWindow();
+				DesktopApplication* app = DesktopApplication::GetInstance();
+				WindowController* window_controller = app->GetWindowController();
+				Data* data = GetData(app);
+				Window* window = data->main_window;
+
+				// No need to center fullscreen window
+				if (window->base.fullscreen)
+					return;
+
 				RECT window_rect;
-				::GetWindowRect(window->handle, &window_rect);
+				::GetWindowRect(window->handle, &window_rect); // in screen coordinates
 				int screen_width = ::GetSystemMetrics(SM_CXSCREEN);
 				int screen_height = ::GetSystemMetrics(SM_CYSCREEN);
 				int window_width = window_rect.right - window_rect.left;
 				int window_height = window_rect.bottom - window_rect.top;
-				window_rect.left = (screen_width - window_width)/2;
-				window_rect.top = (screen_height - window_height)/2;
-				::MoveWindow(window->handle, window_rect.left, window_rect.top, window_width, window_height, TRUE);
+				window->windowed_state.pos.x = (screen_width - window_width)/2;
+				window->windowed_state.pos.y = (screen_height - window_height)/2;
+				::MoveWindow(window->handle, window->windowed_state.pos.x, window->windowed_state.pos.y, window_width, window_height, TRUE);
 			}
 			void Resize(int width, int height)
 			{

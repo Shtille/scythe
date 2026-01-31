@@ -41,8 +41,8 @@ namespace scythe {
 			void Terminate();
 
 			void ToggleFullscreen(void);
-			bool MakeFullscreen(bool force = false);
-			void MakeWindowed(bool force = false);
+			bool MakeFullscreen();
+			void MakeWindowed();
 			void Center();
 			void Resize(int width, int height);
 			void Iconify();

@@ -28,6 +28,9 @@ namespace scythe {
 		MouseController* GetMouseController();
 		WindowController* GetWindowController();
 
+		// Window actions
+		void ToggleFullscreen();
+
 		// Window properties
 		const int GetWidth() const;
 		const int GetHeight() const;
@@ -39,7 +42,7 @@ namespace scythe {
 		// Tuneable application styles
 		virtual const int GetInitialWidth() const;
 		virtual const int GetInitialHeight() const;
-		virtual const bool GetInitialFullscreen() const;
+		virtual const bool IsInitialFullscreen() const;
 		virtual const bool IsDecorated() const;
 		virtual const bool IsResizable() const;
 

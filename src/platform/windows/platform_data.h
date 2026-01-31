@@ -29,11 +29,12 @@ namespace scythe::platform {
 		struct State
 		{
 			RECT rect;
+			POINT pos;
 			DWORD style;
 			DWORD ex_style;
 		};
-		State old_state;
-		State current_state;
+		State windowed_state;
+		State fullscreen_state;
 
 		POINT old_mouse_position;
 	};
