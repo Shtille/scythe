@@ -11,6 +11,15 @@
 namespace scythe {
 
 	/**
+	 * @brief      This enum describes a fullscreen mode.
+	 */
+	enum class FullscreenMode
+	{
+		kWindowed,
+		kExclusive,
+	};
+
+	/**
 	 * @brief      This class describes a desktop application.
 	 */
 	class DesktopApplication
@@ -30,6 +39,9 @@ namespace scythe {
 
 		// Window actions
 		void ToggleFullscreen();
+
+		FullscreenMode GetFullscreenMode() const;
+		bool SetFullscreenMode(FullscreenMode mode);
 
 		// Window properties
 		const int GetWidth() const;
@@ -56,6 +68,7 @@ namespace scythe {
 		KeyboardController* 	keyboard_controller_;	//!< keyboard controller
 		MouseController* 		mouse_controller_;		//!< mouse controller
 		WindowController*		window_controller_;		//!< window controller
+		FullscreenMode			fullscreen_mode_;		//!< fullscreen mode
 	};
 
 } // namespace scythe

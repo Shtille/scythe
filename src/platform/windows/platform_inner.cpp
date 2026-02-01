@@ -353,15 +353,18 @@ static void ConfigureWindowSettings(scythe::platform::Window* window, scythe::De
 	window->fullscreen_state.pos.y = 0;
 	window->fullscreen_state.rect.left = 0;
 	window->fullscreen_state.rect.top = 0;
-#ifdef SCYTHE_USE_EXCLUSIVE_FULLSCREEN
-	window->fullscreen_state.rect.right = width;
-	window->fullscreen_state.rect.bottom = height;
-#else
-	int screen_width = ::GetSystemMetrics(SM_CXSCREEN);
-	int screen_height = ::GetSystemMetrics(SM_CYSCREEN);
-	window->fullscreen_state.rect.right = screen_width;
-	window->fullscreen_state.rect.bottom = screen_height;
-#endif
+	if (app->GetFullscreenMode() == scythe::FullscreenMode::kExclusive)
+	{
+		window->fullscreen_state.rect.right = width;
+		window->fullscreen_state.rect.bottom = height;
+	}
+	else // windowed fullscreen
+	{
+		int screen_width = ::GetSystemMetrics(SM_CXSCREEN);
+		int screen_height = ::GetSystemMetrics(SM_CYSCREEN);
+		window->fullscreen_state.rect.right = screen_width;
+		window->fullscreen_state.rect.bottom = screen_height;
+	}
 }
 static LRESULT CALLBACK HelperWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -658,27 +661,31 @@ namespace scythe {
 				window->windowed_state.pos.y = window->windowed_state.rect.top;
 				::ClientToScreen(window->handle, &window->windowed_state.pos);
 				
-#ifdef SCYTHE_USE_EXCLUSIVE_FULLSCREEN
-				DEVMODE dmScreenSettings;
-				::ZeroMemory(&dmScreenSettings, sizeof(DEVMODE));
-				dmScreenSettings.dmSize = sizeof(DEVMODE);
-				dmScreenSettings.dmPelsWidth = window->fullscreen_state.width;
-				dmScreenSettings.dmPelsHeight = window->fullscreen_state.height;
-				dmScreenSettings.dmBitsPerPel = app->GetColorBits();
-				dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
-				if (::ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
+				if (app->GetFullscreenMode() == FullscreenMode::kExclusive)
 				{
-					// Still windowed
-					scythe::Error("Mode Switch Failed. Running In Windowed Mode.");
-					int width = window->windowed_state.rect.right - window->windowed_state.rect.left;
-					int height = window->windowed_state.rect.bottom - window->windowed_state.rect.top;
-					::SetWindowLongPtr(window->handle, GWL_STYLE, window->windowed_state.style);
-					::SetWindowLongPtr(window->handle, GWL_EXSTYLE, window->windowed_state.ex_style);
-					::MoveWindow(window->handle, window->windowed_state.pos.x, window->windowed_state.pos.y, width, height, TRUE);
-					::ShowWindow(window->handle, SW_NORMAL);
-					return false;
+					// Try to change display settings for exclusive fullscreen
+					int fullscreen_width = window->fullscreen_state.rect.right - window->fullscreen_state.rect.left;
+					int fullscreen_height = window->fullscreen_state.rect.bottom - window->fullscreen_state.rect.top;
+					DEVMODE dmScreenSettings;
+					::ZeroMemory(&dmScreenSettings, sizeof(DEVMODE));
+					dmScreenSettings.dmSize = sizeof(DEVMODE);
+					dmScreenSettings.dmPelsWidth = fullscreen_width;
+					dmScreenSettings.dmPelsHeight = fullscreen_height;
+					dmScreenSettings.dmBitsPerPel = app->GetColorBits();
+					dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+					if (::ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
+					{
+						// Still windowed
+						scythe::Error("Mode Switch Failed. Running In Windowed Mode.");
+						int width = window->windowed_state.rect.right - window->windowed_state.rect.left;
+						int height = window->windowed_state.rect.bottom - window->windowed_state.rect.top;
+						::SetWindowLongPtr(window->handle, GWL_STYLE, window->windowed_state.style);
+						::SetWindowLongPtr(window->handle, GWL_EXSTYLE, window->windowed_state.ex_style);
+						::MoveWindow(window->handle, window->windowed_state.pos.x, window->windowed_state.pos.y, width, height, TRUE);
+						::ShowWindow(window->handle, SW_NORMAL);
+						return false;
+					}
 				}
-#endif
 
 				int width = window->fullscreen_state.rect.right - window->fullscreen_state.rect.left;
 				int height = window->fullscreen_state.rect.bottom - window->fullscreen_state.rect.top;
@@ -705,9 +712,11 @@ namespace scythe {
 				if (!window->base.fullscreen)
 					return;
 
-#ifdef SCYTHE_USE_EXCLUSIVE_FULLSCREEN
-				::ChangeDisplaySettings(NULL, 0); // restore display settings
-#endif
+				if (app->GetFullscreenMode() == FullscreenMode::kExclusive)
+				{
+					// Restore display settings
+					::ChangeDisplaySettings(NULL, 0);
+				}
 
 				int width = window->windowed_state.rect.right - window->windowed_state.rect.left;
 				int height = window->windowed_state.rect.bottom - window->windowed_state.rect.top;

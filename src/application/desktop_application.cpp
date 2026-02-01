@@ -18,6 +18,7 @@ namespace scythe {
 	, keyboard_controller_(nullptr)
 	, mouse_controller_(nullptr)
 	, window_controller_(nullptr)
+	, fullscreen_mode_(FullscreenMode::kWindowed)
 	{
 	}
 	DesktopApplication* DesktopApplication::GetInstance()
@@ -61,6 +62,18 @@ namespace scythe {
 	void DesktopApplication::ToggleFullscreen()
 	{
 		platform::window::ToggleFullscreen();
+	}
+	FullscreenMode DesktopApplication::GetFullscreenMode() const
+	{
+		return fullscreen_mode_;
+	}
+	bool DesktopApplication::SetFullscreenMode(FullscreenMode mode)
+	{
+		// We can't change fullscreen mode in fullscreen mode
+		if (IsFullscreen())
+			return false;
+		fullscreen_mode_ = mode;
+		return true;
 	}
 	const int DesktopApplication::GetWidth() const
 	{
