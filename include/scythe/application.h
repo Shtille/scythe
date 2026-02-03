@@ -4,6 +4,7 @@
 #include "types.h"
 #include "singleton.h"
 #include "expandable.h"
+#include "graphics_provider.h"
 #include "graphics_controller.h"
 #include "physics_controller.h"
 #include "logics_controller.h"
@@ -17,7 +18,6 @@ namespace scythe {
 		Data* GetData(Application*);
 		const Data* GetData(const Application*);
 	}
-	class GraphicsProvider;
 
 	/**
 	 * @brief      This class describes an application.
@@ -33,6 +33,8 @@ namespace scythe {
 	public:
 		int Run(int argc, char const** argv);
 		void Terminate(); //!< terminates application
+
+		GraphicsProvider* GetGraphicsProvider();
 
 		/**
 		 * @brief      Initializes the object.
@@ -50,10 +52,6 @@ namespace scythe {
 
 		const float GetFrameTime() const; //!< returns fixed frame time (1 / fps desired)
 		const float GetFrameRate() const; //!< returns real FPS (not desired)
-
-		const uint8_t GetColorBits() const;
-		const uint8_t GetDepthBits() const;
-		const uint8_t GetStencilBits() const;
 
 		virtual const char* GetTitle() const;
 		virtual const float GetDesiredFrameRate() const; //!< average frame rate for application that we desire

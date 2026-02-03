@@ -6,6 +6,7 @@
 
 namespace scythe::platform {
 
+#ifdef SCYTHE_USE_OPENGL
 	/**
 	 * @brief      Rendering context implementation for Windows platform
 	 */
@@ -14,6 +15,7 @@ namespace scythe::platform {
 		HDC dc;
 		HGLRC handle;
 	};
+#endif
 
 	/**
 	 * @brief      Window implementation for Windows platform
@@ -23,7 +25,9 @@ namespace scythe::platform {
 		// Base window struct to avoid inheritance
 		BaseWindow base;
 
+#ifdef SCYTHE_USE_OPENGL
 		RenderingContext context;
+#endif
 		HWND handle;
 
 		struct State

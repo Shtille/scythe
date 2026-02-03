@@ -4,25 +4,16 @@
 #include "types.h"
 #include "non_copyable.h"
 
-// Default color buffer bits
-#ifndef SCYTHE_DEFAULT_COLOR_BITS
-# define SCYTHE_DEFAULT_COLOR_BITS 32
-#endif
-
-// Default depth buffer bits
-#ifndef SCYTHE_DEFAULT_DEPTH_BITS
-# define SCYTHE_DEFAULT_DEPTH_BITS 24
-#endif
-
-// Default stencil buffer bits
-#ifndef SCYTHE_DEFAULT_STENCIL_BITS
-# define SCYTHE_DEFAULT_STENCIL_BITS 8
-#endif
-
 namespace scythe {
 
 	/**
 	 * @brief      This class describes a graphics provider.
+	 * @details    Note that its a base class that should be created and 
+	 *             initalized during Application::Initialize phase.
+	 *             For example:
+	 *             ```cpp
+	 *             graphics_provider_ = new scythe::GraphicsProvider(this);
+	 *             ```
 	 */
 	class GraphicsProvider
 	: public NonCopyable
@@ -38,11 +29,6 @@ namespace scythe {
 		
 		/**
 		 * @brief      Constructs a new instance with default parameters.
-		 * @details    The default parameters are:
-		 *               - color buffer bits:       SCYTHE_DEFAULT_COLOR_BITS
-		 *               - depth buffer bits:       SCYTHE_DEFAULT_DEPTH_BITS
-		 *               - stencil buffer bits:     SCYTHE_DEFAULT_STENCIL_BITS
-		 *             These parameters can be changed manually or via defines.
 		 *             
 		 * @param[in]  application  The application
 		 */
@@ -63,11 +49,32 @@ namespace scythe {
 		bool IsInitialized() const;
 
 		/**
-		 * @brief      Gets the color bits.
+		 * @brief      Gets the red bits.
 		 *
-		 * @return     The color bits.
+		 * @return     The red bits.
 		 */
-		uint8_t GetColorBits() const;
+		uint8_t GetRedBits() const;
+
+		/**
+		 * @brief      Gets the green bits.
+		 *
+		 * @return     The green bits.
+		 */
+		uint8_t GetGreenBits() const;
+
+		/**
+		 * @brief      Gets the blue bits.
+		 *
+		 * @return     The blue bits.
+		 */
+		uint8_t GetBlueBits() const;
+
+		/**
+		 * @brief      Gets the alpha bits.
+		 *
+		 * @return     The alpha bits.
+		 */
+		uint8_t GetAlphaBits() const;
 
 		/**
 		 * @brief      Gets the depth bits.
@@ -84,18 +91,40 @@ namespace scythe {
 		uint8_t GetStencilBits() const;
 
 		/**
-		 * @brief      Sets the color bits.
-		 * @details    Overrides SCYTHE_DEFAULT_COLOR_BITS value.
-		 *             Should be called on Application::Initialize.
+		 * @brief      Sets the red bits.
+		 * @details    Should be called on Application::Initialize.
 		 *
-		 * @param[in]  color_bits  The color bits
+		 * @param[in]  red_bits  The red bits
 		 */
-		void SetColorBits(uint8_t color_bits);
+		void SetRedBits(uint8_t red_bits);
+
+		/**
+		 * @brief      Sets the green bits.
+		 * @details    Should be called on Application::Initialize.
+		 *
+		 * @param[in]  green_bits  The green bits
+		 */
+		void SetGreenBits(uint8_t green_bits);
+
+		/**
+		 * @brief      Sets the blue bits.
+		 * @details    Should be called on Application::Initialize.
+		 *
+		 * @param[in]  blue_bits  The blue bits
+		 */
+		void SetBlueBits(uint8_t blue_bits);
+
+		/**
+		 * @brief      Sets the alpha bits.
+		 * @details    Should be called on Application::Initialize.
+		 *
+		 * @param[in]  alpha_bits  The alpha bits
+		 */
+		void SetAlphaBits(uint8_t alpha_bits);
 
 		/**
 		 * @brief      Sets the depth bits.
-		 * @details    Overrides SCYTHE_DEFAULT_DEPTH_BITS value.
-		 *             Should be called on Application::Initialize.
+		 * @details    Should be called on Application::Initialize.
 		 *
 		 * @param[in]  depth_bits  The depth bits
 		 */
@@ -103,8 +132,7 @@ namespace scythe {
 
 		/**
 		 * @brief      Sets the stencil bits.
-		 * @details    Overrides SCYTHE_DEFAULT_STENCIL_BITS value.
-		 *             Should be called on Application::Initialize.
+		 * @details    Should be called on Application::Initialize.
 		 *
 		 * @param[in]  stencil_bits  The stencil bits
 		 */
@@ -137,7 +165,10 @@ namespace scythe {
 	protected:
 		Application* application_;		//!< pointer to owner application
 		bool initialized_;				//!< whether application been initalized
-		uint8_t color_bits_;			//!< number of bits for color buffer
+		uint8_t red_bits_;				//!< number of bits for red channel in color buffer
+		uint8_t green_bits_;			//!< number of bits for green channel in color buffer
+		uint8_t blue_bits_;				//!< number of bits for blue channel in color buffer
+		uint8_t alpha_bits_;			//!< number of bits for alpha channel in color buffer
 		uint8_t depth_bits_;			//!< number of bits for depth buffer
 		uint8_t stencil_bits_;			//!< number of bits for stencil buffer
 	};

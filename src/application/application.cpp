@@ -161,6 +161,10 @@ namespace scythe {
 	{
 		need_quit_ = true;
 	}
+	GraphicsProvider* Application::GetGraphicsProvider()
+	{
+		return graphics_provider_;
+	}
 	void Application::Show()
 	{
 		platform::window::Show();
@@ -180,18 +184,6 @@ namespace scythe {
 	const float Application::GetFrameRate() const
 	{
 		return TimeManager::GetInstance()->GetFrameRate();
-	}
-	const uint8_t Application::GetColorBits() const
-	{
-		return graphics_provider_->color_bits_;
-	}
-	const uint8_t Application::GetDepthBits() const
-	{
-		return graphics_provider_->depth_bits_;
-	}
-	const uint8_t Application::GetStencilBits() const
-	{
-		return graphics_provider_->stencil_bits_;
 	}
 	const char* Application::GetTitle() const
 	{

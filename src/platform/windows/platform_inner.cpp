@@ -649,7 +649,6 @@ namespace scythe {
 			bool MakeFullscreen()
 			{
 				DesktopApplication* app = DesktopApplication::GetInstance();
-				WindowController* window_controller = app->GetWindowController();
 				Data* data = GetData(app);
 				Window* window = data->main_window;
 
@@ -666,12 +665,18 @@ namespace scythe {
 					// Try to change display settings for exclusive fullscreen
 					int fullscreen_width = window->fullscreen_state.rect.right - window->fullscreen_state.rect.left;
 					int fullscreen_height = window->fullscreen_state.rect.bottom - window->fullscreen_state.rect.top;
+
+					GraphicsProvider* graphics_provider = app->GetGraphicsProvider();
+					int red_bits   = graphics_provider->GetRedBits();
+					int green_bits = graphics_provider->GetGreenBits();
+					int blue_bits  = graphics_provider->GetBlueBits();
+
 					DEVMODE dmScreenSettings;
 					::ZeroMemory(&dmScreenSettings, sizeof(DEVMODE));
 					dmScreenSettings.dmSize = sizeof(DEVMODE);
 					dmScreenSettings.dmPelsWidth = fullscreen_width;
 					dmScreenSettings.dmPelsHeight = fullscreen_height;
-					dmScreenSettings.dmBitsPerPel = app->GetColorBits();
+					dmScreenSettings.dmBitsPerPel = red_bits + green_bits + blue_bits;
 					dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 					if (::ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
 					{
@@ -698,6 +703,8 @@ namespace scythe {
 				window->base.height = height;
 				window->base.aspect_ratio = static_cast<float>(window->base.width) / static_cast<float>(window->base.height);
 				window->base.fullscreen = true;
+
+				WindowController* window_controller = app->GetWindowController();
 				if (window_controller)
 					window_controller->OnResize(window->base.width, window->base.height);
 				return true;
@@ -705,7 +712,6 @@ namespace scythe {
 			void MakeWindowed()
 			{
 				DesktopApplication* app = DesktopApplication::GetInstance();
-				WindowController* window_controller = app->GetWindowController();
 				Data* data = GetData(app);
 				Window* window = data->main_window;
 
@@ -731,6 +737,8 @@ namespace scythe {
 				window->base.height = height;
 				window->base.aspect_ratio = static_cast<float>(window->base.width) / static_cast<float>(window->base.height);
 				window->base.fullscreen = false;
+
+				WindowController* window_controller = app->GetWindowController();
 				if (window_controller)
 					window_controller->OnResize(window->base.width, window->base.height);
 			}
