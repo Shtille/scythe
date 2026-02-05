@@ -10,6 +10,7 @@ conan profile detect --force
 ```
 
 ## Build
+From project directory:
 ```bash
 conan install . --build=missing -s compiler.cppstd=17
 cmake --preset conan-default

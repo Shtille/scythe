@@ -17,6 +17,8 @@ option(SCYTHE_USE_PHYSICS "Use physics" ON)
 if (WIN32)
 	option(SCYTHE_WINDOWS_NO_CONSOLE "Native Windows GUI application" ON)
 endif (WIN32)
+# Graphics API options
+option(SCYTHE_USE_OPENGL "Use OpenGL graphics" OFF)
 
 # Configure build
 if (WIN32)

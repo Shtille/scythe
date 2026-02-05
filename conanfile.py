@@ -15,8 +15,16 @@ class ScytheRecipe(ConanFile):
 
 	# Binary configuration
 	settings = "os", "compiler", "build_type", "arch"
-	options = {"shared": [True, False], "fPIC": [True, False]}
-	default_options = {"shared": False, "fPIC": True}
+	options = {
+		"shared": [True, False], 
+		"fPIC": [True, False],
+		"OpenGL": [True, False],
+		}
+	default_options = {
+		"shared": False, 
+		"fPIC": True,
+		"OpenGL": True,
+		}
 
 	# Sources are located in the same place as this recipe, copy them to the recipe
 	exports_sources = "CMakeLists.txt", "src/*", "include/*", "tests/*"
@@ -30,6 +38,8 @@ class ScytheRecipe(ConanFile):
 
 	def requirements(self):
 		self.test_requires("gtest/[>=1.15.0]")
+		if self.options.OpenGL == "True":
+			self.requires("glad/[>=2.0]")
 
 	def build_requirements(self):
 		self.tool_requires("cmake/[>3.15]")
@@ -41,6 +51,7 @@ class ScytheRecipe(ConanFile):
 		deps = CMakeDeps(self)
 		deps.generate()
 		tc = CMakeToolchain(self)
+		tc.variables["SCYTHE_USE_OPENGL"] = self.options.OpenGL == "True"
 		tc.generate()
 
 	def build(self):

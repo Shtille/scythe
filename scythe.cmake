@@ -60,6 +60,26 @@ if (WIN32)
 	)
 endif (WIN32)
 
+# OpenGL
+if (SCYTHE_USE_OPENGL)
+	list(APPEND PUBLIC_HEADERS
+		./include/scythe/opengl_include.h
+		./include/scythe/opengl_provider.h
+	)
+	list(APPEND SRC_FILES
+		./src/graphics/opengl/opengl_context_config.h
+		./src/graphics/opengl/opengl_framebuffer_config.h
+		./src/graphics/opengl/opengl_provider.cpp
+	)
+	if (WIN32)
+		list(APPEND SRC_FILES
+			./src/platform/windows/opengl_provider.cpp
+			./src/platform/windows/wgl.cpp
+			./src/platform/windows/wgl.h
+		)
+	endif (WIN32)
+endif (SCYTHE_USE_OPENGL)
+
 # Libraries
 set(LIBRARIES
 	# TODO
@@ -86,6 +106,15 @@ endif (SCYTHE_USE_PHYSICS)
 if (SCYTHE_WINDOWS_NO_CONSOLE)
 	target_compile_definitions(${PROJECT_NAME} PUBLIC SCYTHE_WINDOWS_NO_CONSOLE)
 endif (SCYTHE_WINDOWS_NO_CONSOLE)
+if (SCYTHE_USE_OPENGL)
+	target_compile_definitions(${PROJECT_NAME} PUBLIC SCYTHE_USE_OPENGL)
+endif (SCYTHE_USE_OPENGL)
+
+# OpenGL specific
+if (SCYTHE_USE_OPENGL)
+	find_package(glad REQUIRED)
+	target_link_libraries(${PROJECT_NAME} PUBLIC glad::glad)
+endif (SCYTHE_USE_OPENGL)
 
 # Installation properties
 install(TARGETS ${PROJECT_NAME})
