@@ -2,6 +2,7 @@
 
 #include <scythe/opengl_include.h>
 #include <scythe/desktop_application.h>
+#include <scythe/log.h>
 #include "platform_data.h"
 #include "../platform_inner.h"
 #include "wgl.h"
@@ -21,15 +22,17 @@ static inline scythe::platform::Window* GetMainWindow(scythe::Application* app)
 
 namespace scythe {
 
+	static GLADapiproc _GetProcAddress(const char* name)
+	{
+		LibraryWGL* wgl = LibraryWGL::GetInstance();
+		return wgl->GetProcedureAddress(name);
+	}
+
 	bool OpenGLGraphicsProvider::Initialize()
 	{
 		LibraryWGL* wgl = LibraryWGL::GetInstance();
 		// Initialize WGL
 		if (!wgl->Initialize())
-			return false;
-
-		// Load GLAD
-		if (!gladLoadGL((GLADloadfunc) wgl->wglGetProcAddress))
 			return false;
 
 		// Context configuration
@@ -64,6 +67,15 @@ namespace scythe {
 		if (!wgl->CreateContext(&context_config, &fb_config))
 		{
 			wgl->Deinitialize();
+			return false;
+		}
+
+		MakeContextCurrent();
+
+		// Load GLAD
+		if (!gladLoadGL(_GetProcAddress))
+		{
+			Error("GLAD loading failed");
 			return false;
 		}
 

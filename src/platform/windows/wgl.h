@@ -88,6 +88,9 @@ namespace scythe {
 
 		bool IsExtensionSupported(const char* extension);
 
+		typedef void (*Procedure)(void);
+		Procedure GetProcedureAddress(const char* name);
+
 	private:
 		int _ChoosePixelFormat(const OpenGLContextConfiguration* context_config, const OpenGLFramebufferConfiguration* fb_config);
 

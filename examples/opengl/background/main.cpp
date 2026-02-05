@@ -25,7 +25,8 @@ public:
 	void UnloadGraphicsResources() override {}
 	void Render() override
 	{
-		glClearColor(0.5f, 0.3f, 0.2f, 1.f);
+		// turquoise background color
+		glClearColor(0.25f, 0.88f, 0.81f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT);
 	}
 	// Derived from scythe::KeyboardController

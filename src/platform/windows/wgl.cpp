@@ -523,6 +523,14 @@ namespace scythe {
 
 		return ::IsStringInExtensionString(extension, extensions);
 	}
+	LibraryWGL::Procedure LibraryWGL::GetProcedureAddress(const char* name)
+	{
+		const Procedure proc = (Procedure) wglGetProcAddress(name);
+		if (proc)
+			return proc;
+
+		return (Procedure) ::GetProcAddress((HMODULE) library_instance_, name);
+	}
 
 #define ADD_ATTRIB(a) \
 { \
