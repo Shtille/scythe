@@ -20,13 +20,20 @@ static inline scythe::platform::Window* GetMainWindow(scythe::Application* app)
 	return data->main_window;
 }
 
-namespace scythe {
+/**
+ * @brief      Gets the proc address.
+ *
+ * @param[in]  name  The name
+ *
+ * @return     The proc address.
+ */
+static GLADapiproc GetProcedureAddress(const char* name)
+{
+	scythe::LibraryWGL* wgl = scythe::LibraryWGL::GetInstance();
+	return wgl->GetProcedureAddress(name);
+}
 
-	static GLADapiproc _GetProcAddress(const char* name)
-	{
-		LibraryWGL* wgl = LibraryWGL::GetInstance();
-		return wgl->GetProcedureAddress(name);
-	}
+namespace scythe {
 
 	bool OpenGLGraphicsProvider::Initialize()
 	{
@@ -73,7 +80,7 @@ namespace scythe {
 		MakeContextCurrent();
 
 		// Load GLAD
-		if (!gladLoadGL(_GetProcAddress))
+		if (!gladLoadGL(::GetProcedureAddress))
 		{
 			Error("GLAD loading failed");
 			return false;
