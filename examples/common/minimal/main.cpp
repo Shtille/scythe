@@ -18,9 +18,9 @@ public:
 		delete graphics_provider_;
 	}
 	// Derived from scythe::GraphicsController
-	bool LoadGraphicsResources() { return true; }
-	void UnloadGraphicsResources() {}
-	void Render() {}
+	bool LoadGraphicsResources() override { return true; }
+	void UnloadGraphicsResources() override {}
+	void Render() override {}
 };
 
 SCYTHE_DECLARE_MAIN(MinimalApplication)
