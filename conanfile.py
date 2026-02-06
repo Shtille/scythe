@@ -4,7 +4,7 @@ from conan.tools.build import check_min_cppstd
 
 class ScytheRecipe(ConanFile):
 	name = "scythe"
-	version = "2.0"
+	version = "1.0"
 
 	# Optional metadata
 	license = "MIT"
@@ -27,7 +27,15 @@ class ScytheRecipe(ConanFile):
 		}
 
 	# Sources are located in the same place as this recipe, copy them to the recipe
-	exports_sources = "CMakeLists.txt", "src/*", "include/*", "tests/*"
+	exports_sources = [
+		"CMakeLists.txt",
+		"conan_setup.cmake",
+		"scythe.cmake",
+		"src/*",
+		"include/*",
+		"examples/*",
+		"tests/*"
+	]
 
 	def config_options(self):
 		if self.settings.os == "Windows":
