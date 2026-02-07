@@ -37,6 +37,13 @@ class ScytheRecipe(ConanFile):
 		"tests/*"
 	]
 
+	scythe_defines = {
+		"OpenGL": ["SCYTHE_USE_OPENGL"],
+	}
+	scythe_requires = {
+		"OpenGL": ["glad/[>=2.0]"],
+	}
+
 	def config_options(self):
 		if self.settings.os == "Windows":
 			del self.options.fPIC
@@ -47,7 +54,8 @@ class ScytheRecipe(ConanFile):
 	def requirements(self):
 		self.test_requires("gtest/[>=1.15.0]")
 		if self.options.OpenGL == "True":
-			self.requires("glad/[>=2.0]")
+			for require in self.scythe_requires["OpenGL"]:
+				self.requires(require, transitive_headers=True)
 
 	def build_requirements(self):
 		self.tool_requires("cmake/[>3.15]")
@@ -59,7 +67,9 @@ class ScytheRecipe(ConanFile):
 		deps = CMakeDeps(self)
 		deps.generate()
 		tc = CMakeToolchain(self)
-		tc.variables["SCYTHE_USE_OPENGL"] = self.options.OpenGL == "True"
+		if self.options.OpenGL == "True":
+			for define in self.scythe_defines["OpenGL"]:
+				tc.variables[define] = True
 		tc.generate()
 
 	def build(self):
@@ -73,4 +83,7 @@ class ScytheRecipe(ConanFile):
 		cmake.install()
 
 	def package_info(self):
+		if self.options.OpenGL == "True":
+			for define in self.scythe_defines["OpenGL"]:
+				self.cpp_info.defines.append(define)
 		self.cpp_info.libs = ["scythe"]
