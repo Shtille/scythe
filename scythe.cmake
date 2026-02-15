@@ -60,7 +60,50 @@ if (WIN32)
 	)
 endif (WIN32)
 
-# OpenGL
+# Math specific
+if (SCYTHE_USE_MATH)
+	list(APPEND PUBLIC_HEADERS
+		./include/scythe/math/bounding_box.h
+		./include/scythe/math/bounding_box.inl
+		./include/scythe/math/bounding_sphere.h
+		./include/scythe/math/bounding_sphere.inl
+		./include/scythe/math/common.h
+		./include/scythe/math/constants.h
+		./include/scythe/math/frustum.h
+		./include/scythe/math/matrix3.h
+		./include/scythe/math/matrix3.inl
+		./include/scythe/math/matrix4.h
+		./include/scythe/math/matrix4.inl
+		./include/scythe/math/plane.h
+		./include/scythe/math/plane.inl
+		./include/scythe/math/quaternion.h
+		./include/scythe/math/quaternion.inl
+		./include/scythe/math/ray.h
+		./include/scythe/math/ray.inl
+		./include/scythe/math/vector2.h
+		./include/scythe/math/vector2.inl
+		./include/scythe/math/vector3.h
+		./include/scythe/math/vector3.inl
+		./include/scythe/math/vector4.h
+		./include/scythe/math/vector4.inl
+	)
+	list(APPEND SRC_FILES
+		./src/math/bounding_box.cpp
+		./src/math/bounding_sphere.cpp
+		./src/math/frustum.cpp
+		./src/math/common.cpp
+		./src/math/matrix3.cpp
+		./src/math/matrix4.cpp
+		./src/math/plane.cpp
+		./src/math/quaternion.cpp
+		./src/math/ray.cpp
+		./src/math/vector2.cpp
+		./src/math/vector3.cpp
+		./src/math/vector4.cpp
+	)
+endif (SCYTHE_USE_MATH)
+
+# OpenGL specific
 if (SCYTHE_USE_OPENGL)
 	list(APPEND PUBLIC_HEADERS
 		./include/scythe/opengl_include.h
@@ -100,9 +143,9 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE ${PRIVATE_DEFINES})
 #set_target_properties(${PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ${SCYTHE_WORKING_DIRECTORY})
 
 # Pass options as defines
-if (SCYTHE_USE_PHYSICS)
-	target_compile_definitions(${PROJECT_NAME} PUBLIC SCYTHE_USE_PHYSICS)
-endif (SCYTHE_USE_PHYSICS)
+if (SCYTHE_USE_MATH)
+	target_compile_definitions(${PROJECT_NAME} PUBLIC SCYTHE_USE_MATH)
+endif (SCYTHE_USE_MATH)
 if (SCYTHE_WINDOWS_NO_CONSOLE)
 	target_compile_definitions(${PROJECT_NAME} PUBLIC SCYTHE_WINDOWS_NO_CONSOLE)
 endif (SCYTHE_WINDOWS_NO_CONSOLE)

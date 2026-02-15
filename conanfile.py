@@ -18,11 +18,13 @@ class ScytheRecipe(ConanFile):
 	options = {
 		"shared": [True, False], 
 		"fPIC": [True, False],
+		"Math": [True, False],
 		"OpenGL": [True, False],
 		}
 	default_options = {
 		"shared": False, 
 		"fPIC": True,
+		"Math": True,
 		"OpenGL": True,
 		}
 
@@ -38,6 +40,7 @@ class ScytheRecipe(ConanFile):
 	]
 
 	scythe_defines = {
+		"Math": "SCYTHE_USE_MATH",
 		"OpenGL": ["SCYTHE_USE_OPENGL"],
 	}
 	scythe_requires = {
@@ -70,6 +73,7 @@ class ScytheRecipe(ConanFile):
 		if self.options.OpenGL == "True":
 			for define in self.scythe_defines["OpenGL"]:
 				tc.variables[define] = True
+		tc.variables[self.scythe_defines["Math"]] = self.options.Math == "True"
 		tc.generate()
 
 	def build(self):

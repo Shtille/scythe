@@ -13,7 +13,7 @@ set(CMAKE_PROJECT_TOP_LEVEL_INCLUDES "${CMAKE_SOURCE_DIR}/conan_setup.cmake" CAC
 
 # Options
 option(SCYTHE_BUILD_EXAMPLES "Build examples" ON)
-option(SCYTHE_USE_PHYSICS "Use physics" ON)
+option(SCYTHE_USE_MATH "Use Math" ON)
 if (WIN32)
 	option(SCYTHE_WINDOWS_NO_CONSOLE "Native Windows GUI application" ON)
 endif (WIN32)
