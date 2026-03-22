@@ -4,7 +4,7 @@ from conan.tools.build import check_min_cppstd
 from conan.errors import ConanException
 from scythe_features import ScytheFeatures
 
-# ConanFile require options to be static, thus we store it here
+# ConanFile requires options to be static, thus we store it outside of main class
 scythe_options = {
 	"shared": [True, False], 
 	"fPIC": [True, False],

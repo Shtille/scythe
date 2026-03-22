@@ -37,7 +37,7 @@ class ScytheFeatures:
 		first_keys = set(dicts[0].keys())
 		return all(set(d.keys()) == first_keys for d in dicts[1:])
 
-	def __validate_scythe_features_keys(self):
+	def __validate_features_keys(self):
 		return self.__all_dicts_have_same_keys([
 			self.features,
 			self.features_dependecies,
@@ -57,33 +57,33 @@ class ScytheFeatures:
 				return True
 		return False
 
-	def __validate_scythe_features_dependencies_graph(self):
+	def __validate_features_dependencies_graph(self):
 		for feature in self.features:
 			if self.__has_circular_dependency(feature):
 				return False
 		return True
 
-	def __enable_scythe_feature(self, feature):
+	def __enable_feature(self, feature):
 		self.features[feature] = True
 		deps = self.features_dependecies.get(feature, [])
 		for dep in deps:
-			self.__enable_scythe_feature(dep)
+			self.__enable_feature(dep)
 
-	def __enable_dependent_scythe_features(self):
+	def __enable_dependent_features(self):
 		for feature, value in self.features.items():
 			if value:
-				self.__enable_scythe_feature(feature)
+				self.__enable_feature(feature)
 
 	def configure(self):
-		result = self.__validate_scythe_features_keys()
+		result = self.__validate_features_keys()
 		if not result:
-			raise Exception("Scythe features keys do not match.")
+			raise Exception("Features keys do not match.")
 			return
-		result = self.__validate_scythe_features_dependencies_graph()
+		result = self.__validate_features_dependencies_graph()
 		if not result:
 			raise Exception("Circular dependecy detected.")
 			return
-		self.__enable_dependent_scythe_features()
+		self.__enable_dependent_features()
 
 	def add_features_to_options(self, options, default_options):
 		for feature, value in self.features.items():
