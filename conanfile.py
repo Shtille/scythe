@@ -15,7 +15,7 @@ scythe_default_options = {
 	}
 
 scythe_features = ScytheFeatures()
-scythe_features.configure()
+scythe_features.validate()
 scythe_features.add_features_to_options(scythe_options, scythe_default_options)
 
 
@@ -71,8 +71,13 @@ class ScytheRecipe(ScytheFeatures, ConanFile):
 					self.cpp_info.defines.append(define)
 
 	def config_options(self):
+		"""Delete unnecessary options here"""
 		if self.settings.os == "Windows":
 			del self.options.fPIC
+
+	def configure(self):
+		"""Modify options here"""
+		scythe_features.configure(self.options)
 
 	def validate(self):
 		check_min_cppstd(self, "17")

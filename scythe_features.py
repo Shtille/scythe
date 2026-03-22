@@ -63,27 +63,33 @@ class ScytheFeatures:
 				return False
 		return True
 
-	def __enable_feature(self, feature):
+	def __sync_features_with_options(self, options):
+		for feature in self.features:
+			self.features[feature] = options[feature]
+
+	def __enable_option(self, feature, options):
+		setattr(options, feature, True)
 		self.features[feature] = True
 		deps = self.features_dependecies.get(feature, [])
 		for dep in deps:
-			self.__enable_feature(dep)
+			self.__enable_option(dep, options)
 
-	def __enable_dependent_features(self):
+	def __enable_dependent_options(self, options):
 		for feature, value in self.features.items():
 			if value:
-				self.__enable_feature(feature)
+				self.__enable_option(feature, options)
 
-	def configure(self):
+	def validate(self):
 		result = self.__validate_features_keys()
 		if not result:
 			raise Exception("Features keys do not match.")
-			return
 		result = self.__validate_features_dependencies_graph()
 		if not result:
-			raise Exception("Circular dependecy detected.")
-			return
-		self.__enable_dependent_features()
+			raise Exception("Circular dependency detected.")
+
+	def configure(self, options):
+		self.__sync_features_with_options(options)
+		self.__enable_dependent_options(options)
 
 	def add_features_to_options(self, options, default_options):
 		for feature, value in self.features.items():
