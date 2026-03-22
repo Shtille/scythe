@@ -30,7 +30,7 @@ cmake -S . -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES=conan_provider.cmake -DCMAKE_BUILD
 On deployment we should enable all available options:
 
 ```bash
-conan create . --build=missing -s compiler.cppstd=17 -o OpenGL=True
+conan create . --build=missing -s compiler.cppstd=17 -o '&:OpenGL=True'
 ```
 
 ### Comsuming
