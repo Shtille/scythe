@@ -106,8 +106,8 @@ endif (SCYTHE_USE_MATH)
 # OpenGL specific
 if (SCYTHE_USE_OPENGL)
 	list(APPEND PUBLIC_HEADERS
-		./include/scythe/opengl_include.h
-		./include/scythe/opengl_provider.h
+		./include/scythe/opengl/opengl_include.h
+		./include/scythe/opengl/opengl_provider.h
 	)
 	list(APPEND SRC_FILES
 		./src/graphics/opengl/opengl_context_config.h

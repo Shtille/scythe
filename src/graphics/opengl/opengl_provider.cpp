@@ -1,4 +1,4 @@
-#include <scythe/opengl_provider.h>
+#include <scythe/opengl/opengl_provider.h>
 
 namespace scythe {
 

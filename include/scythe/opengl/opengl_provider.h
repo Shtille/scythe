@@ -5,7 +5,7 @@
 # error "OpenGL should be enabled to use this header"
 #endif
 
-#include "graphics_provider.h"
+#include "../graphics_provider.h"
 
 namespace scythe {
 

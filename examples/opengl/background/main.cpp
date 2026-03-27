@@ -1,7 +1,7 @@
 #include <scythe/main.h>
 #include <scythe/desktop_application.h>
-#include <scythe/opengl_provider.h>
-#include <scythe/opengl_include.h>
+#include <scythe/opengl/opengl_provider.h>
+#include <scythe/opengl/opengl_include.h>
 
 class BackgroundApplication final
 : public scythe::DesktopApplication

@@ -1,7 +1,7 @@
 #ifndef __SCYTHE_OPENGL_INCLUDE_H__
 #define __SCYTHE_OPENGL_INCLUDE_H__
 
-#include "platform.h"
+#include "../platform.h"
 
 #ifndef SCYTHE_USE_OPENGL
 # error "OpenGL should be enabled to use this header"
