@@ -4,7 +4,6 @@
 
 #include <string>
 #include <vector>
-#include <array>
 #include <optional>
 #include <cstdio>
 
@@ -68,24 +67,22 @@ namespace scythe {
 		return id_;
 	}
 
-	bool OpenGLProgram::Create(const ShadersInfo& info, bool use_files)
+	/**
+	 * @brief       Creates a program.
+	 *
+	 * @param[out]  id_              The identifier
+	 * @param[in]   shader_files     The shader files
+	 * @param[in]   shader_types     The shader types
+	 * @param[in]   shader_required  The shader required
+	 * @param[out]  shaders          The shaders
+	 * @param[in]   use_files        Whether use files or sources.
+	 *
+	 * @return      True on success and false otherwise.
+	 */
+	static bool CreateProgram(GLuint& id_, const std::vector<const char*>& shader_files, const std::vector<GLenum>& shader_types, 
+		const std::vector<bool>& shader_required, std::vector<std::optional<OpenGLShader>>& shaders, bool use_files)
 	{
-		std::array<const char*, kNumShaders> shader_files = {
-			info.vertex,
-			info.fragment,
-			info.geometry,
-		};
-		std::array<GLenum, kNumShaders> shader_types = {
-			GL_VERTEX_SHADER,
-			GL_FRAGMENT_SHADER,
-			GL_GEOMETRY_SHADER,
-		};
-		std::array<bool, kNumShaders> shader_required = {
-			true, true, false,
-		};
-		std::array<std::optional<OpenGLShader>, kNumShaders> shaders;
-
-		for (std::size_t i = 0u; i < kNumShaders; ++i)
+		for (std::size_t i = 0u; i < shader_types.size(); ++i)
 		{
 			if (!shader_required[i] && shader_files[i] == nullptr)
 				continue;
@@ -109,7 +106,7 @@ namespace scythe {
 				source = (const GLchar *)shader_code.c_str();
 			else
 				source = (const GLchar *)shader_files[i];
-			glShaderSource(shader_id, 1, &source, 0);
+			glShaderSource(shader_id, 1, &source, nullptr);
 
 			// Compile the vertex shader
 			glCompileShader(shader_id);
@@ -178,6 +175,65 @@ namespace scythe {
 				glDetachShader(id_, shader.value().id());
 
 		return true;
+	}
+
+	bool OpenGLProgram::Create(const RenderShadersInfo& info, bool use_files)
+	{
+		std::vector<const char*> shader_files;
+		std::vector<GLenum> shader_types;
+		std::vector<bool> shader_required;
+		std::vector<std::optional<OpenGLShader>> shaders;
+
+		try
+		{
+			shader_files.assign({
+				info.vertex,
+				info.fragment,
+				info.geometry,
+			});
+			shader_types.assign({
+				GL_VERTEX_SHADER,
+				GL_FRAGMENT_SHADER,
+				GL_GEOMETRY_SHADER,
+			});
+			shader_required.assign({
+				true, true, false,
+			});
+			shaders.resize(shader_types.size());
+		}
+		catch(...)
+		{
+			return false;
+		}
+
+		return CreateProgram(id_, shader_files, shader_types, shader_required, shaders, use_files);
+	}
+	bool OpenGLProgram::Create(const ComputeShadersInfo& info, bool use_files)
+	{
+		std::vector<const char*> shader_files;
+		std::vector<GLenum> shader_types;
+		std::vector<bool> shader_required;
+		std::vector<std::optional<OpenGLShader>> shaders;
+
+		try
+		{
+			shader_files.assign({
+				info.compute,
+			});
+			shader_types.assign({
+				GL_COMPUTE_SHADER,
+			});
+			shader_required.assign({
+				true,
+			});
+			shaders.resize(shader_types.size());
+		}
+		catch(...)
+		{
+			return false;
+		}
+
+		return CreateProgram(id_, shader_files, shader_types, shader_required, shaders, use_files);
 	}
 	void OpenGLProgram::Destroy()
 	{

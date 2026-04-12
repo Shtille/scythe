@@ -135,7 +135,7 @@ void Drawer::Render()
 }
 bool Drawer::LoadShaders()
 {
-	scythe::OpenGLProgram::ShadersInfo info;
+	scythe::OpenGLProgram::RenderShadersInfo info;
 	info.vertex   = quad_shaders::kVertexSource;
 	info.geometry = quad_shaders::kGeometrySource;
 	info.fragment = quad_shaders::kFragmentSource;

@@ -20,13 +20,21 @@ namespace scythe {
 	public:
 
 		/**
-		 * @brief      Describes shader sources information.
+		 * @brief      Describes render shader sources information.
 		 */
-		struct ShadersInfo
+		struct RenderShadersInfo
 		{
 			const char* vertex = nullptr;
 			const char* fragment = nullptr;
 			const char* geometry = nullptr;
+		};
+
+		/**
+		 * @brief      Describes compute shader sources information.
+		 */
+		struct ComputeShadersInfo
+		{
+			const char* compute = nullptr;
 		};
 
 		/**
@@ -37,14 +45,24 @@ namespace scythe {
 	public:
 
 		/**
-		 * @brief      Creates program from files.
+		 * @brief      Creates render program from files.
 		 *
 		 * @param[in]  info       Shader source information.
 		 * @param[in]  use_files  Whether use files or sources.
 		 *
 		 * @return     True on success and false otherwise.
 		 */
-		bool Create(const ShadersInfo& info, bool use_files);
+		bool Create(const RenderShadersInfo& info, bool use_files);
+
+		/**
+		 * @brief      Creates compute program from files.
+		 *
+		 * @param[in]  info       Shader source information.
+		 * @param[in]  use_files  Whether use files or sources.
+		 *
+		 * @return     True on success and false otherwise.
+		 */
+		bool Create(const ComputeShadersInfo& info, bool use_files);
 
 		/**
 		 * @brief      Destroys the object.
