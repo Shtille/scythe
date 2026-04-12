@@ -31,17 +31,12 @@ namespace scythe {
 	{
 		return msaa_samples_;
 	}
-	void OpenGLGraphicsProvider::SetContextMajorVersion(uint8_t context_major_version)
+	void OpenGLGraphicsProvider::SetContextVersion(uint8_t major, uint8_t minor)
 	{
 		if (initialized_)
 			return;
-		context_major_version_ = context_major_version;
-	}
-	void OpenGLGraphicsProvider::SetContextMinorVersion(uint8_t context_minor_version)
-	{
-		if (initialized_)
-			return;
-		context_minor_version_ = context_minor_version;
+		context_major_version_ = major;
+		context_minor_version_ = minor;
 	}
 	void OpenGLGraphicsProvider::SetMultisample(bool flag)
 	{

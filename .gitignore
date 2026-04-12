@@ -66,6 +66,9 @@ CMakeUserPresets.json
 test_package/[Bb]uild/
 test_package/CMakeUserPresets.json
 
+# Conan VS Code addon
+.vsconan/
+
 # Some intermediate files
 *.o
 *.d

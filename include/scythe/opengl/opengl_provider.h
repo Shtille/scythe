@@ -69,17 +69,10 @@ namespace scythe {
 		 * @brief      Sets the context major version.
 		 * @details    Should be called on Application::Initialize.
 		 *
-		 * @param[in]  context_major_version  The context major version
+		 * @param[in]  major  The context major version
+		 * @param[in]  minor  The context minor version
 		 */
-		void SetContextMajorVersion(uint8_t context_major_version);
-
-		/**
-		 * @brief      Sets the context minor version.
-		 * @details    Should be called on Application::Initialize.
-		 *
-		 * @param[in]  context_minor_version  The context minor version
-		 */
-		void SetContextMinorVersion(uint8_t context_minor_version);
+		void SetContextVersion(uint8_t major, uint8_t minor);
 
 		/**
 		 * @brief      Sets the multisample.

@@ -1,6 +1,8 @@
 #ifndef __SCYTHE_SINGLETON_H__
 #define __SCYTHE_SINGLETON_H__
 
+#include <type_traits>
+
 #include "non_copyable.h"
 #include "types.h"
 

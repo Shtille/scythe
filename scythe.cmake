@@ -107,11 +107,13 @@ endif (SCYTHE_USE_MATH)
 if (SCYTHE_USE_OPENGL)
 	list(APPEND PUBLIC_HEADERS
 		./include/scythe/opengl/opengl_include.h
+		./include/scythe/opengl/opengl_program.h
 		./include/scythe/opengl/opengl_provider.h
 	)
 	list(APPEND SRC_FILES
 		./src/graphics/opengl/opengl_context_config.h
 		./src/graphics/opengl/opengl_framebuffer_config.h
+		./src/graphics/opengl/opengl_program.cpp
 		./src/graphics/opengl/opengl_provider.cpp
 	)
 	if (WIN32)
