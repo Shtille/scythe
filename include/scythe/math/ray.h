@@ -20,7 +20,7 @@ class BoundingBox;
  *
  * Rays direction vector are always normalized.
  */
-class Ray
+class alignas(4) Ray
 {
 public:
 

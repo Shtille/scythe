@@ -10,7 +10,7 @@ namespace scythe {
 /**
  * Defines 4-element floating point vector.
  */
-class Vector4
+class alignas(4) Vector4
 {
 public:
 

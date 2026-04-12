@@ -31,7 +31,7 @@ class BoundingBox;
  * don't need to be rendered, culling them quickly can save you a lot of
  * rendering time.
  */
-class Frustum
+class alignas(4) Frustum
 {
 public:
 

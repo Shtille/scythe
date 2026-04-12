@@ -21,7 +21,7 @@ class Ray;
  * The plane is represented as a plane using a 3D vector normal and a
  * distance value (stored as a negative value).
  */
-class Plane
+class alignas(4) Plane
 {
 public:
 

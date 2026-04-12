@@ -18,7 +18,7 @@ class Matrix4;
 /**
  * Defines a 3-dimensional bounding sphere.
  */
-class BoundingSphere
+class alignas(4) BoundingSphere
 {
 public:
 

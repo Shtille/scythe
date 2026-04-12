@@ -45,7 +45,7 @@ class Matrix3;
  *
  * @see Transform
  */
-class Matrix4
+class alignas(4) Matrix4
 {
 public:
 

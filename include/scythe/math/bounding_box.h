@@ -18,7 +18,7 @@ class Matrix4;
 /**
  * Defines a 3-dimensional axis-aligned bounding box.
  */
-class BoundingBox
+class alignas(4) BoundingBox
 {
 public:
 

@@ -28,7 +28,7 @@ class Matrix4;
  * Since matrix multiplication is not commutative, multiplication must be done in the
  * correct order when combining transformations.
  */
-class Matrix3
+class alignas(4) Matrix3
 {
 public:
 

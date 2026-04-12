@@ -16,7 +16,7 @@ namespace scythe {
  * the magnitude of the vector intact. When used as a point,
  * the elements of the vector represent a position in 3D space.
  */
-class Vector3
+class alignas(4) Vector3
 {
 public:
 
