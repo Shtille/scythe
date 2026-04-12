@@ -28,6 +28,10 @@ private:
 	};
 
 	void FreeArrays();
+	void ResetCounterToZero();
+	void FilterIndices();
+	void ReadFilteredCount();
+	void RenderObjects();
 	bool LoadShaders();
 
 private:
@@ -36,7 +40,8 @@ private:
 	const uint32_t vertex_size_;
 	const uint32_t index_size_;
 	uint32_t num_vertices_;
-	uint32_t num_indices_;
+	uint32_t num_original_indices_;
+	uint32_t num_filtered_indices_;
 	uint8_t* vertices_array_;
 	uint8_t* indices_array_;
 	// OpenGL resources
@@ -44,7 +49,9 @@ private:
 	scythe::OpenGLProgram compute_program_;
 	uint32_t vertex_array_object_;
 	uint32_t vertex_buffer_object_;
-	uint32_t index_buffer_object_;
+	uint32_t original_index_buffer_object_;
+	uint32_t filtered_index_buffer_object_;
+	uint32_t atomic_counter_object_;
 };
 
 #endif

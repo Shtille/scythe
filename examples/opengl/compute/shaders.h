@@ -66,11 +66,6 @@ void main()
 
 namespace filter_shaders {
 
-// See: "opengl compute shader atomic counter usage"
-// Index buffers should be bound as SSBO:
-// `glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, indexBuffer);`
-// `glMemoryBarrier(GL_ELEMENT_ARRAY_BARRIER_BIT)`
-// `glMemoryBarrier(GL_ATOMIC_COUNTER_BARRIER_BIT)`
 static const char* kComputeSource = R"(
 #version 460 core
 
