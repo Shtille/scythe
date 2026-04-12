@@ -12,7 +12,8 @@ Drawer::Drawer(uint32_t num_objects)
 , num_indices_(0)
 , vertices_array_(nullptr)
 , indices_array_(nullptr)
-, program_()
+, render_program_()
+, compute_program_()
 , vertex_array_object_(0)
 , vertex_buffer_object_(0)
 , index_buffer_object_(0)
@@ -124,8 +125,8 @@ void Drawer::Unload()
 }
 void Drawer::Render()
 {
-	glUseProgram(program_.id());
-	int location = glGetUniformLocation(program_.id(), "u_color");
+	glUseProgram(render_program_.id());
+	int location = glGetUniformLocation(render_program_.id(), "u_color");
 	glUniform4f(location, 1.0f, 0.0f, 0.0f, 0.0f);
 
 	glBindVertexArray(vertex_array_object_);
@@ -135,9 +136,17 @@ void Drawer::Render()
 }
 bool Drawer::LoadShaders()
 {
-	scythe::OpenGLProgram::RenderShadersInfo info;
-	info.vertex   = quad_shaders::kVertexSource;
-	info.geometry = quad_shaders::kGeometrySource;
-	info.fragment = quad_shaders::kFragmentSource;
-	return program_.Create(info, false);
+	scythe::OpenGLProgram::RenderShadersInfo render_info;
+	render_info.vertex   = quad_shaders::kVertexSource;
+	render_info.geometry = quad_shaders::kGeometrySource;
+	render_info.fragment = quad_shaders::kFragmentSource;
+	if (!render_program_.Create(render_info, false))
+		return false;
+
+	scythe::OpenGLProgram::ComputeShadersInfo compute_info;
+	compute_info.compute = filter_shaders::kComputeSource;
+	if (!compute_program_.Create(compute_info, false))
+		return false;
+
+	return true;
 }

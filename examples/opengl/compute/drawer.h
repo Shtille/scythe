@@ -40,7 +40,8 @@ private:
 	uint8_t* vertices_array_;
 	uint8_t* indices_array_;
 	// OpenGL resources
-	scythe::OpenGLProgram program_;
+	scythe::OpenGLProgram render_program_;
+	scythe::OpenGLProgram compute_program_;
 	uint32_t vertex_array_object_;
 	uint32_t vertex_buffer_object_;
 	uint32_t index_buffer_object_;

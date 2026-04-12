@@ -64,4 +64,40 @@ void main()
 
 } // namespace quad_shaders
 
+namespace filter_shaders {
+
+// See: "opengl compute shader atomic counter usage"
+// Index buffers should be bound as SSBO:
+// `glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, indexBuffer);`
+// `glMemoryBarrier(GL_ELEMENT_ARRAY_BARRIER_BIT)`
+// `glMemoryBarrier(GL_ATOMIC_COUNTER_BARRIER_BIT)`
+static const char* kComputeSource = R"(
+#version 460 core
+
+layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+layout (std430, binding = 0) readonly buffer InputIndexBuffer {
+	uint input_indices[];
+};
+layout (std430, binding = 1) writeonly buffer OutputIndexBuffer {
+	uint output_indices[];
+};
+
+layout (binding = 0) uniform atomic_uint counter;
+
+uniform uint count;
+
+void main()
+{
+	uint src_index = gl_GlobalInvocationID.x;
+	if ((src_index % count) == 0)
+	{
+		uint dst_index = atomicCounterIncrement(counter);
+		output_indices[dst_index] = input_indices[src_index];
+	}
+}
+)";
+
+} // namespace filter_shaders
+
 #endif
