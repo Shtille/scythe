@@ -57,15 +57,15 @@ static const char* kFragmentSource = R"(
 #version 460 core
 
 layout (std430, binding = 0) readonly buffer Colors {
-	vec3 colors[];
+	vec4 colors[];
 };
 
 out vec4 fragment_color;
 
 void main()
 {
-	vec3 current_color = colors[gl_PrimitiveID];
-	fragment_color = vec4(current_color, 1.0);
+	vec4 current_color = colors[gl_PrimitiveID];
+	fragment_color = current_color;
 }
 )";
 

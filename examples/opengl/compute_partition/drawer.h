@@ -7,7 +7,7 @@
 #include <scythe/opengl/opengl_include.h>
 #include <scythe/opengl/opengl_program.h>
 #include <scythe/math/vector2.h>
-#include <scythe/math/vector3.h>
+#include <scythe/math/vector4.h>
 
 class Drawer final
 {
@@ -46,7 +46,7 @@ private:
 	uint32_t num_filtered_indices_;
 	uint8_t* vertices_array_;
 	uint8_t* indices_array_;
-	std::vector<scythe::Vector3> colors_;
+	std::vector<scythe::Vector4> colors_;
 	// OpenGL resources
 	scythe::OpenGLProgram render_program_;
 	scythe::OpenGLProgram compute_program_;

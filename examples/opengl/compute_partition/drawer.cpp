@@ -83,7 +83,7 @@ bool Drawer::CreateData()
 		float r = t;
 		float g = 0.0f;
 		float b = 0.0f;
-		colors_.push_back(scythe::Vector3(r, g, b));
+		colors_.push_back(scythe::Vector4(r, g, b, 1.0f));
 	}
 
 	return true;
