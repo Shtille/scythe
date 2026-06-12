@@ -20,6 +20,7 @@ Drawer::Drawer(uint32_t num_objects)
 , original_index_buffer_object_(0)
 , filtered_index_buffer_object_(0)
 , atomic_counter_object_(0)
+, colors_buffer_object_(0)
 {
 	//
 }
@@ -74,6 +75,17 @@ bool Drawer::CreateData()
 		indices[i] = i;
 	}
 
+	// Fill colors
+	colors_.reserve(num_objects_);
+	for (uint32_t i = 0u; i < num_objects_; ++i)
+	{
+		float t = static_cast<float>(i) / static_cast<float>(num_objects_ - 1);
+		float r = t;
+		float g = 0.0f;
+		float b = 0.0f;
+		colors_.push_back(scythe::Vector3(r, g, b));
+	}
+
 	return true;
 }
 bool Drawer::Load()
@@ -92,6 +104,12 @@ bool Drawer::Load()
 	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, atomic_counter_object_);
 	glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(GLuint), nullptr, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
+
+	// Colors buffer
+	glGenBuffers(1, &colors_buffer_object_);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, colors_buffer_object_);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(colors_[0]) * colors_.size(), colors_.data(), GL_STATIC_DRAW);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	// --- Render objects ---
 	glGenVertexArrays(1, &vertex_array_object_);
@@ -150,6 +168,11 @@ void Drawer::Unload()
 		glDeleteBuffers(1, &atomic_counter_object_);
 		atomic_counter_object_ = 0;
 	}
+	if (colors_buffer_object_ != 0)
+	{
+		glDeleteBuffers(1, &colors_buffer_object_);
+		colors_buffer_object_ = 0;
+	}
 }
 void Drawer::Render()
 {
@@ -194,14 +217,15 @@ void Drawer::ReadFilteredCount()
 }
 void Drawer::RenderObjects()
 {
-	glUseProgram(render_program_.id());
-	int location = glGetUniformLocation(render_program_.id(), "u_color");
-	glUniform4f(location, 1.0f, 0.0f, 0.0f, 0.0f);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, colors_buffer_object_);
 
+	glUseProgram(render_program_.id());
 	glBindVertexArray(vertex_array_object_);
 	glDrawElements(GL_POINTS, num_filtered_indices_, GL_UNSIGNED_INT, nullptr);
 	glBindVertexArray(0);
 	glUseProgram(0);
+
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);
 }
 bool Drawer::LoadShaders()
 {

@@ -2,7 +2,7 @@
  * @file main.cpp
  * @brief Entry point of the application.
  *
- * This example shows how to filter objects with compute shader.
+ * This example shows how to partition items with compute shader.
  */
 
 #include <scythe/main.h>
@@ -34,7 +34,7 @@ public:
 	// Derived from scythe::GraphicsController
 	bool LoadGraphicsResources() override
 	{
-		drawer_ = new Drawer(10);
+		drawer_ = new Drawer(100);
 		if (!drawer_)
 			return false;
 		if (!drawer_->CreateData())

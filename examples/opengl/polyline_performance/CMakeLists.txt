@@ -1,6 +1,6 @@
-# CMakeLists file for compute filtering example
+# CMakeLists file for polyline example
 
-project(compute_filtering VERSION 0.1.0 LANGUAGES CXX)
+project(polyline_performance VERSION 0.1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -11,6 +11,7 @@ set(SRC_FILES
 	drawer.h
 	main.cpp
 	shaders.h
+	types.h
 )
 
 # Libraries

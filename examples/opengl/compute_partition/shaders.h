@@ -33,12 +33,16 @@ in VS_OUT {
 void build_quad(vec4 pos, float size)
 {
 	gl_Position = pos + vec4(-size, -size, 0.0, 0.0);
+	gl_PrimitiveID = gl_PrimitiveIDIn;
 	EmitVertex();
 	gl_Position = pos + vec4(+size, -size, 0.0, 0.0);
+	gl_PrimitiveID = gl_PrimitiveIDIn;
 	EmitVertex();
 	gl_Position = pos + vec4(-size, +size, 0.0, 0.0);
+	gl_PrimitiveID = gl_PrimitiveIDIn;
 	EmitVertex();
 	gl_Position = pos + vec4(+size, +size, 0.0, 0.0);
+	gl_PrimitiveID = gl_PrimitiveIDIn;
 	EmitVertex();
 	EndPrimitive();
 }
@@ -52,13 +56,16 @@ void main()
 static const char* kFragmentSource = R"(
 #version 460 core
 
-uniform vec4 u_color;
+layout (std430, binding = 0) readonly buffer Colors {
+	vec3 colors[];
+};
 
-out vec4 color;
+out vec4 fragment_color;
 
 void main()
 {
-	color = u_color;
+	vec3 current_color = colors[gl_PrimitiveID];
+	fragment_color = vec4(current_color, 1.0);
 }
 )";
 
@@ -87,11 +94,8 @@ void main()
 	uint src_index = gl_GlobalInvocationID.x;
 	if (src_index >= count)
 		return;
-	if ((src_index % 2) == 0) // take only even indices
-	{
-		uint dst_index = atomicCounterIncrement(counter);
-		output_indices[dst_index] = input_indices[src_index];
-	}
+	uint dst_index = atomicCounterIncrement(counter);
+	output_indices[dst_index] = input_indices[src_index];
 }
 )";
 
