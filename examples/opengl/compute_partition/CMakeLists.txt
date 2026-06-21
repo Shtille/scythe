@@ -9,8 +9,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(SRC_FILES
 	drawer.cpp
 	drawer.h
+	partitioner.cpp
+	partitioner.h
 	main.cpp
 	shaders.h
+	partition_shaders.h
 )
 
 # Libraries

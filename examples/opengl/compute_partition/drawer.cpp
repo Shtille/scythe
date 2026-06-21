@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include <scythe/log.h> // temp
+
 #include "shaders.h"
 
 Drawer::Drawer(uint32_t num_objects)
@@ -10,17 +12,18 @@ Drawer::Drawer(uint32_t num_objects)
 , index_size_(sizeof(uint32_t))
 , num_vertices_(0)
 , num_original_indices_(0)
-, num_filtered_indices_(0)
+, num_opaque_indices_(0)
+, num_transparent_indices_(0)
 , vertices_array_(nullptr)
 , indices_array_(nullptr)
 , render_program_()
-, compute_program_()
 , vertex_array_object_(0)
 , vertex_buffer_object_(0)
 , original_index_buffer_object_(0)
 , filtered_index_buffer_object_(0)
+, original_colors_buffer_object_(0)
+, filtered_colors_buffer_object_(0)
 , atomic_counter_object_(0)
-, colors_buffer_object_(0)
 {
 	//
 }
@@ -51,16 +54,17 @@ bool Drawer::CreateData()
 	if (!vertices_array_)
 		return false;
 	Vertex* vertices = reinterpret_cast<Vertex*>(vertices_array_);
-	float size = 1.0f / static_cast<float>(num_objects_);
+	float size = 1.0f / static_cast<float>(num_objects_); // half of quad length
 	float start_x = -1.0f + size;
 	float offset_x = size + size;
 	for (uint32_t i = 0; i < num_vertices_; ++i)
 	{
 		float x = start_x + offset_x * static_cast<float>(i);
 
+		bool even = (i % 2) == 0;
 		Vertex& vertex = vertices[i];
 		vertex.position.Set(x, 0.0f);
-		vertex.size = size;
+		vertex.size = even ? size : (size * 1.4f);
 	}
 
 	// Fill indices data
@@ -79,11 +83,13 @@ bool Drawer::CreateData()
 	colors_.reserve(num_objects_);
 	for (uint32_t i = 0u; i < num_objects_; ++i)
 	{
-		float t = static_cast<float>(i) / static_cast<float>(num_objects_ - 1);
-		float r = t;
-		float g = 0.0f;
-		float b = 0.0f;
-		colors_.push_back(scythe::Vector4(r, g, b, 1.0f));
+		bool even = (i % 2) == 0;
+		scythe::Vector4 color;
+		if (even)
+			color.Set(1.0f, 0.0f, 0.0f, 1.0f);
+		else
+			color.Set(0.0f, 1.0f, 0.0f, 0.5f);
+		colors_.push_back(color);
 	}
 
 	return true;
@@ -105,10 +111,16 @@ bool Drawer::Load()
 	glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(GLuint), nullptr, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
 
-	// Colors buffer
-	glGenBuffers(1, &colors_buffer_object_);
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, colors_buffer_object_);
+	// Original colors buffer
+	glGenBuffers(1, &original_colors_buffer_object_);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, original_colors_buffer_object_);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(colors_[0]) * colors_.size(), colors_.data(), GL_STATIC_DRAW);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+	// Filtered colors buffer
+	glGenBuffers(1, &filtered_colors_buffer_object_);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, filtered_colors_buffer_object_);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(colors_[0]) * colors_.size(), colors_.data(), GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	// --- Render objects ---
@@ -139,10 +151,22 @@ bool Drawer::Load()
 
 	// Finally we can free arrays
 	FreeArrays();
+
+	if (!partitioner_.Load())
+		return false;
+
+	FilterObjects();
+
+	// Enable blend to see transparency
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	return true;
 }
 void Drawer::Unload()
 {
+	partitioner_.Unload();
+
 	if (vertex_array_object_ != 0)
 	{
 		glDeleteVertexArrays(1, &vertex_array_object_);
@@ -168,64 +192,59 @@ void Drawer::Unload()
 		glDeleteBuffers(1, &atomic_counter_object_);
 		atomic_counter_object_ = 0;
 	}
-	if (colors_buffer_object_ != 0)
+	if (original_colors_buffer_object_ != 0)
 	{
-		glDeleteBuffers(1, &colors_buffer_object_);
-		colors_buffer_object_ = 0;
+		glDeleteBuffers(1, &original_colors_buffer_object_);
+		original_colors_buffer_object_ = 0;
+	}
+	if (filtered_colors_buffer_object_ != 0)
+	{
+		glDeleteBuffers(1, &filtered_colors_buffer_object_);
+		filtered_colors_buffer_object_ = 0;
 	}
 }
 void Drawer::Render()
 {
-	ResetCounterToZero();
-	FilterIndices();
-	ReadFilteredCount();
-	RenderObjects();
+	RenderObjects(false);
 }
-void Drawer::ResetCounterToZero()
+void Drawer::RenderObjects(bool opaque)
 {
-	GLuint zero = 0;
-	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, atomic_counter_object_);
-	glBufferSubData(GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(GLuint), &zero);
-	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
-}
-void Drawer::FilterIndices()
-{
-	glUseProgram(compute_program_.id());
-	int location = glGetUniformLocation(compute_program_.id(), "count");
-	glUniform1ui(location, num_objects_);
+	GLsizei count;
+	const uint8_t* base = nullptr;
+	size_t offset;
+	if (opaque)
+	{
+		count = static_cast<GLsizei>(num_opaque_indices_);
+		offset = 0;
+	}
+	else // transparent
+	{
+		count = static_cast<GLsizei>(num_transparent_indices_);
+		offset = num_opaque_indices_ * sizeof(uint32_t);
+	}
 
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, original_index_buffer_object_);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, filtered_index_buffer_object_);
-	glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, atomic_counter_object_);
-
-	constexpr uint32_t kWorkGroupSizeX = 64; // == local_size_x
-	uint32_t work_group_count_x = (num_original_indices_ + (kWorkGroupSizeX - 1)) / kWorkGroupSizeX;
-	glDispatchCompute(work_group_count_x, 1, 1);
-	glMemoryBarrier(GL_ELEMENT_ARRAY_BARRIER_BIT | GL_ATOMIC_COUNTER_BARRIER_BIT);
-
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
-	glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, 0);
-}
-void Drawer::ReadFilteredCount()
-{
-	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, atomic_counter_object_);
-	GLuint* ptr = (GLuint*)glMapBufferRange(GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(GLuint), GL_MAP_READ_BIT);
-	num_filtered_indices_ = ptr[0];
-	glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
-	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
-}
-void Drawer::RenderObjects()
-{
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, colors_buffer_object_);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, filtered_colors_buffer_object_);
 
 	glUseProgram(render_program_.id());
 	glBindVertexArray(vertex_array_object_);
-	glDrawElements(GL_POINTS, num_filtered_indices_, GL_UNSIGNED_INT, nullptr);
+	glDrawElements(GL_POINTS, count, GL_UNSIGNED_INT, base + offset);
 	glBindVertexArray(0);
 	glUseProgram(0);
 
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);
+}
+void Drawer::FilterObjects()
+{
+	partitioner_.Partition(num_objects_, original_index_buffer_object_, filtered_index_buffer_object_,
+		original_colors_buffer_object_, filtered_colors_buffer_object_);
+
+	uint32_t num_opaque_objects = partitioner_.ReadNumOpaque();
+	uint32_t num_transparent_objects = num_objects_ - num_opaque_objects;
+
+	num_opaque_indices_ = num_opaque_objects;
+	num_transparent_indices_ = num_transparent_objects;
+
+	 // TODO: align filtered_colors_buffer_object_
 }
 bool Drawer::LoadShaders()
 {
@@ -234,11 +253,6 @@ bool Drawer::LoadShaders()
 	render_info.geometry = quad_shaders::kGeometrySource;
 	render_info.fragment = quad_shaders::kFragmentSource;
 	if (!render_program_.Create(render_info, false))
-		return false;
-
-	scythe::OpenGLProgram::ComputeShadersInfo compute_info;
-	compute_info.compute = filter_shaders::kComputeSource;
-	if (!compute_program_.Create(compute_info, false))
 		return false;
 
 	return true;

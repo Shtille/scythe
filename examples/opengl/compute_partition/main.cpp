@@ -3,6 +3,9 @@
  * @brief Entry point of the application.
  *
  * This example shows how to partition items with compute shader.
+ * 
+ * Originally we have single array of object with different opacity.
+ * We want opaque objects to be rendered first, transparent ones after.
  */
 
 #include <scythe/main.h>
@@ -34,7 +37,7 @@ public:
 	// Derived from scythe::GraphicsController
 	bool LoadGraphicsResources() override
 	{
-		drawer_ = new Drawer(100);
+		drawer_ = new Drawer(20);
 		if (!drawer_)
 			return false;
 		if (!drawer_->CreateData())
@@ -56,7 +59,7 @@ public:
 	void Render() override
 	{
 		// turquoise background color
-		glClearColor(0.25f, 0.88f, 0.81f, 1.f);
+		glClearColor(0.f, 0.f, 0.f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		drawer_->Render();

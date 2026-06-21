@@ -9,6 +9,8 @@
 #include <scythe/math/vector2.h>
 #include <scythe/math/vector4.h>
 
+#include "partitioner.h"
+
 class Drawer final
 {
 public:
@@ -30,10 +32,8 @@ private:
 	};
 
 	void FreeArrays();
-	void ResetCounterToZero();
-	void FilterIndices();
-	void ReadFilteredCount();
-	void RenderObjects();
+	void RenderObjects(bool opaque);
+	void FilterObjects();
 	bool LoadShaders();
 
 private:
@@ -43,19 +43,22 @@ private:
 	const uint32_t index_size_;
 	uint32_t num_vertices_;
 	uint32_t num_original_indices_;
-	uint32_t num_filtered_indices_;
+	uint32_t num_opaque_indices_;
+	uint32_t num_transparent_indices_;
 	uint8_t* vertices_array_;
 	uint8_t* indices_array_;
 	std::vector<scythe::Vector4> colors_;
 	// OpenGL resources
 	scythe::OpenGLProgram render_program_;
-	scythe::OpenGLProgram compute_program_;
 	uint32_t vertex_array_object_;
 	uint32_t vertex_buffer_object_;
 	uint32_t original_index_buffer_object_;
 	uint32_t filtered_index_buffer_object_;
+	uint32_t original_colors_buffer_object_;
+	uint32_t filtered_colors_buffer_object_;
 	uint32_t atomic_counter_object_;
-	uint32_t colors_buffer_object_;
+	// Partitioner
+	Partitioner partitioner_;
 };
 
 #endif
