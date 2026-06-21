@@ -34,10 +34,11 @@ private:
 	void FreeArrays();
 	void RenderObjects(bool opaque);
 	void FilterObjects();
+	void AlignData(uint32_t num_opaque_objects, uint32_t num_transparent_objects);
 	bool LoadShaders();
 
 private:
-	uint32_t num_objects_;
+	const uint32_t num_objects_;
 	// Data
 	const uint32_t vertex_size_;
 	const uint32_t index_size_;
@@ -45,6 +46,10 @@ private:
 	uint32_t num_original_indices_;
 	uint32_t num_opaque_indices_;
 	uint32_t num_transparent_indices_;
+	intptr_t opaque_colors_size_;
+	intptr_t transparent_colors_size_;
+	intptr_t transparent_indices_offset_;
+	intptr_t transparent_colors_offset_;
 	uint8_t* vertices_array_;
 	uint8_t* indices_array_;
 	std::vector<scythe::Vector4> colors_;

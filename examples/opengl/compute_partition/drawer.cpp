@@ -14,6 +14,10 @@ Drawer::Drawer(uint32_t num_objects)
 , num_original_indices_(0)
 , num_opaque_indices_(0)
 , num_transparent_indices_(0)
+, opaque_colors_size_(0)
+, transparent_colors_size_(0)
+, transparent_indices_offset_(0)
+, transparent_colors_offset_(0)
 , vertices_array_(nullptr)
 , indices_array_(nullptr)
 , render_program_()
@@ -205,29 +209,36 @@ void Drawer::Unload()
 }
 void Drawer::Render()
 {
+	RenderObjects(true);
 	RenderObjects(false);
 }
 void Drawer::RenderObjects(bool opaque)
 {
-	GLsizei count;
+	GLsizei num_indices;
 	const uint8_t* base = nullptr;
-	size_t offset;
+	size_t indices_offset;
+	GLintptr colors_offset;
+	GLsizeiptr colors_size;
 	if (opaque)
 	{
-		count = static_cast<GLsizei>(num_opaque_indices_);
-		offset = 0;
+		indices_offset = 0;
+		num_indices = static_cast<GLsizei>(num_opaque_indices_);
+		colors_offset = 0;
+		colors_size = opaque_colors_size_;
 	}
 	else // transparent
 	{
-		count = static_cast<GLsizei>(num_transparent_indices_);
-		offset = num_opaque_indices_ * sizeof(uint32_t);
+		indices_offset = transparent_indices_offset_;
+		num_indices = static_cast<GLsizei>(num_transparent_indices_);
+		colors_offset = transparent_colors_offset_;
+		colors_size = transparent_colors_size_;
 	}
 
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, filtered_colors_buffer_object_);
+	glBindBufferRange(GL_SHADER_STORAGE_BUFFER, 0, filtered_colors_buffer_object_, colors_offset, colors_size);
 
 	glUseProgram(render_program_.id());
 	glBindVertexArray(vertex_array_object_);
-	glDrawElements(GL_POINTS, count, GL_UNSIGNED_INT, base + offset);
+	glDrawElements(GL_POINTS, num_indices, GL_UNSIGNED_INT, base + indices_offset);
 	glBindVertexArray(0);
 	glUseProgram(0);
 
@@ -243,8 +254,46 @@ void Drawer::FilterObjects()
 
 	num_opaque_indices_ = num_opaque_objects;
 	num_transparent_indices_ = num_transparent_objects;
+	transparent_indices_offset_ = num_opaque_indices_ * sizeof(uint32_t);
 
-	 // TODO: align filtered_colors_buffer_object_
+	AlignData(num_opaque_objects, num_transparent_objects);
+}
+void Drawer::AlignData(uint32_t num_opaque_objects, uint32_t num_transparent_objects)
+{
+	GLint alignment;
+	glGetIntegerv(GL_SHADER_STORAGE_BUFFER_OFFSET_ALIGNMENT, &alignment);
+
+	constexpr size_t element_size = sizeof(colors_[0]);
+	size_t original_transparent_offset = element_size * num_opaque_objects;
+	size_t aligned_transparent_offset = ((original_transparent_offset + alignment - 1) / alignment) * alignment;
+	size_t aligned_size = sizeof(colors_[0]) * colors_.size() + (aligned_transparent_offset - original_transparent_offset);
+
+	// Create new colors buffer
+	uint32_t aligned_colors_buffer_object = 0u;
+	glGenBuffers(1, &aligned_colors_buffer_object);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, aligned_colors_buffer_object);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, aligned_size, nullptr, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+	glBindBuffer(GL_COPY_READ_BUFFER, filtered_colors_buffer_object_);
+	glBindBuffer(GL_COPY_WRITE_BUFFER, aligned_colors_buffer_object);
+
+	// Copy opaque colors
+	glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, num_opaque_objects * element_size);
+	// Copy transparent colors
+	glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, original_transparent_offset, aligned_transparent_offset, num_transparent_objects * element_size);
+
+	glBindBuffer(GL_COPY_READ_BUFFER, 0);
+	glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
+
+	// Replace old buffer with aligned version
+	glDeleteBuffers(1, &filtered_colors_buffer_object_);
+	filtered_colors_buffer_object_ = aligned_colors_buffer_object;
+
+	// Finally
+	opaque_colors_size_ = static_cast<intptr_t>(num_opaque_objects * element_size);
+	transparent_colors_size_ = static_cast<intptr_t>(num_transparent_objects * element_size);
+	transparent_colors_offset_ = static_cast<intptr_t>(aligned_transparent_offset);
 }
 bool Drawer::LoadShaders()
 {
