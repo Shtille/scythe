@@ -21,6 +21,7 @@ class ComputeApplication final
 , public scythe::KeyboardController
 {
 public:
+	// Derived from scythe::Application
 	bool Initialize() override
 	{
 		graphics_provider_ = new scythe::OpenGLGraphicsProvider(this);
@@ -33,6 +34,10 @@ public:
 	void Deinitialize() override
 	{
 		delete graphics_provider_;
+	}
+	const char* GetTitle() const override
+	{
+		return "Compute partition";
 	}
 	// Derived from scythe::GraphicsController
 	bool LoadGraphicsResources() override
@@ -62,12 +67,16 @@ public:
 		glClearColor(0.f, 0.f, 0.f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		drawer_->Render();
+		drawer_->Render(render_filter_);
 	}
 	// Derived from scythe::KeyboardController
 	void OnKeyDown(scythe::KeyboardKey key, scythe::KeyModifiers modifiers) override
 	{
-		if (keyboard_state_.IsKeyPressed(key, scythe::KeyboardKey::kEscape))
+		if (keyboard_state_.IsKeyPressed(key, scythe::KeyboardKey::kSpace))
+		{
+			render_filter_ = ::NextRenderFilter(render_filter_);
+		}
+		else if (keyboard_state_.IsKeyPressed(key, scythe::KeyboardKey::kEscape))
 		{
 			Terminate();
 		}
@@ -77,7 +86,8 @@ public:
 		}
 	}
 private:
-	Drawer* drawer_;
+	Drawer* drawer_ = nullptr;
+	RenderFilter render_filter_ = RenderFilter::kAll;
 };
 
 SCYTHE_DECLARE_MAIN(ComputeApplication)

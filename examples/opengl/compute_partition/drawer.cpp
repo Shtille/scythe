@@ -2,9 +2,21 @@
 
 #include <vector>
 
-#include <scythe/log.h> // temp
-
 #include "shaders.h"
+
+RenderFilter NextRenderFilter(RenderFilter filter)
+{
+	switch (filter)
+	{
+	case RenderFilter::kAll:
+	default:
+		return RenderFilter::kOpaque;
+	case RenderFilter::kOpaque:
+		return RenderFilter::kTransparent;
+	case RenderFilter::kTransparent:
+		return RenderFilter::kAll;
+	}
+}
 
 Drawer::Drawer(uint32_t num_objects)
 : num_objects_(num_objects)
@@ -207,10 +219,17 @@ void Drawer::Unload()
 		filtered_colors_buffer_object_ = 0;
 	}
 }
-void Drawer::Render()
+void Drawer::Render(RenderFilter filter)
 {
-	RenderObjects(true);
-	RenderObjects(false);
+	if (filter == RenderFilter::kOpaque)
+		RenderObjects(true);
+	else if (filter == RenderFilter::kTransparent)
+		RenderObjects(false);
+	else
+	{
+		RenderObjects(true);
+		RenderObjects(false);
+	}
 }
 void Drawer::RenderObjects(bool opaque)
 {

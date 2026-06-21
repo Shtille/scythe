@@ -11,6 +11,18 @@
 
 #include "partitioner.h"
 
+/**
+ * Render filter: all, opaque, transparent.
+ */
+enum class RenderFilter
+{
+	kAll,
+	kOpaque,
+	kTransparent
+};
+
+RenderFilter NextRenderFilter(RenderFilter filter);
+
 class Drawer final
 {
 public:
@@ -22,7 +34,7 @@ public:
 	bool Load();
 	void Unload();
 
-	void Render();
+	void Render(RenderFilter filter);
 
 private:
 	struct Vertex
