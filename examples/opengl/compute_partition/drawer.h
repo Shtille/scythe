@@ -73,7 +73,6 @@ private:
 	uint32_t filtered_index_buffer_object_;
 	uint32_t original_colors_buffer_object_;
 	uint32_t filtered_colors_buffer_object_;
-	uint32_t atomic_counter_object_;
 	// Partitioner
 	Partitioner partitioner_;
 };

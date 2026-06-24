@@ -4,8 +4,9 @@
  *
  * This example shows how to partition items with compute shader.
  * 
- * Originally we have single array of object with different opacity.
+ * Originally we have single array of objects with different opacity.
  * We want opaque objects to be rendered first, transparent ones after.
+ * Opacity is controlled by color alpha.
  */
 
 #include <scythe/main.h>
