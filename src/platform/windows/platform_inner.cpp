@@ -21,8 +21,8 @@
 # undef RemoveDirectory
 #endif // RemoveDirectory
 
-static constexpr char* kMainWindowClassName = "scythe-window";
-static constexpr char* kHelperWindowClassName = "scythe-helper-window";
+static constexpr wchar_t* kMainWindowClassName = L"scythe-window";
+static constexpr wchar_t* kHelperWindowClassName = L"scythe-helper-window";
 
 // Translates Windows key modifiers to engine ones
 static scythe::KeyModifiers TranslateKeyboardModifiers(void)
@@ -373,24 +373,24 @@ static LRESULT CALLBACK HelperWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 static bool CreateHelperWindow(scythe::platform::Data* data)
 {
 	MSG msg;
-	WNDCLASSEXA wc = { sizeof(wc) };
+	WNDCLASSEXW wc = { sizeof(wc) };
 
 	wc.style         = CS_OWNDC;
 	wc.lpfnWndProc   = (WNDPROC) HelperWindowProc;
 	wc.hInstance     = data->instance;
 	wc.lpszClassName = kHelperWindowClassName;
 
-	data->helper_window_class_registered = ::RegisterClassExA(&wc) != 0;
+	data->helper_window_class_registered = ::RegisterClassExW(&wc) != 0;
 	if (!data->helper_window_class_registered)
 	{
 		scythe::Error("Failed to register helper window class");
 		return false;
 	}
 
-	data->helper_window_handle = ::CreateWindowExA(
+	data->helper_window_handle = ::CreateWindowExW(
 		WS_EX_OVERLAPPEDWINDOW,
 		kHelperWindowClassName,
-		"scythe helper window",
+		L"scythe helper window",
 		WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
 		0, 0, 1, 1,
 		NULL, NULL,
@@ -420,7 +420,7 @@ static void DestroyHelperWindow(scythe::platform::Data* data)
 	if (data->helper_window_handle)
 		::DestroyWindow(data->helper_window_handle);
 	if (data->helper_window_class_registered)
-		::UnregisterClassA(kHelperWindowClassName, data->instance);
+		::UnregisterClassW(kHelperWindowClassName, data->instance);
 }
 static inline scythe::platform::Window* GetMainWindow()
 {
@@ -493,9 +493,9 @@ namespace scythe {
 			data->instance = GetModuleHandle(NULL);
 
 			// Register A Window Class
-			WNDCLASSEXA wc;
-			::ZeroMemory(&wc, sizeof(WNDCLASSEXA));
-			wc.cbSize = sizeof(WNDCLASSEXA);
+			WNDCLASSEXW wc;
+			::ZeroMemory(&wc, sizeof(WNDCLASSEXW));
+			wc.cbSize = sizeof(WNDCLASSEXW);
 			wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 			wc.lpfnWndProc = (WNDPROC)(WindowProc);
 			wc.hInstance = data->instance;
@@ -505,7 +505,7 @@ namespace scythe {
 			wc.hIconSm = data->icon;
 			wc.lpszClassName = kMainWindowClassName;
 
-			data->main_window_class_registered = ::RegisterClassExA(&wc) != 0;
+			data->main_window_class_registered = ::RegisterClassExW(&wc) != 0;
 			if (!data->main_window_class_registered)
 			{
 				Error("RegisterClassEx Failed!");
@@ -527,7 +527,7 @@ namespace scythe {
 			::DestroyHelperWindow(data);
 
 			if (data->main_window_class_registered)
-				::UnregisterClassA(kMainWindowClassName, data->instance);
+				::UnregisterClassW(kMainWindowClassName, data->instance);
 			if (data->icon)
 				::DestroyIcon(data->icon);
 		}
@@ -581,10 +581,10 @@ namespace scythe {
 					: window->windowed_state;
 
 				// Create Window
-				window->handle = ::CreateWindowExA(
+				window->handle = ::CreateWindowExW(
 					current_state.ex_style,													// Extended Style
 					kMainWindowClassName,													// Class Name
-					app->GetTitle(),														// Window Title
+					app->GetInitialTitle(),													// Window Title
 					current_state.style,													// Window Style
 					current_state.pos.x,	 												// Window X Position
 					current_state.pos.y,													// Window Y Position
@@ -596,7 +596,7 @@ namespace scythe {
 					nullptr);																// pointer to window class
 				if (!window->handle)
 				{
-					Error("CreateWindowExA Failed!");
+					Error("CreateWindowExW Failed!");
 					return false;
 				}
 
@@ -806,6 +806,10 @@ namespace scythe {
 				Window* window = ::GetMainWindow();
 				::SetWindowTextA(window->handle, title);
 			}
+			// std::string GetTitle()
+			// {
+			// 	Window* window = ::GetMainWindow();
+			// }
 
 		} // namespace window
 

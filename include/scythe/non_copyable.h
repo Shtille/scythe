@@ -14,9 +14,9 @@ namespace scythe {
 
 	private:
 		NonCopyable(const NonCopyable&) = delete;
-		NonCopyable(NonCopyable&&) = delete;
+		NonCopyable(NonCopyable&&) noexcept = delete;
 		NonCopyable& operator =(const NonCopyable&) = delete;
-		NonCopyable& operator =(NonCopyable&&) = delete;
+		NonCopyable& operator =(NonCopyable&&) noexcept = delete;
 	};
 
 } // namespace scythe

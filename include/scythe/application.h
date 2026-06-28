@@ -53,7 +53,7 @@ namespace scythe {
 		const float GetFrameTime() const; //!< returns fixed frame time (1 / fps desired)
 		const float GetFrameRate() const; //!< returns real FPS (not desired)
 
-		virtual const char* GetTitle() const;
+		virtual const wchar_t* GetInitialTitle() const;
 		virtual const float GetDesiredFrameRate() const; //!< average frame rate for application that we desire
 		virtual const bool IsBenchmark() const;
 

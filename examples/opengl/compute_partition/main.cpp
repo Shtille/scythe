@@ -36,9 +36,9 @@ public:
 	{
 		delete graphics_provider_;
 	}
-	const char* GetTitle() const override
+	const wchar_t* GetInitialTitle() const override
 	{
-		return "Compute partition";
+		return L"Compute partition";
 	}
 	// Derived from scythe::GraphicsController
 	bool LoadGraphicsResources() override

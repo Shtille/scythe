@@ -185,9 +185,9 @@ namespace scythe {
 	{
 		return TimeManager::GetInstance()->GetFrameRate();
 	}
-	const char* Application::GetTitle() const
+	const wchar_t* Application::GetInitialTitle() const
 	{
-		return "scythe application";
+		return L"scythe application";
 	}
 	const float Application::GetDesiredFrameRate() const
 	{
