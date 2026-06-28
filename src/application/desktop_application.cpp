@@ -75,6 +75,14 @@ namespace scythe {
 		fullscreen_mode_ = mode;
 		return true;
 	}
+	void DesktopApplication::SetTitle(const wchar_t* title)
+	{
+		platform::window::SetTitle(title);
+	}
+	std::wstring DesktopApplication::GetTitle()
+	{
+		return platform::window::GetTitle();
+	}
 	const int DesktopApplication::GetWidth() const
 	{
 		const BaseWindow* window = GetBaseWindow(this);

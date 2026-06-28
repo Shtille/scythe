@@ -298,7 +298,7 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		return 0;
 	}
 
-	return ::DefWindowProc(hWnd, uMsg, wParam, lParam);	// Pass Unhandled Messages
+	return ::DefWindowProcW(hWnd, uMsg, wParam, lParam);	// Pass Unhandled Messages
 }
 static void ConfigureWindowSettings(scythe::platform::Window* window, scythe::DesktopApplication* app)
 {
@@ -368,7 +368,7 @@ static void ConfigureWindowSettings(scythe::platform::Window* window, scythe::De
 }
 static LRESULT CALLBACK HelperWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	return ::DefWindowProcA(hWnd, uMsg, wParam, lParam);
+	return ::DefWindowProcW(hWnd, uMsg, wParam, lParam);
 }
 static bool CreateHelperWindow(scythe::platform::Data* data)
 {
@@ -801,15 +801,20 @@ namespace scythe {
 				Window* window = ::GetMainWindow();
 				return window->base.visible;
 			}
-			void SetTitle(const char* title)
+			void SetTitle(const wchar_t* title)
 			{
 				Window* window = ::GetMainWindow();
-				::SetWindowTextA(window->handle, title);
+				::SetWindowTextW(window->handle, title);
 			}
-			// std::string GetTitle()
-			// {
-			// 	Window* window = ::GetMainWindow();
-			// }
+			std::wstring GetTitle()
+			{
+				Window* window = ::GetMainWindow();
+				std::wstring result;
+				int length = ::GetWindowTextLengthW(window->handle);
+				result.resize(static_cast<std::wstring::size_type>(length + 1));
+				::GetWindowTextW(window->handle, result.data(), length + 1);
+				return result;
+			}
 
 		} // namespace window
 

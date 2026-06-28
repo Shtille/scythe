@@ -76,6 +76,7 @@ public:
 		if (keyboard_state_.IsKeyPressed(key, scythe::KeyboardKey::kSpace))
 		{
 			render_filter_ = ::NextRenderFilter(render_filter_);
+			UpdateTitle();
 		}
 		else if (keyboard_state_.IsKeyPressed(key, scythe::KeyboardKey::kEscape))
 		{
@@ -85,6 +86,23 @@ public:
 		{
 			ToggleFullscreen();
 		}
+	}
+	void UpdateTitle()
+	{
+		std::wstring title = GetInitialTitle();
+		switch (render_filter_)
+		{
+		case RenderFilter::kAll:
+			title += L" (all)";
+			break;
+		case RenderFilter::kOpaque:
+			title += L" (opaque)";
+			break;
+		case RenderFilter::kTransparent:
+			title += L" (transparent)";
+			break;
+		}
+		SetTitle(title.data());
 	}
 private:
 	Drawer* drawer_ = nullptr;

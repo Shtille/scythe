@@ -1,6 +1,8 @@
 #ifndef __SCYTHE_DESKTOP_APPLICATION_H__
 #define __SCYTHE_DESKTOP_APPLICATION_H__
 
+#include <string>
+
 #include "application.h"
 #include "keyboard.h"
 #include "mouse.h"
@@ -42,6 +44,9 @@ namespace scythe {
 
 		FullscreenMode GetFullscreenMode() const;
 		bool SetFullscreenMode(FullscreenMode mode);
+
+		void SetTitle(const wchar_t* title);
+		std::wstring GetTitle();
 
 		// Window properties
 		const int GetWidth() const;

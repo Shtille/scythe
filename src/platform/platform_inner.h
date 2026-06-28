@@ -51,8 +51,8 @@ namespace scythe {
 			void Hide();
 			bool IsVisible();
 
-			void SetTitle(const char* title);
-			// std::string GetTitle();
+			void SetTitle(const wchar_t* title);
+			std::wstring GetTitle();
 
 		} // namespace window
 
