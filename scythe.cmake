@@ -59,6 +59,12 @@ if (WIN32)
 		./src/platform/windows/platform_inner.cpp
 	)
 endif (WIN32)
+# MacOS X specific sources
+if (APPLE)
+	list(APPEND SRC_FILES
+		./src/platform/macosx/platform_data.h
+	)
+endif (APPLE)
 
 # Math specific
 if (SCYTHE_USE_MATH)
