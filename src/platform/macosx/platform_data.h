@@ -6,17 +6,20 @@
 #if defined(__OBJC__)
 	#import <Cocoa/Cocoa.h>
 #else
+	#include "../base_window.h"
 	#include <ApplicationServices/ApplicationServices.h>
 	typedef void* id;
 #endif
+
+namespace scythe::platform {
 
 #ifdef SCYTHE_USE_OPENGL
 	/**
 	 * @brief      Rendering context implementation for Mac OS X platform
 	 */
-	struct PlatformRenderingContext
+	struct RenderingContext
 	{
-		id context;
+		id object;
 		id pixel_format;
 	};
 #endif
@@ -24,10 +27,13 @@
 	/**
 	 * @brief      Window implementation for Mac OS X platform
 	 */
-	struct PlatformWindow
+	struct Window
 	{
-		// Base window struct to avoid inheritance
-		BaseWindow base;
+#ifdef __cplusplus
+		BaseWindow* base;
+#else
+		void* base;
+#endif
 
 		// Window delegate
 		id object;
@@ -35,21 +41,27 @@
 		id view;
 
 #ifdef SCYTHE_USE_OPENGL
-		PlatformRenderingContext context;
+		RenderingContext context;
 #endif
 	};
 
 	/**
 	 * @brief      Describes data specific for Mac OS X platform.
 	 */
-	struct PlatformData
+	struct Data
 	{
 		// App delegate
 		CGEventSourceRef event_source;
 		id app_delegate;
 		id autorelease_pool;
 
-		PlatformWindow* main_window;
+#ifdef __cplusplus
+		Window* main_window;
+#else
+		void* main_window;
+#endif
 	};
+
+} // namespace scythe::platform
 
 #endif

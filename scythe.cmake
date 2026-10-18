@@ -63,6 +63,11 @@ endif (WIN32)
 if (APPLE)
 	list(APPEND SRC_FILES
 		./src/platform/macosx/platform_data.h
+		./src/platform/macosx/platform_inner.mm
+		./src/platform/macosx/window.h
+		./src/platform/macosx/window.mm
+		./src/platform/macosx/fullscreen_window.h
+		./src/platform/macosx/fullscreen_window.m
 	)
 endif (APPLE)
 
@@ -129,12 +134,25 @@ if (SCYTHE_USE_OPENGL)
 			./src/platform/windows/wgl.h
 		)
 	endif (WIN32)
+	if (APPLE)
+		list(APPEND SRC_FILES
+			./src/platform/macosx/opengl_provider.cpp
+			./src/platform/macosx/nsgl_context.cpp
+			./src/platform/macosx/nsgl_context.h
+		)
+	endif (APPLE)
 endif (SCYTHE_USE_OPENGL)
 
 # Libraries
 set(LIBRARIES
 	# TODO
 )
+if (APPLE)
+	list(APPEND LIBRARIES
+		-framework Cocoa
+		-framework Foundation
+	)
+endif (APPLE)
 
 # Compile definitions
 set(PRIVATE_DEFINES
@@ -165,6 +183,9 @@ endif (SCYTHE_USE_OPENGL)
 if (SCYTHE_USE_OPENGL)
 	find_package(glad REQUIRED)
 	target_link_libraries(${PROJECT_NAME} PUBLIC glad::glad)
+	if (APPLE)
+		target_compile_definitions(${PROJECT_NAME} PRIVATE GL_SILENCE_DEPRECATION)
+	endif (APPLE)
 endif (SCYTHE_USE_OPENGL)
 
 # Installation properties

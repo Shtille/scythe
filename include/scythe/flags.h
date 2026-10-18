@@ -40,6 +40,14 @@ public:
 		values_ |= other.values_;
 		return *this;
 	}
+	bool operator <(const Flags& other)
+	{
+		return values_ < other.values_;
+	}
+	bool operator >(const Flags& other)
+	{
+		return values_ > other.values_;
+	}
 
 	void Clear()
 	{
