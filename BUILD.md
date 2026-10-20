@@ -11,9 +11,17 @@ conan profile detect --force
 
 ## Build
 From project directory:
+
+### Debug build
 ```bash
-conan install . --build=missing -s compiler.cppstd=17
-cmake --preset conan-default
+conan install . --build=missing -s compiler.cppstd=17 -s build_type=Debug
+cmake --preset conan-debug
+cmake --build --preset conan-debug
+```
+### Release build
+```bash
+conan install . --build=missing -s compiler.cppstd=17 -s build_type=Release
+cmake --preset conan-release
 cmake --build --preset conan-release
 ```
 

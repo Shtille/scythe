@@ -10,12 +10,7 @@
 	typedef void* id;
 #endif
 
-// Forward
-#ifdef __cplusplus
-namespace scythe {
-	struct BaseWindow;
-}
-#endif
+#include "../base_window.h"
 
 namespace scythe::platform {
 
@@ -35,11 +30,7 @@ namespace scythe::platform {
 	 */
 	struct Window
 	{
-#ifdef __cplusplus
-		BaseWindow* base;
-#else
-		void* base;
-#endif
+		BaseWindow base;
 
 		// Window delegate
 		id object;

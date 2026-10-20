@@ -1,7 +1,6 @@
 #import "window.h"
 
 #include "../platform_inner.h"
-#include "../base_window.h"
 #include "platform_data.h"
 
 #include <scythe/desktop_application.h>
@@ -30,14 +29,14 @@
 	const NSRect viewRectPoints = [window->view frame];
 	const NSRect viewRectPixels = [window->view convertRectToBacking:viewRectPoints];
 
-	window->base->width = viewRectPixels.size.width;
-	window->base->height = viewRectPixels.size.height;
-	window->base->aspect_ratio = static_cast<float>(window->base->width) / static_cast<float>(window->base->height);
-	window->base->fullscreen = false;
+	window->base.width = viewRectPixels.size.width;
+	window->base.height = viewRectPixels.size.height;
+	window->base.aspect_ratio = static_cast<float>(window->base.width) / static_cast<float>(window->base.height);
+	window->base.fullscreen = false;
 
 	scythe::WindowController* window_controller = app->GetWindowController();
 	if (window_controller)
-		window_controller->OnResize(window->base->width, window->base->height);
+		window_controller->OnResize(window->base.width, window->base.height);
 }
 
 - (void)windowDidMove:(NSNotification *)notification
@@ -50,7 +49,7 @@
 	scythe::platform::Data* data = scythe::platform::GetData(app);
 	scythe::platform::Window* window = data->main_window;
 
-	window->base->visible = false;
+	window->base.visible = false;
 }
 
 - (void)windowDidDeminiaturize:(NSNotification *)notification
@@ -59,7 +58,7 @@
 	scythe::platform::Data* data = scythe::platform::GetData(app);
 	scythe::platform::Window* window = data->main_window;
 
-	window->base->visible = true;
+	window->base.visible = true;
 }
 
 - (void)windowDidBecomeKey:(NSNotification *)notification
@@ -68,7 +67,7 @@
 	scythe::platform::Data* data = scythe::platform::GetData(app);
 	scythe::platform::Window* window = data->main_window;
 
-	window->base->active = true;
+	window->base.active = true;
 }
 
 - (void)windowDidResignKey:(NSNotification *)notification
@@ -77,7 +76,7 @@
 	scythe::platform::Data* data = scythe::platform::GetData(app);
 	scythe::platform::Window* window = data->main_window;
 
-	window->base->active = false;
+	window->base.active = false;
 }
 
 - (NSSize)window:(NSWindow *)window willUseFullScreenContentSize:(NSSize)proposedSize
@@ -203,12 +202,12 @@ static void ProcessMouseDown(scythe::MouseButton mouse_button, bool down, NSUInt
 	const NSRect viewRectPoints = [window->view frame];
 	const NSRect viewRectPixels = [window->view convertRectToBacking:viewRectPoints];
 
-	window->base->width = viewRectPixels.size.width;
-	window->base->height = viewRectPixels.size.height;
-	window->base->aspect_ratio = static_cast<float>(window->base->width) / static_cast<float>(window->base->height);
+	window->base.width = viewRectPixels.size.width;
+	window->base.height = viewRectPixels.size.height;
+	window->base.aspect_ratio = static_cast<float>(window->base.width) / static_cast<float>(window->base.height);
 
 	if (window_controller)
-		window_controller->OnResize(window->base->width, window->base->height);
+		window_controller->OnResize(window->base.width, window->base.height);
 }
 
 // ----- Keyboard events -----
