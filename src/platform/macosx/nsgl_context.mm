@@ -78,15 +78,15 @@ namespace scythe {
 		ADD_ATTRIB(NSOpenGLPFAAccelerated);
 		ADD_ATTRIB(NSOpenGLPFAClosestPolicy);
 
-		if (context_config->nsgl.offline)
-		{
-			ADD_ATTRIB(NSOpenGLPFAAllowOfflineRenderers);
-			// NOTE: This replaces the NSSupportsAutomaticGraphicsSwitching key in
-			//       Info.plist for unbundled applications
-			// HACK: This assumes that NSOpenGLPixelFormat will remain
-			//       a straightforward wrapper of its CGL counterpart
-			ADD_ATTRIB(kCGLPFASupportsAutomaticGraphicsSwitching);
-		}
+		// if (context_config->nsgl.offline)
+		// {
+		// 	ADD_ATTRIB(NSOpenGLPFAAllowOfflineRenderers);
+		// 	// NOTE: This replaces the NSSupportsAutomaticGraphicsSwitching key in
+		// 	//       Info.plist for unbundled applications
+		// 	// HACK: This assumes that NSOpenGLPixelFormat will remain
+		// 	//       a straightforward wrapper of its CGL counterpart
+		// 	ADD_ATTRIB(kCGLPFASupportsAutomaticGraphicsSwitching);
+		// }
 
 		if (context_config->major >= 4)
 		{
@@ -204,16 +204,6 @@ namespace scythe {
 									forParameter:NSOpenGLContextParameterSurfaceOpacity];
 		}
 
-		if (context_config->profile == OpenGLContextProfile::kCore)
-		{
-			// When we're using a CoreProfile context, crash if we call a legacy OpenGL function
-			// This will make it much more obvious where and when such a function call is made so
-			// that we can remove such calls.
-			// Without this we'd simply get GL_INVALID_OPERATION error for calling legacy functions
-			// but it would be more difficult to see where that function was called.
-			CGLEnable([window->context.object CGLContextObj], kCGLCECrashOnRemovedFunctions);
-		}
-
 		//[window->view setWantsBestResolutionOpenGLSurface:window->scale_framebuffer];
 
 		[window->context.object setView:window->view];
@@ -246,13 +236,13 @@ namespace scythe {
 	{
 		platform::Window* window = ::GetMainWindow();
 
-		[window->context flushBuffer];
+		[window->context.object flushBuffer];
 	}
 	void LibraryNSGL::MakeContextCurrent()
 	{
 		platform::Window* window = ::GetMainWindow();
 
-		[window->context makeCurrentContext];
+		[window->context.object makeCurrentContext];
 	}
 	void LibraryNSGL::SetSwapInterval(int interval)
 	{
@@ -264,7 +254,7 @@ namespace scythe {
 	#else
 		const NSOpenGLContextParameter kSwapInterval = NSOpenGLContextParameterSwapInterval;
 	#endif
-		[window->context setValues:&swapInt forParameter:kSwapInterval];
+		[window->context.object setValues:&swapInt forParameter:kSwapInterval];
 	}
 
 } // namespace scythe

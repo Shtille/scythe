@@ -6,9 +6,15 @@
 #if defined(__OBJC__)
 	#import <Cocoa/Cocoa.h>
 #else
-	#include "../base_window.h"
 	#include <ApplicationServices/ApplicationServices.h>
 	typedef void* id;
+#endif
+
+// Forward
+#ifdef __cplusplus
+namespace scythe {
+	struct BaseWindow;
+}
 #endif
 
 namespace scythe::platform {

@@ -1,4 +1,5 @@
 #import <Cocoa/Cocoa.h>
+#import "fullscreen_window.h"
 
 // Delegate for window related notifications
 @interface ScytheWindowDelegate : NSObject

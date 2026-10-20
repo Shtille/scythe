@@ -6,6 +6,9 @@
 
 namespace scythe {
 
+	// Forward declaration
+	class Application;
+
 	/**
 	 * @brief      This class describes a graphics provider.
 	 * @details    Note that its a base class that should be created and 

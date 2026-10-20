@@ -137,7 +137,7 @@ if (SCYTHE_USE_OPENGL)
 	if (APPLE)
 		list(APPEND SRC_FILES
 			./src/platform/macosx/opengl_provider.cpp
-			./src/platform/macosx/nsgl_context.cpp
+			./src/platform/macosx/nsgl_context.mm
 			./src/platform/macosx/nsgl_context.h
 		)
 	endif (APPLE)
@@ -148,10 +148,12 @@ set(LIBRARIES
 	# TODO
 )
 if (APPLE)
-	list(APPEND LIBRARIES
-		-framework Cocoa
-		-framework Foundation
-	)
+	# find_library(FOUNDATION_FRAMEWORK Foundation REQUIRED)
+	# find_library(COCOA_FRAMEWORK Cocoa REQUIRED)
+	# list(APPEND LIBRARIES
+	# 	-framework Cocoa
+	# 	-framework Foundation
+	# )
 endif (APPLE)
 
 # Compile definitions
@@ -165,6 +167,13 @@ target_include_directories(${PROJECT_NAME}
 						   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include"
 						   "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
 target_link_libraries(${PROJECT_NAME} PUBLIC ${LIBRARIES})
+if (APPLE)
+	find_library(FOUNDATION_FRAMEWORK Foundation REQUIRED)
+	find_library(COCOA_FRAMEWORK Cocoa REQUIRED)
+	
+	target_link_libraries(${PROJECT_NAME} PRIVATE ${FOUNDATION_FRAMEWORK})
+	target_link_libraries(${PROJECT_NAME} PRIVATE ${COCOA_FRAMEWORK})
+endif (APPLE)
 target_compile_definitions(${PROJECT_NAME} PRIVATE ${PRIVATE_DEFINES})
 #set_target_properties(${PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ${SCYTHE_WORKING_DIRECTORY})
 

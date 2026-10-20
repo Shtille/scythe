@@ -7,6 +7,10 @@
 #include "../../graphics/opengl/opengl_context_config.h"
 #include "../../graphics/opengl/opengl_framebuffer_config.h"
 
+#if defined(__OBJC__)
+# import <CoreFoundation/CoreFoundation.h>
+#endif
+
 namespace scythe {
 
 	/**

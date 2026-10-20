@@ -20,33 +20,41 @@ public:
 	Flags(Flags&& other) : values_(other.values_) { other.values_ = 0; }
 	~Flags() = default;
 
-	Flags& operator =(const Flags& other)
+	Flags& operator =(const Flags& other) noexcept
 	{
 		values_ = other.values_;
 		return *this;
 	}
-	Flags& operator =(Flags&& other)
+	Flags& operator =(Flags&& other) noexcept
 	{
 		values_ = other.values_;
 		other.values_ = 0;
 		return *this;
 	}
-	void operator |=(EnumType value)
+	void operator |=(EnumType value) noexcept
 	{
 		Add(value);
 	}
-	Flags& operator |(const Flags& other)
+	Flags& operator |(const Flags& other) noexcept
 	{
 		values_ |= other.values_;
 		return *this;
 	}
-	bool operator <(const Flags& other)
+	bool operator <(const Flags& other) const noexcept
 	{
 		return values_ < other.values_;
 	}
-	bool operator >(const Flags& other)
+	bool operator >(const Flags& other) const noexcept
 	{
 		return values_ > other.values_;
+	}
+	bool operator ==(const Flags& other) const noexcept
+	{
+		return values_ == other.values_;
+	}
+	bool operator !=(const Flags& other) const noexcept
+	{
+		return values_ != other.values_;
 	}
 
 	void Clear()

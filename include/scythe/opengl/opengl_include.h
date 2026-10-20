@@ -10,8 +10,9 @@
 #ifdef SCYTHE_TARGET_WINDOWS
 # include <glad/gl.h>
 #elif defined(SCYTHE_TARGET_MAC)
-# include <OpenGL/gl3.h>
-# include <OpenGL/glext.h>
+# include <glad/gl.h>
+// # include <OpenGL/gl3.h>
+// # include <OpenGL/glext.h>
 #else
 # error "OpenGL includes haven't been defined"
 #endif

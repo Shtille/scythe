@@ -12,7 +12,7 @@
  */
 static void OutputErrorMessage(const char* message) noexcept
 {
-	fprintf(stderr, message);
+	fprintf(stderr, "%s", message);
 }
 
 namespace scythe {

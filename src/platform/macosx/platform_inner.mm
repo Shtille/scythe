@@ -1,7 +1,12 @@
 #import "fullscreen_window.h"
 #import "window.h"
 
+#include <crt_externs.h> // for _NSGetProgname()
+#include <wchar.h> // for wcslen
+
 #include "../platform_inner.h"
+#include "../base_window.h"
+#include "platform_data.h"
 
 #include <scythe/desktop_application.h>
 #include <scythe/log.h>
@@ -276,7 +281,9 @@ static bool CreateWindow()
 #endif
 
 	// We will create fullscreen window separately
-	NSRect contentRect = NSMakeRect(0, 0, app->GetWidth(), app->GetHeight());
+	int width = app->GetInitialWidth();
+	int height = app->GetInitialHeight();
+	NSRect contentRect = NSMakeRect(0, 0, width, height);
 
 	window->object = [[ScytheWindow alloc]
 		initWithContentRect:contentRect
@@ -296,9 +303,18 @@ static bool CreateWindow()
 			[window->object setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
 	}
 
-	[window->object setTitle:[NSString stringWithFormat:@"%S", app->GetTitle()]];
+	std::wstring appTitle = app->GetTitle();
+	const wchar_t* title = appTitle.c_str();
+	NSUInteger byteLength = wcslen(title) * sizeof(wchar_t);
+	NSString *titleStr = [[NSString alloc] initWithBytes:title
+				                                  length:byteLength
+				                                encoding:NSUTF32LittleEndianStringEncoding];
+
+	[window->object setTitle:titleStr];
 	[window->object setDelegate:window->delegate];
 	[window->object setAcceptsMouseMovedEvents:YES];
+
+	[titleStr release];
 
 	if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_6)
 		[window->object setRestorable:NO];
@@ -310,12 +326,12 @@ static bool CreateWindow()
 	// CGFloat pixelWidth = windowRectInPoints.size.width * scale;
 	// CGFloat pixelHeight = windowRectInPoints.size.height * scale;
 
-	// window->base.width = pixelWidth;
-	// window->base.height = pixelHeight;
-	// window->base.aspect_ratio = static_cast<float>(pixelWidth) / static_cast<float>(pixelHeight);
-	// window->base.active = true;
-	// window->base.visible = false;
-	// window->base.fullscreen = false;
+	// window->base->width = pixelWidth;
+	// window->base->height = pixelHeight;
+	// window->base->aspect_ratio = static_cast<float>(pixelWidth) / static_cast<float>(pixelHeight);
+	// window->base->active = true;
+	// window->base->visible = false;
+	// window->base->fullscreen = false;
 
 	return true;
 }
@@ -329,7 +345,7 @@ namespace scythe {
 	const BaseWindow* GetBaseWindow(const Application* app)
 	{
 		const platform::Window* window = platform::GetWindow(app);
-		return &window->base;
+		return window->base;
 	}
 
 	namespace platform {
@@ -492,12 +508,12 @@ namespace scythe {
 				const NSRect viewRectPoints = [window->view frame];
 				const NSRect viewRectPixels = [window->view convertRectToBacking:viewRectPoints];
 
-				window->base.width = viewRectPixels.size.width;
-				window->base.height = viewRectPixels.size.height;
-				window->base.aspect_ratio = static_cast<float>(window->base.width) / static_cast<float>(window->base.height);
-				window->base.active = true;
-				window->base.visible = true;
-				window->base.fullscreen = app->IsFullscreen();
+				window->base->width = viewRectPixels.size.width;
+				window->base->height = viewRectPixels.size.height;
+				window->base->aspect_ratio = static_cast<float>(window->base->width) / static_cast<float>(window->base->height);
+				window->base->active = true;
+				window->base->visible = true;
+				window->base->fullscreen = app->IsFullscreen();
 
 				return true;
 			}
@@ -536,7 +552,7 @@ namespace scythe {
 			void ToggleFullscreen(void)
 			{
 				Window* window = ::GetMainWindow();
-				if (window->base.fullscreen) // fullscreen -> windowed
+				if (window->base->fullscreen) // fullscreen -> windowed
 				{
 					MakeWindowed();
 				}
@@ -551,7 +567,7 @@ namespace scythe {
 				Data* data = GetData(app);
 				Window* window = data->main_window;
 
-				if (window->base.fullscreen)
+				if (window->base->fullscreen)
 					return true;
 
 				[window->object goFullscreen];
@@ -559,14 +575,14 @@ namespace scythe {
 				const NSRect viewRectPoints = [window->view frame];
 				const NSRect viewRectPixels = [window->view convertRectToBacking:viewRectPoints];
 
-				window->base.width = viewRectPixels.size.width;
-				window->base.height = viewRectPixels.size.height;
-				window->base.aspect_ratio = static_cast<float>(window->base.width) / static_cast<float>(window->base.height);
-				window->base.fullscreen = true;
+				window->base->width = viewRectPixels.size.width;
+				window->base->height = viewRectPixels.size.height;
+				window->base->aspect_ratio = static_cast<float>(window->base->width) / static_cast<float>(window->base->height);
+				window->base->fullscreen = true;
 
 				WindowController* window_controller = app->GetWindowController();
 				if (window_controller)
-					window_controller->OnResize(window->base.width, window->base.height);
+					window_controller->OnResize(window->base->width, window->base->height);
 
 				return true;
 			}
@@ -576,7 +592,7 @@ namespace scythe {
 				Data* data = GetData(app);
 				Window* window = data->main_window;
 
-				if (!window->base.fullscreen)
+				if (!window->base->fullscreen)
 					return;
 
 				[window->object goWindow];
@@ -584,24 +600,24 @@ namespace scythe {
 				const NSRect viewRectPoints = [window->view frame];
 				const NSRect viewRectPixels = [window->view convertRectToBacking:viewRectPoints];
 
-				window->base.width = viewRectPixels.size.width;
-				window->base.height = viewRectPixels.size.height;
-				window->base.aspect_ratio = static_cast<float>(window->base.width) / static_cast<float>(window->base.height);
-				window->base.fullscreen = false;
+				window->base->width = viewRectPixels.size.width;
+				window->base->height = viewRectPixels.size.height;
+				window->base->aspect_ratio = static_cast<float>(window->base->width) / static_cast<float>(window->base->height);
+				window->base->fullscreen = false;
 
 				WindowController* window_controller = app->GetWindowController();
 				if (window_controller)
-					window_controller->OnResize(window->base.width, window->base.height);
+					window_controller->OnResize(window->base->width, window->base->height);
 			}
 			void Center()
 			{
-				Window* window = ::GetMainWindow();
+				Window* main_window = ::GetMainWindow();
 
 				// No need to center fullscreen window
-				if (window->base.fullscreen)
+				if (main_window->base->fullscreen)
 					return;
 
-				ScytheWindow * window = (ScytheWindow *)window->object;
+				ScytheWindow * window = (ScytheWindow *)main_window->object; // to surpass -Wobjc-multiple-method-names
 				[window center];
 			}
 			void Resize(int width, int height)
@@ -630,18 +646,18 @@ namespace scythe {
 			{
 				Window* window = ::GetMainWindow();
 				[window->object makeKeyAndOrderFront:nil];
-				window->base.visible = true;
+				window->base->visible = true;
 			}
 			void Hide()
 			{
 				Window* window = ::GetMainWindow();
 				[window->object orderOut:nil];
-				window->base.visible = false;
+				window->base->visible = false;
 			}
 			bool IsVisible()
 			{
 				Window* window = ::GetMainWindow();
-				return window->base.visible;
+				return window->base->visible;
 			}
 			void SetTitle(const wchar_t* title)
 			{
@@ -651,6 +667,7 @@ namespace scythe {
 				                                              length:byteLength
 				                                            encoding:NSUTF32LittleEndianStringEncoding];
 				[window->object setTitle:titleStr];
+				[titleStr release];
 			}
 			std::wstring GetTitle()
 			{
