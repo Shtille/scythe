@@ -147,14 +147,6 @@ endif (SCYTHE_USE_OPENGL)
 set(LIBRARIES
 	# TODO
 )
-if (APPLE)
-	# find_library(FOUNDATION_FRAMEWORK Foundation REQUIRED)
-	# find_library(COCOA_FRAMEWORK Cocoa REQUIRED)
-	# list(APPEND LIBRARIES
-	# 	-framework Cocoa
-	# 	-framework Foundation
-	# )
-endif (APPLE)
 
 # Compile definitions
 set(PRIVATE_DEFINES
@@ -170,7 +162,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ${LIBRARIES})
 if (APPLE)
 	find_library(FOUNDATION_FRAMEWORK Foundation REQUIRED)
 	find_library(COCOA_FRAMEWORK Cocoa REQUIRED)
-	
+
 	target_link_libraries(${PROJECT_NAME} PRIVATE ${FOUNDATION_FRAMEWORK})
 	target_link_libraries(${PROJECT_NAME} PRIVATE ${COCOA_FRAMEWORK})
 endif (APPLE)

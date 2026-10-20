@@ -11,8 +11,6 @@
 # include <glad/gl.h>
 #elif defined(SCYTHE_TARGET_MAC)
 # include <glad/gl.h>
-// # include <OpenGL/gl3.h>
-// # include <OpenGL/glext.h>
 #else
 # error "OpenGL includes haven't been defined"
 #endif
