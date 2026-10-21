@@ -240,6 +240,11 @@ static const scythe::OpenGLFramebufferConfiguration* ChooseFramebufferConfig(
 	return closest;
 }
 
+/**
+ * @brief      Gets the platform window.
+ *
+ * @return     The platform window.
+ */
 static inline scythe::platform::Window* GetMainWindow()
 {
 	scythe::Application* app = scythe::Application::GetInstance();
@@ -530,6 +535,21 @@ namespace scythe {
 			return proc;
 
 		return (Procedure) ::GetProcAddress((HMODULE) library_instance_, name);
+	}
+	void LibraryWGL::SwapBuffers()
+	{
+		platform::Window* window = ::GetMainWindow();
+		::SwapBuffers(window->context.dc);
+	}
+	void LibraryWGL::MakeContextCurrent()
+	{
+		platform::Window* window = ::GetMainWindow();
+		wglMakeCurrent(window->context.dc, window->context.handle);
+	}
+	void LibraryWGL::SetSwapInterval(int interval)
+	{
+		if (EXT_swap_control)
+			wglSwapIntervalEXT(interval);
 	}
 
 #define ADD_ATTRIB(a) \

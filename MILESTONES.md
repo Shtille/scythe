@@ -20,8 +20,8 @@ List of features to release with certain version of library.
 | :--                                   | :-:     | :-:  |
 | Window creation on Windows platform.  | 0.6.0   | +    |
 | OpenGL support on Windows platform.   | 0.7.0   | +    |
-| Window creation on Mac OS X platform. | 0.8.0   | -    |
-| OpenGL support on Mac OS X platform.  | 0.9.0   | -    |
+| Window creation on Mac OS X platform. | 0.8.0   | +    |
+| OpenGL support on Mac OS X platform.  | 0.9.0   | +    |
 | Math classes (vector, matrix, etc.).  | 1.0.0   | +    |
 | Image support                         | 1.1.0   | -    |
 

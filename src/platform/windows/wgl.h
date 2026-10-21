@@ -91,6 +91,10 @@ namespace scythe {
 		typedef void (*Procedure)(void);
 		Procedure GetProcedureAddress(const char* name);
 
+		void SwapBuffers();
+		void MakeContextCurrent();
+		void SetSwapInterval(int interval);
+
 	private:
 		int _ChoosePixelFormat(const OpenGLContextConfiguration* context_config, const OpenGLFramebufferConfiguration* fb_config);
 

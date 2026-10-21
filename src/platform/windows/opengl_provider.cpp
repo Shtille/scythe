@@ -3,22 +3,8 @@
 #include <scythe/opengl/opengl_include.h>
 #include <scythe/desktop_application.h>
 #include <scythe/log.h>
-#include "platform_data.h"
-#include "../platform_inner.h"
-#include "wgl.h"
 
-/**
- * @brief      Gets the platform window.
- *
- * @param[in]  app   The application
- *
- * @return     The platform window.
- */
-static inline scythe::platform::Window* GetMainWindow(scythe::Application* app)
-{
-	scythe::platform::Data* data = scythe::platform::GetData(app);
-	return data->main_window;
-}
+#include "wgl.h"
 
 /**
  * @brief      Gets the proc address.
@@ -103,24 +89,18 @@ namespace scythe {
 	}
 	void OpenGLGraphicsProvider::EndFrame()
 	{
-		// Swap buffers
-		platform::Window* window = ::GetMainWindow(application_);
-
-		::SwapBuffers(window->context.dc);
+		LibraryWGL* wgl = LibraryWGL::GetInstance();
+		wgl->SwapBuffers();
 	}
 	void OpenGLGraphicsProvider::SetSwapInterval(int interval)
 	{
 		LibraryWGL* wgl = LibraryWGL::GetInstance();
-
-		if (wgl->EXT_swap_control)
-			wgl->wglSwapIntervalEXT(interval);
+		wgl->SetSwapInterval(interval);
 	}
 	void OpenGLGraphicsProvider::MakeContextCurrent()
 	{
 		LibraryWGL* wgl = LibraryWGL::GetInstance();
-		platform::Window* window = ::GetMainWindow(application_);
-
-		wgl->wglMakeCurrent(window->context.dc, window->context.handle);
+		wgl->MakeContextCurrent();
 	}
 
 } // namespace scythe
