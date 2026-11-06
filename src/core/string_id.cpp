@@ -1,4 +1,4 @@
-#include <scythe/string_id.h>
+#include <scythe/core/string_id.h>
 
 namespace scythe {
 

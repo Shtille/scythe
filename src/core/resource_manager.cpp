@@ -1,4 +1,4 @@
-#include <scythe/resource_manager.h>
+#include <scythe/core/resource_manager.h>
 
 #include <scythe/defines.h>
 

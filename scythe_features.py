@@ -7,28 +7,38 @@ Created: 2026-03-21
 
 class ScytheFeatures:
 	# List of features
+	FEATURE_CORE = "Core"
 	FEATURE_MATH = "Math"
 	FEATURE_OPENGL = "OpenGL"
+	FEATURE_IMAGE = "Image"
 
 	# Features paired with its default values
 	features = {
+		FEATURE_CORE: True,
 		FEATURE_MATH: True,
 		FEATURE_OPENGL: True,
+		FEATURE_IMAGE: True,
 	}
 	# Dependencies to other features
 	features_dependecies = {
+		FEATURE_CORE: [],
 		FEATURE_MATH: [],
 		FEATURE_OPENGL: [],
+		FEATURE_IMAGE: [],
 	}
 	# First element is dependency, second is usage of transitive headers (if library headers are passed outside)
 	features_requirements = {
+		FEATURE_CORE: [],
 		FEATURE_MATH: [],
 		FEATURE_OPENGL: [["glad/[>=2.0]", True]],
+		FEATURE_IMAGE: [],
 	}
 	# Maps feature to list of defines
 	features_defines = {
+		FEATURE_CORE: ["SCYTHE_USE_CORE"],
 		FEATURE_MATH: ["SCYTHE_USE_MATH"],
 		FEATURE_OPENGL: ["SCYTHE_USE_OPENGL"],
+		FEATURE_IMAGE: ["SCYTHE_USE_IMAGE"],
 	}
 
 	def __all_dicts_have_same_keys(self, dicts):

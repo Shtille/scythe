@@ -6,10 +6,8 @@ project(scythe VERSION 2.0.0 LANGUAGES CXX)
 set(PUBLIC_HEADERS
 	./include/scythe/application.h
 	./include/scythe/clock.h
-	./include/scythe/color.h
 	./include/scythe/defines.h
 	./include/scythe/desktop_application.h
-	./include/scythe/endianness.h
 	./include/scythe/expandable.h
 	./include/scythe/flags.h
 	./include/scythe/graphics_controller.h
@@ -25,11 +23,7 @@ set(PUBLIC_HEADERS
 	./include/scythe/physics_controller.h
 	./include/scythe/platform.h
 	./include/scythe/platform_includes.h
-	./include/scythe/resource.h
-	./include/scythe/resource_manager.h
 	./include/scythe/singleton.h
-	./include/scythe/string_format.h
-	./include/scythe/string_id.h
 	./include/scythe/time_manager.h
 	./include/scythe/timer.h
 	./include/scythe/types.h
@@ -48,11 +42,7 @@ set(SRC_FILES
 	./src/time/clock.cpp
 	./src/time/time_manager.cpp
 	./src/time/timer.cpp
-	./src/color.cpp
-	./src/endianness.cpp
 	./src/log.cpp
-	./src/resource_manager.cpp
-	./src/string_id.cpp
 )
 # Windows specific sources
 if (WIN32)
@@ -72,6 +62,24 @@ if (APPLE)
 		./src/platform/macosx/fullscreen_window.m
 	)
 endif (APPLE)
+
+# Core specific
+if (SCYTHE_USE_CORE)
+	list(APPEND PUBLIC_HEADERS
+		./include/scythe/core/color.h
+		./include/scythe/core/endianness.h
+		./include/scythe/core/resource.h
+		./include/scythe/core/resource_manager.h
+		./include/scythe/core/string_format.h
+		./include/scythe/core/string_id.h
+	)
+	list(APPEND SRC_FILES
+		./src/core/color.cpp
+		./src/core/endianness.cpp
+		./src/core/resource_manager.cpp
+		./src/core/string_id.cpp
+	)
+endif (SCYTHE_USE_CORE)
 
 # Math specific
 if (SCYTHE_USE_MATH)

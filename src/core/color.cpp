@@ -1,4 +1,4 @@
-﻿#include <scythe/color.h>
+﻿#include <scythe/core/color.h>
 
 #include <algorithm>
 #include <cmath>

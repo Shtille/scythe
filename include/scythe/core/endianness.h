@@ -1,7 +1,7 @@
 #ifndef __SCYTHE_ENDIANNESS_H__
 #define __SCYTHE_ENDIANNESS_H__
 
-#include "types.h"
+#include "../types.h"
 
 namespace scythe {
 

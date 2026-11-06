@@ -26,14 +26,18 @@ namespace scythe {
 	void Application::InitializeManagers()
 	{
 		TimeManager::CreateInstance<TimeManager>();
+#ifdef SCYTHE_USE_CORE
 		ResourceManager::CreateInstance<ResourceManager>();
+#endif
 
 		// Our engine uses fixed time steps, so make it shared for any consumer
 		TimeManager::GetInstance()->SetFixedFrameTime(GetFrameTime());
 	}
 	void Application::DeinitializeManagers()
 	{
+#ifdef SCYTHE_USE_CORE
 		ResourceManager::DestroyInstance();
+#endif
 		TimeManager::DestroyInstance();
 	}
 	void Application::UpdateManagers()

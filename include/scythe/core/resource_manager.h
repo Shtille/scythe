@@ -3,8 +3,8 @@
 
 #include <unordered_map>
 
+#include "../singleton.h"
 #include "resource.h"
-#include "singleton.h"
 #include "string_id.h"
 
 namespace scythe {

@@ -1,4 +1,4 @@
-#include <scythe/endianness.h>
+#include <scythe/core/endianness.h>
 
 namespace scythe {
 
