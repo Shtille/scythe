@@ -6,6 +6,7 @@ project(scythe VERSION 2.0.0 LANGUAGES CXX)
 set(PUBLIC_HEADERS
 	./include/scythe/application.h
 	./include/scythe/clock.h
+	./include/scythe/color.h
 	./include/scythe/defines.h
 	./include/scythe/desktop_application.h
 	./include/scythe/endianness.h
@@ -47,6 +48,7 @@ set(SRC_FILES
 	./src/time/clock.cpp
 	./src/time/time_manager.cpp
 	./src/time/timer.cpp
+	./src/color.cpp
 	./src/endianness.cpp
 	./src/log.cpp
 	./src/resource_manager.cpp
